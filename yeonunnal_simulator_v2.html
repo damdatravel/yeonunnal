@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>여는날 — 내 행사 만들기</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=Noto+Sans+KR:wght@300;400;500&display=swap');
+
+  :root {
+    --ink: #1a1610;
+    --paper: #faf8f4;
+    --cream: #f2ede4;
+    --gold: #c8a96e;
+    --gold-light: #e8d5a8;
+    --muted: #8a7d6a;
+    --line: #e0d8cc;
+    --white: #ffffff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--ink);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 20px;
+    color: var(--gold);
+    letter-spacing: 0.08em;
+  }
+  .logo span { color: #fff; font-weight: 300; font-size: 13px; margin-left: 10px; opacity: 0.6; }
+
+  /* HERO */
+  .hero {
+    background: var(--ink);
+    padding: 48px 24px 56px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: 50%; transform: translateX(-50%);
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(200,169,110,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-size: 13px;
+    color: var(--gold);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: clamp(34px, 7vw, 54px);
+    color: var(--white);
+    font-weight: 300;
+    line-height: 1.4;
+    margin-bottom: 16px;
+  }
+  .hero h1 em {
+    color: var(--gold);
+    font-style: normal;
+  }
+  .hero p {
+    color: rgba(255,255,255,0.5);
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  /* STEP INDICATOR */
+  .steps-bar {
+    background: var(--cream);
+    border-bottom: 1px solid var(--line);
+    padding: 0 24px;
+    display: flex;
+    overflow-x: auto;
+    gap: 0;
+    scrollbar-width: none;
+  }
+  .steps-bar::-webkit-scrollbar { display: none; }
+  .step-tab {
+    flex: none;
+    padding: 14px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    cursor: default;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .step-tab.active {
+    color: var(--ink);
+    border-bottom-color: var(--gold);
+    font-weight: 500;
+  }
+  .step-tab.done { color: var(--gold); }
+  .step-num {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--line);
+    font-size: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 500;
+  }
+  .step-tab.active .step-num { background: var(--gold); color: #fff; }
+  .step-tab.done .step-num { background: var(--gold); color: #fff; }
+
+  /* MAIN */
+  main { padding: 24px 16px 120px; max-width: 480px; margin: 0 auto; }
+
+  /* SECTION */
+  .section { display: none; animation: fadeUp 0.3s ease; }
+  .section.active { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 26px;
+    font-weight: 400;
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+  .section-sub {
+    font-size: 15px;
+    color: var(--muted);
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  /* CARD GRID */
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .card-grid.single { grid-template-columns: 1fr; }
+  .card-grid.triple { grid-template-columns: 1fr 1fr 1fr; }
+
+  .option-card {
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 14px;
+    cursor: pointer;
+    transition: all 0.18s;
+    background: var(--white);
+    position: relative;
+  }
+  .option-card:hover { border-color: var(--gold-light); background: #fffdf9; }
+  .option-card.selected {
+    border-color: var(--gold);
+    background: #fffbf2;
+    box-shadow: 0 0 0 3px rgba(200,169,110,0.15);
+  }
+  .option-card .emoji { font-size: 28px; margin-bottom: 10px; display: block; }
+  .option-card .card-name {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.4;
+    margin-bottom: 5px;
+  }
+  .option-card .card-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .option-card .card-price {
+    font-size: 14px;
+    color: var(--gold);
+    font-weight: 500;
+    margin-top: 10px;
+  }
+  .check-badge {
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--gold);
+    display: none;
+    align-items: center; justify-content: center;
+  }
+  .check-badge::after {
+    content: '✓';
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .option-card.selected .check-badge { display: flex; }
+
+  /* SLIDER */
+  .slider-wrap { margin-bottom: 24px; }
+  .slider-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .slider-label span { font-size: 13px; color: var(--muted); }
+  .slider-val {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 22px;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .slider-val small { font-size: 13px; font-weight: 300; color: var(--muted); }
+  input[type=range] {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 3px;
+    background: var(--line);
+    border-radius: 2px;
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--gold);
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(200,169,110,0.4);
+  }
+  .slider-marks {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+  }
+  .slider-marks span { font-size: 10px; color: var(--muted); }
+
+  /* OPTION TOGGLES */
+  .toggle-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+  .toggle-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    background: var(--white);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .toggle-item.selected { border-color: var(--gold); background: #fffbf2; }
+  .toggle-left { display: flex; align-items: center; gap: 12px; }
+  .toggle-emoji { font-size: 18px; width: 28px; text-align: center; }
+  .toggle-name { font-size: 13px; font-weight: 500; }
+  .toggle-desc { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .toggle-price { font-size: 12px; color: var(--gold); font-weight: 500; white-space: nowrap; }
+  .toggle-check {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid var(--line);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .toggle-item.selected .toggle-check {
+    background: var(--gold);
+    border-color: var(--gold);
+  }
+  .toggle-item.selected .toggle-check::after {
+    content: '✓';
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  /* QUOTE CARD */
+  .quote-card {
+    background: var(--ink);
+    border-radius: 16px;
+    padding: 28px 24px;
+    margin-bottom: 20px;
+    color: var(--white);
+  }
+  .quote-card .q-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .quote-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 13px;
+  }
+  .quote-line:last-of-type { border-bottom: none; }
+  .quote-line .ql-name { color: rgba(255,255,255,0.6); }
+  .quote-line .ql-val { font-weight: 400; color: var(--white); }
+  .quote-total {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(200,169,110,0.4);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .quote-total .qt-label { font-size: 13px; color: rgba(255,255,255,0.7); }
+  .quote-total .qt-price {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 28px;
+    color: var(--gold);
+  }
+  .quote-total .qt-price small { font-size: 14px; }
+
+  .notice-box {
+    background: var(--cream);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+  .notice-box strong { color: var(--ink); font-weight: 500; }
+
+  /* CONTACT FORM */
+  .form-group { margin-bottom: 16px; }
+  .form-group label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    letter-spacing: 0.05em;
+  }
+  .form-group input, .form-group textarea, .form-group select {
+    width: 100%;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 14px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 300;
+    background: var(--white);
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+    border-color: var(--gold);
+  }
+  .form-group textarea { resize: none; height: 80px; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--white);
+    border-top: 1px solid var(--line);
+    padding: 12px 16px 20px;
+    display: flex;
+    gap: 10px;
+    z-index: 100;
+  }
+  .btn {
+    flex: 1;
+    padding: 14px;
+    border-radius: 10px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+  .btn-prev {
+    background: var(--cream);
+    color: var(--muted);
+    flex: 0 0 80px;
+  }
+  .btn-prev:hover { background: var(--line); }
+  .btn-next {
+    background: var(--gold);
+    color: var(--white);
+  }
+  .btn-next:hover { background: #b8945a; }
+  .btn-next:disabled { background: var(--line); color: var(--muted); cursor: not-allowed; }
+  .btn-submit {
+    background: var(--ink);
+    color: var(--white);
+  }
+  .btn-submit:hover { background: #2a2418; }
+
+  /* MINI QUOTE BAR */
+  .mini-quote {
+    background: rgba(200,169,110,0.12);
+    border: 1px solid var(--gold-light);
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .mq-label { font-size: 11px; color: var(--muted); }
+  .mq-price { font-family: 'Noto Serif KR', serif; font-size: 18px; color: var(--gold); font-weight: 600; }
+
+  /* SUCCESS */
+  .success-wrap { text-align: center; padding: 40px 0; }
+  .success-icon { font-size: 52px; margin-bottom: 20px; }
+  .success-title { font-family: 'Noto Serif KR', serif; font-size: 22px; margin-bottom: 10px; }
+  .success-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
+  .success-info {
+    background: var(--cream);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 24px 0;
+    text-align: left;
+  }
+  .si-row { display: flex; gap: 10px; margin-bottom: 8px; font-size: 13px; }
+  .si-row:last-child { margin-bottom: 0; }
+  .si-label { color: var(--muted); flex: 0 0 70px; }
+  .si-val { color: var(--ink); font-weight: 500; }
+
+  /* SPACE PREVIEW */
+  .space-preview {
+    background: var(--cream);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    display: none;
+  }
+  .space-preview.show { display: block; }
+  .sp-title { font-size: 12px; color: var(--gold); font-weight: 500; margin-bottom: 6px; }
+  .sp-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">여는날 <span>Yeonunnal</span></div>
+</header>
+
+<div class="hero">
+  <div class="hero-eyebrow">당신의 새로운 날을 엽니다</div>
+  <h1>내 <em>특별한 날</em>을<br>직접 만들어보세요</h1>
+  <p>행사 유형부터 옵션까지 선택하면<br>바로 견적을 확인할 수 있어요</p>
+</div>
+
+<!-- STEP BAR -->
+<div class="steps-bar">
+  <div class="step-tab active" id="tab-0"><div class="step-num">1</div> 행사 선택</div>
+  <div class="step-tab" id="tab-1"><div class="step-num">2</div> 공간 · 날짜</div>
+  <div class="step-tab" id="tab-2"><div class="step-num">3</div> 인원 · 규모</div>
+  <div class="step-tab" id="tab-3"><div class="step-num">4</div> 옵션 구성</div>
+  <div class="step-tab" id="tab-4"><div class="step-num">5</div> 견적 확인</div>
+  <div class="step-tab" id="tab-5"><div class="step-num">6</div> 상담 예약</div>
+</div>
+
+<main>
+
+  <!-- STEP 1: 행사 유형 -->
+  <div class="section active" id="step-0">
+    <div class="section-title">어떤 날을 여실 건가요?</div>
+    <div class="section-sub">행사 유형을 선택해주세요</div>
+    <div class="card-grid">
+      <div class="option-card" data-group="event" data-val="wedding" data-base="4500000" onclick="selectCard(this)">
+        <div class="check-badge"></div>
+        <span class="emoji">💍</span>
+        <div class="card-name">여는날 웨딩</div>
+        <div class="card-desc">야외 가든 웨딩<br>최대 100명</div>
+        <div class="card-price">450만원~</div>
+      </div>
+      <div class="option-card" data-group="event" data-val="cinema" data-base="5500000" onclick="selectCard(this)">
+        <div class="check-badge"></div>
+        <span class="emoji">🎬</span>
+        <div class="card-name">시네마 웨딩</div>
+        <div class="card-desc">영화 장면 재현<br>최대 100명</div>
+        <div class="card-price">550만원~</div>
+      </div>
+      <div class="option-card" data-group="event" data-val="propose" data-base="500000" onclick="selectCard(this)">
+        <div class="check-badge"></div>
+        <span class="emoji">💌</span>
+        <div class="card-name">프로포즈</div>
+        <div class="card-desc">나만의 특별한<br>프로포즈 연출</div>
+        <div class="card-price">50만원~</div>
+      </div>
+      <div class="option-card" data-group="event" data-val="remind" data-base="3800000" onclick="selectCard(this)">
+        <div class="check-badge"></div>
+        <span class="emoji">💑</span>
+        <div class="card-name">다시 여는날</div>
+        <div class="card-desc">결혼기념일<br>리마인드 웨딩</div>
+        <div class="card-price">380만원~</div>
+      </div>
+      <div class="option-card" data-group="event" data-val="dol" data-base="1500000" onclick="selectCard(this)">
+        <div class="check-badge"></div>
+        <span class="emoji">👶</span>
+        <div class="card-name">백일 · 돌잔치</div>
+        <div class="card-desc">소중한 아이의<br>첫 번째 파티</div>
+        <div class="card-price">100만원~</div>
+      </div>
+      <div class="option-card" data-group="event" data-val="party" data-base="800000" onclick="selectCard(this)">
+        <div class="check-badge"></div>
+        <span class="emoji">🎉</span>
+        <div class="card-name">생일 · 파티</div>
+        <div class="card-desc">특별한 날을<br>더 특별하게</div>
+        <div class="card-price">80만원~</div>
+      </div>
+      <div class="option-card" data-group="event" data-val="parents" data-base="3000000" onclick="selectCard(this)">
+        <div class="check-badge"></div>
+        <span class="emoji">👨‍👩‍👧</span>
+        <div class="card-name">부모님의 여는날</div>
+        <div class="card-desc">효도 웨딩<br>10~20명</div>
+        <div class="card-price">300만원~</div>
+      </div>
+      <div class="option-card" data-group="event" data-val="corporate" data-base="0" onclick="selectCard(this)">
+        <div class="check-badge"></div>
+        <span class="emoji">🏢</span>
+        <div class="card-name">기업 · 단체 행사</div>
+        <div class="card-desc">팀빌딩, 기념식<br>50명 이상</div>
+        <div class="card-price">별도 협의</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: 공간 · 날짜 -->
+  <div class="section" id="step-1">
+    <div class="section-title">어디서 여실 건가요?</div>
+    <div class="section-sub">영종도의 각 공간은 분위기가 달라요</div>
+    <div class="card-grid single">
+      <div class="option-card" data-group="space" data-val="yedan" data-add="0" onclick="selectCard(this)">
+        <div class="check-badge"></div>
+        <span class="emoji">🌿</span>
+        <div class="card-name">여는날 in 예단 — 카페 예단 가든</div>
+        <div class="card-desc">정원·가든 컨셉 / 웨딩·시네마·파티 최적 / 영종도 예단포 위치</div>
+        <div class="card-price">기본 포함</div>
+      </div>
+      <div class="option-card" data-group="space" data-val="eulwang" data-add="0" onclick="selectCard(this)">
+        <div class="check-badge"></div>
+        <span class="emoji">🌊</span>
+        <div class="card-name">여는날 in 을왕 — 을왕리 해변</div>
+        <div class="card-desc">해변·선셋 컨셉 / 웨딩·프로포즈 / 노을이 배경이 되는 공간</div>
+        <div class="card-price">기본 포함</div>
+      </div>
+      <div class="option-card" data-group="space" data-val="masian" data-add="0" onclick="selectCard(this)">
+        <div class="check-badge"></div>
+        <span class="emoji">🌲</span>
+        <div class="card-name">여는날 in 마시안 — 마시안 해변·숲</div>
+        <div class="card-desc">소나무 숲·노을 컨셉 / 리마인드·시네마·프로포즈 / 나이트도 가능</div>
+        <div class="card-price">기본 포함</div>
+      </div>
+    </div>
+
+    <div id="space-preview-yedan" class="space-preview">
+      <div class="sp-title">🌿 카페 예단 가든</div>
+      <div class="sp-desc">정원과 가든이 어우러진 공간. 영국 정원 웨딩, 초원 소박 웨딩 등 시네마 컨셉 촬영에 최적화. 실내+야외 복합 구성 가능.</div>
+    </div>
+    <div id="space-preview-eulwang" class="space-preview">
+      <div class="sp-title">🌊 을왕리 해변</div>
+      <div class="sp-desc">인천의 대표 해변. 그리스 해변 웨딩, 선셋 프로포즈 연출 최적. 조수 시간 사전 조율 필요.</div>
+    </div>
+    <div id="space-preview-masian" class="space-preview">
+      <div class="sp-title">🌲 마시안 해변·소나무 숲</div>
+      <div class="sp-desc">소나무 숲과 해변이 함께하는 공간. 전통 혼례, 숲속 신비 웨딩 컨셉 연출. 나이트 재즈 웨딩도 가능.</div>
+    </div>
+
+    <div class="section-title" style="margin-top:8px; font-size:16px;">희망 날짜</div>
+    <div class="section-sub" style="margin-bottom:12px;">대략적인 시기를 알려주세요</div>
+    <div class="card-grid triple">
+      <div class="option-card" data-group="season" data-val="spring" data-add="0" onclick="selectCard(this)">
+        <div class="check-badge"></div>
+        <span class="emoji">🌸</span>
+        <div class="card-name" style="font-size:12px;">봄 (3~5월)</div>
+      </div>
+      <div class="option-card" data-group="season" data-val="summer" data-add="0" onclick="selectCard(this)">
+        <div class="check-badge"></div>
+        <span class="emoji">☀️</span>
+        <div class="card-name" style="font-size:12px;">여름 (6~8월)</div>
+      </div>
+      <div class="option-card" data-group="season" data-val="fall" data-add="0" onclick="selectCard(this)">
+        <div class="check-badge"></div>
+        <span class="emoji">🍂</span>
+        <div class="card-name" style="font-size:12px;">가을 (9~11월)</div>
+      </div>
+      <div class="option-card" data-group="season" data-val="winter" data-add="0" onclick="selectCard(this)">
+        <div class="check-badge"></div>
+        <span class="emoji">❄️</span>
+        <div class="card-name" style="font-size:12px;">겨울 (12~2월)</div>
+      </div>
+      <div class="option-card" data-group="season" data-val="undecided" data-add="0" onclick="selectCard(this)">
+        <div class="check-badge"></div>
+        <span class="emoji">🗓️</span>
+        <div class="card-name" style="font-size:12px;">미정</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: 인원 -->
+  <div class="section" id="step-2">
+    <div class="section-title">몇 분이 함께하시나요?</div>
+    <div class="section-sub">예상 인원을 설정해주세요<br>인원에 따라 케이터링 비용이 달라져요</div>
+
+    <div class="slider-wrap">
+      <div class="slider-label">
+        <span>하객 / 참석 인원</span>
+        <div class="slider-val"><span id="guest-num">30</span><small> 명</small></div>
+      </div>
+      <input type="range" id="guest-slider" min="2" max="100" value="30" step="1" oninput="updateGuest(this.value)">
+      <div class="slider-marks">
+        <span>2명</span><span>25명</span><span>50명</span><span>75명</span><span>100명</span>
+      </div>
+    </div>
+
+    <div class="notice-box">
+      <strong>인원별 케이터링 기준</strong><br>
+      10명 이하 — 핑거푸드 뷔페 권장<br>
+      10~50명 — 출장 뷔페 or 도시락 세트<br>
+      50명 이상 — 정찬 뷔페 구성 가능
+    </div>
+  </div>
+
+  <!-- STEP 4: 옵션 -->
+  <div class="section" id="step-3">
+    <div class="section-title">어떻게 꾸밀까요?</div>
+    <div class="section-sub">원하는 옵션을 선택해주세요 (복수 선택 가능)</div>
+
+    <div id="mini-quote-bar" class="mini-quote">
+      <span class="mq-label">현재 예상 견적</span>
+      <span class="mq-price" id="mini-price">계산 중</span>
+    </div>
+
+    <div class="toggle-list">
+      <div class="toggle-item" data-add="500000" onclick="toggleOption(this)">
+        <div class="toggle-left">
+          <span class="toggle-emoji">🎵</span>
+          <div>
+            <div class="toggle-name">버스킹 퍼포머</div>
+            <div class="toggle-desc">라이브 음악 — 어쿠스틱·재즈·클래식 선택</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div class="toggle-price">+50만원~</div>
+          <div class="toggle-check"></div>
+        </div>
+      </div>
+      <div class="toggle-item" data-add="300000" onclick="toggleOption(this)">
+        <div class="toggle-left">
+          <span class="toggle-emoji">📸</span>
+          <div>
+            <div class="toggle-name">스냅 사진 촬영</div>
+            <div class="toggle-desc">전문 스냅작가 4시간 촬영 · 원본 전달</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div class="toggle-price">+30만원~</div>
+          <div class="toggle-check"></div>
+        </div>
+      </div>
+      <div class="toggle-item" data-add="500000" onclick="toggleOption(this)">
+        <div class="toggle-left">
+          <span class="toggle-emoji">🎥</span>
+          <div>
+            <div class="toggle-name">영상 촬영 · 편집</div>
+            <div class="toggle-desc">시네마틱 하이라이트 영상 제작</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div class="toggle-price">+50만원~</div>
+          <div class="toggle-check"></div>
+        </div>
+      </div>
+      <div class="toggle-item" data-add="300000" onclick="toggleOption(this)">
+        <div class="toggle-left">
+          <span class="toggle-emoji">💐</span>
+          <div>
+            <div class="toggle-name">플라워 장식</div>
+            <div class="toggle-desc">부케·아치·테이블 플라워 구성</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div class="toggle-price">+30만원~</div>
+          <div class="toggle-check"></div>
+        </div>
+      </div>
+      <div class="toggle-item" data-add="400000" onclick="toggleOption(this)">
+        <div class="toggle-left">
+          <span class="toggle-emoji">💄</span>
+          <div>
+            <div class="toggle-name">헤어 · 메이크업</div>
+            <div class="toggle-desc">전담 메이크업 아티스트 출장</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div class="toggle-price">+40만원~</div>
+          <div class="toggle-check"></div>
+        </div>
+      </div>
+      <div class="toggle-item" data-add="200000" onclick="toggleOption(this)">
+        <div class="toggle-left">
+          <span class="toggle-emoji">🎆</span>
+          <div>
+            <div class="toggle-name">불꽃 · 특수 효과</div>
+            <div class="toggle-desc">콜드 스파크 · 버블 · 스모그 연출</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div class="toggle-price">+20만원~</div>
+          <div class="toggle-check"></div>
+        </div>
+      </div>
+      <div class="toggle-item" data-add="150000" onclick="toggleOption(this)">
+        <div class="toggle-left">
+          <span class="toggle-emoji">🎁</span>
+          <div>
+            <div class="toggle-name">하객 답례품</div>
+            <div class="toggle-desc">여는날 브랜드 답례품 세트</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div class="toggle-price">+15만원~</div>
+          <div class="toggle-check"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 5: 견적 확인 -->
+  <div class="section" id="step-4">
+    <div class="section-title">예상 견적입니다</div>
+    <div class="section-sub">선택하신 옵션 기준이에요<br>실제 견적은 상담 후 확정돼요</div>
+
+    <div class="quote-card">
+      <div class="q-label">여는날 견적서</div>
+      <div class="quote-line">
+        <span class="ql-name">행사 유형</span>
+        <span class="ql-val" id="q-event">—</span>
+      </div>
+      <div class="quote-line">
+        <span class="ql-name">공간</span>
+        <span class="ql-val" id="q-space">—</span>
+      </div>
+      <div class="quote-line">
+        <span class="ql-name">시즌</span>
+        <span class="ql-val" id="q-season">—</span>
+      </div>
+      <div class="quote-line">
+        <span class="ql-name">인원</span>
+        <span class="ql-val" id="q-guest">—</span>
+      </div>
+      <div class="quote-line">
+        <span class="ql-name">기본 패키지</span>
+        <span class="ql-val" id="q-base">—</span>
+      </div>
+      <div class="quote-line">
+        <span class="ql-name">케이터링 (인당 3만원)</span>
+        <span class="ql-val" id="q-catering">—</span>
+      </div>
+      <div class="quote-line">
+        <span class="ql-name">추가 옵션</span>
+        <span class="ql-val" id="q-options">—</span>
+      </div>
+      <div class="quote-total">
+        <span class="qt-label">예상 합계</span>
+        <span class="qt-price" id="q-total">—<small>원</small></span>
+      </div>
+    </div>
+
+    <div class="notice-box">
+      <strong>안내사항</strong><br>
+      · 위 견적은 예상 금액으로, 실제 상담 후 확정됩니다<br>
+      · 케이터링 메뉴에 따라 인당 단가가 달라질 수 있어요<br>
+      · 버스킹 퍼포머 장르 선택에 따라 추가 비용이 있을 수 있어요<br>
+      · 날짜·시간대에 따라 공간 이용료가 조정될 수 있어요
+    </div>
+  </div>
+
+  <!-- STEP 6: 상담 예약 -->
+  <div class="section" id="step-5">
+    <div class="section-title">상담을 예약해드릴게요</div>
+    <div class="section-sub">연락처를 남겨주시면 담당자가<br>24시간 내에 연락드려요</div>
+
+    <div id="final-summary" class="notice-box" style="margin-bottom:20px;">
+    </div>
+
+    <div class="form-group">
+      <label>이름</label>
+      <input type="text" id="f-name" placeholder="이름을 입력해주세요">
+    </div>
+    <div class="form-group">
+      <label>연락처</label>
+      <input type="tel" id="f-phone" placeholder="010-0000-0000">
+    </div>
+    <div class="form-group">
+      <label>카카오톡 ID (선택)</label>
+      <input type="text" id="f-kakao" placeholder="카카오톡 ID를 입력해주세요">
+    </div>
+    <div class="form-group">
+      <label>희망 상담 시간대</label>
+      <select id="f-time">
+        <option value="">선택해주세요</option>
+        <option>오전 (10시~12시)</option>
+        <option>오후 (13시~17시)</option>
+        <option>저녁 (18시~20시)</option>
+        <option>언제든 괜찮아요</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>추가 요청사항 (선택)</label>
+      <textarea id="f-memo" placeholder="특별히 원하시는 컨셉이나 요청사항을 자유롭게 적어주세요"></textarea>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="section" id="step-success">
+    <div class="success-wrap">
+      <div class="success-icon">🎊</div>
+      <div class="success-title">예약 접수 완료!</div>
+      <div class="success-desc">담당자가 확인 후<br>24시간 내 연락드릴게요</div>
+      <div class="success-info" id="success-detail"></div>
+      <div class="notice-box">
+        더 빠른 상담을 원하시면<br>
+        <strong>카카오채널 @여는날</strong>으로 연락주세요
+      </div>
+      <a href="http://pf.kakao.com/_XExfXX/chat" target="_blank"
+         style="display:block;background:#FEE500;color:#3A1D1D;text-align:center;padding:14px;font-size:15px;font-weight:500;margin-top:16px;border-radius:8px;text-decoration:none;">
+        💬 카카오채널 바로 상담하기
+      </a>
+    </div>
+  </div>
+
+</main>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav" id="bottom-nav">
+  <button class="btn btn-prev" id="btn-prev" onclick="prevStep()" style="display:none">이전</button>
+  <button class="btn btn-next" id="btn-next" onclick="nextStep()">시작하기 →</button>
+</div>
+
+<script>
+  let currentStep = 0;
+  const totalSteps = 6;
+
+  const state = {
+    event: null, eventName: '', basePrice: 0,
+    space: null, spaceName: '',
+    season: null, seasonName: '',
+    guests: 30,
+    options: [], optionTotal: 0
+  };
+
+  const eventNames = {
+    wedding: '여는날 웨딩', cinema: '시네마 웨딩', propose: '프로포즈',
+    remind: '다시 여는날 (리마인드)', dol: '백일·돌잔치', party: '생일·파티',
+    parents: '부모님의 여는날', corporate: '기업·단체 행사'
+  };
+  const spaceNames = {
+    yedan: '카페 예단 가든', eulwang: '을왕리 해변', masian: '마시안 해변·숲'
+  };
+  const seasonNames = {
+    spring: '봄 (3~5월)', summer: '여름 (6~8월)', fall: '가을 (9~11월)',
+    winter: '겨울 (12~2월)', undecided: '미정'
+  };
+
+  function selectCard(el) {
+    const group = el.dataset.group;
+    document.querySelectorAll(`[data-group="${group}"]`).forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+
+    if (group === 'event') {
+      state.event = el.dataset.val;
+      state.eventName = eventNames[state.event];
+      state.basePrice = parseInt(el.dataset.base) || 0;
+    } else if (group === 'space') {
+      state.space = el.dataset.val;
+      state.spaceName = spaceNames[state.space];
+      document.querySelectorAll('.space-preview').forEach(p => p.classList.remove('show'));
+      const preview = document.getElementById('space-preview-' + state.space);
+      if (preview) preview.classList.add('show');
+    } else if (group === 'season') {
+      state.season = el.dataset.val;
+      state.seasonName = seasonNames[state.season];
+    }
+    updateNextBtn();
+    calcTotal();
+  }
+
+  function toggleOption(el) {
+    el.classList.toggle('selected');
+    const add = parseInt(el.dataset.add) || 0;
+    if (el.classList.contains('selected')) {
+      state.optionTotal += add;
+    } else {
+      state.optionTotal -= add;
+    }
+    calcTotal();
+  }
+
+  function updateGuest(val) {
+    state.guests = parseInt(val);
+    document.getElementById('guest-num').textContent = val;
+    calcTotal();
+  }
+
+  function calcTotal() {
+    const catering = state.guests * 30000;
+    const total = state.basePrice + catering + state.optionTotal;
+    const mini = document.getElementById('mini-price');
+    if (mini) mini.textContent = total > 0 ? fmt(total) + '원~' : '—';
+    return { total, catering };
+  }
+
+  function fmt(n) {
+    if (n >= 10000000) return Math.round(n / 10000).toLocaleString() + '만';
+    if (n >= 1000000) return (n / 10000).toFixed(0) + '만';
+    return n.toLocaleString();
+  }
+
+  function fmtFull(n) {
+    if (n === 0) return '별도 협의';
+    const man = Math.floor(n / 10000);
+    return man.toLocaleString() + '만원';
+  }
+
+  function updateNextBtn() {
+    const btn = document.getElementById('btn-next');
+    if (currentStep === 0 && !state.event) {
+      btn.disabled = true; btn.textContent = '행사를 선택해주세요';
+    } else if (currentStep === 1 && (!state.space || !state.season)) {
+      btn.disabled = true; btn.textContent = '공간과 시즌을 선택해주세요';
+    } else {
+      btn.disabled = false;
+      btn.textContent = currentStep === totalSteps - 2 ? '상담 예약하기 →' :
+                        currentStep === totalSteps - 1 ? '제출하기 ✓' : '다음 →';
+    }
+  }
+
+  function buildQuote() {
+    const { total, catering } = calcTotal();
+    document.getElementById('q-event').textContent = state.eventName;
+    document.getElementById('q-space').textContent = state.spaceName || '—';
+    document.getElementById('q-season').textContent = state.seasonName || '—';
+    document.getElementById('q-guest').textContent = state.guests + '명';
+    document.getElementById('q-base').textContent = fmtFull(state.basePrice);
+    document.getElementById('q-catering').textContent = fmtFull(catering);
+    document.getElementById('q-options').textContent = state.optionTotal > 0 ? fmtFull(state.optionTotal) : '없음';
+    document.getElementById('q-total').innerHTML = total > 0 ? fmt(total) + '<small>원~</small>' : '별도 협의';
+  }
+
+  function buildFinalSummary() {
+    const { total } = calcTotal();
+    document.getElementById('final-summary').innerHTML =
+      `<strong>📋 선택하신 내용</strong><br>
+      ${state.eventName} · ${state.spaceName || '공간 미선택'} · ${state.guests}명<br>
+      예상 견적 <strong>${total > 0 ? fmtFull(total) + '~' : '별도 협의'}</strong>`;
+  }
+
+  function nextStep() {
+    if (currentStep === totalSteps - 1) {
+      submitForm(); return;
+    }
+    document.getElementById(`step-${currentStep}`).classList.remove('active');
+    document.getElementById(`tab-${currentStep}`).classList.remove('active');
+    document.getElementById(`tab-${currentStep}`).classList.add('done');
+    currentStep++;
+    document.getElementById(`step-${currentStep}`).classList.add('active');
+    document.getElementById(`tab-${currentStep}`).classList.add('active');
+
+    if (currentStep === 4) buildQuote();
+    if (currentStep === 5) buildFinalSummary();
+
+    document.getElementById('btn-prev').style.display = 'block';
+    updateNextBtn();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // scroll tab into view
+    const tab = document.getElementById(`tab-${currentStep}`);
+    tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }
+
+  function prevStep() {
+    document.getElementById(`step-${currentStep}`).classList.remove('active');
+    document.getElementById(`tab-${currentStep}`).classList.remove('active');
+    currentStep--;
+    document.getElementById(`step-${currentStep}`).classList.add('active');
+    document.getElementById(`tab-${currentStep}`).classList.add('active');
+    document.getElementById(`tab-${currentStep}`).classList.remove('done');
+    if (currentStep === 0) document.getElementById('btn-prev').style.display = 'none';
+    updateNextBtn();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const tab = document.getElementById(`tab-${currentStep}`);
+    tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }
+
+  function submitForm() {
+    const name = document.getElementById('f-name').value.trim();
+    const phone = document.getElementById('f-phone').value.trim();
+    if (!name || !phone) {
+      alert('이름과 연락처를 입력해주세요');
+      return;
+    }
+    document.getElementById(`step-${currentStep}`).classList.remove('active');
+    document.getElementById(`tab-${currentStep}`).classList.remove('active');
+    document.getElementById(`tab-${currentStep}`).classList.add('done');
+    document.getElementById('step-success').classList.add('active');
+    document.getElementById('bottom-nav').style.display = 'none';
+
+    const { total } = calcTotal();
+    document.getElementById('success-detail').innerHTML =
+      `<div class="si-row"><span class="si-label">이름</span><span class="si-val">${name}</span></div>
+       <div class="si-row"><span class="si-label">연락처</span><span class="si-val">${phone}</span></div>
+       <div class="si-row"><span class="si-label">행사</span><span class="si-val">${state.eventName}</span></div>
+       <div class="si-row"><span class="si-label">공간</span><span class="si-val">${state.spaceName || '미선택'}</span></div>
+       <div class="si-row"><span class="si-label">인원</span><span class="si-val">${state.guests}명</span></div>
+       <div class="si-row"><span class="si-label">예상견적</span><span class="si-val">${total > 0 ? fmtFull(total) + '~' : '별도 협의'}</span></div>`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // init
+  updateNextBtn();
+</script>
+</body>
+</html>
