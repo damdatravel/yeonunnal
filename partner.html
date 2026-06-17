@@ -78,7 +78,26 @@
     font-size: 12px; color: var(--muted); line-height: 1.7; margin-bottom: 24px;
   }
   .notice-box strong { color: var(--ink); font-weight:500; }
+
+  /* SOCIAL LOGIN */
+  .social-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .social-btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 13px; border-radius: 8px; font-size: 14px; font-weight: 500;
+    cursor: pointer; border: 1.5px solid var(--line); transition: all 0.15s;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+  .social-btn:hover { transform: translateY(-1px); }
+  .social-btn.kakao { background: #FEE500; color: #3A1D1D; border-color: #FEE500; }
+  .social-btn.google { background: var(--white); color: var(--ink); }
+  .social-btn.naver { background: #03C75A; color: var(--white); border-color: #03C75A; }
+  .social-icon { width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; }
+
+  .divider { display: flex; align-items: center; gap: 12px; margin: 24px 0; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+  .divider span { font-size: 12px; color: var(--muted); }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -96,7 +115,21 @@
   <!-- LOGIN -->
   <div class="panel active" id="panel-login">
     <div class="page-title">협력사 로그인</div>
-    <div class="page-sub">등록된 협력사 계정으로 로그인해주세요<br>정산 내역과 신청 현황을 확인할 수 있어요</div>
+    <div class="page-sub">간편 로그인으로 빠르게 시작하세요<br>정산 내역과 신청 현황을 확인할 수 있어요</div>
+
+    <div class="social-list">
+      <button class="social-btn kakao" onclick="socialLogin('kakao')">
+        <span class="social-icon">💬</span> 카카오로 로그인
+      </button>
+      <button class="social-btn google" onclick="socialLogin('google')">
+        <span class="social-icon">G</span> 구글로 로그인
+      </button>
+      <button class="social-btn naver" onclick="socialLogin('naver')">
+        <span class="social-icon">N</span> 네이버로 로그인
+      </button>
+    </div>
+
+    <div class="divider"><span>또는</span></div>
 
     <div class="form-group">
       <label>아이디 (이메일)</label>
@@ -106,7 +139,7 @@
       <label>비밀번호</label>
       <input type="password" placeholder="비밀번호 입력">
     </div>
-    <button class="btn-submit" onclick="alert('로그인 기능은 준비 중입니다. 카카오채널로 문의해주세요.')">로그인</button>
+    <button class="btn-submit" onclick="alert('이메일 로그인 기능은 준비 중입니다. 소셜 로그인을 이용해주세요.')">로그인</button>
     <a href="#" class="helper-link" onclick="showPanel('apply'); return false;">아직 협력사가 아니신가요? 협력 신청하기 →</a>
   </div>
 
@@ -154,12 +187,55 @@
 </main>
 
 <script>
+  // Supabase 초기화
+  const SUPABASE_URL = 'https://ntldrtnpewfvechqxjzj.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_rmTxWljULBYeHVnswvJkKw_FaJ6KNXB';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
   function showPanel(name) {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
     document.getElementById('panel-' + name).classList.add('active');
     document.getElementById('tab-' + name).classList.add('active');
   }
+
+  async function socialLogin(provider) {
+    // 카카오·구글은 기본 제공자, 네이버는 Custom Provider(custom:naver)
+    const providerName = provider === 'naver' ? 'custom:naver' : provider;
+    const { error } = await sb.auth.signInWithOAuth({
+      provider: providerName,
+      options: { redirectTo: window.location.origin + '/partner.html' }
+    });
+    if (error) {
+      alert('로그인 중 문제가 발생했습니다: ' + error.message);
+    }
+  }
+
+  // 로그인 후 돌아왔을 때 세션 확인
+  async function checkSession() {
+    const { data } = await sb.auth.getSession();
+    if (data.session) {
+      const user = data.session.user;
+      const name = user.user_metadata?.full_name || user.user_metadata?.name || user.email || '협력사 회원';
+      document.getElementById('panel-login').innerHTML = `
+        <div class="page-title">환영합니다, ${name}님</div>
+        <div class="page-sub">협력사 계정으로 로그인되었습니다</div>
+        <div class="notice-box">
+          <strong>로그인 정보</strong><br>
+          이메일: ${user.email || '제공되지 않음'}<br>
+          로그인 방식: ${user.app_metadata?.provider || '-'}
+        </div>
+        <button class="btn-submit" onclick="logout()">로그아웃</button>
+      `;
+    }
+  }
+
+  async function logout() {
+    await sb.auth.signOut();
+    location.reload();
+  }
+
+  checkSession();
 </script>
 </body>
 </html>
