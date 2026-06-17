@@ -451,7 +451,26 @@
   .space-preview.show { display: block; }
   .sp-title { font-size: 12px; color: var(--gold); font-weight: 500; margin-bottom: 6px; }
   .sp-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+  /* SOCIAL LOGIN */
+  .social-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .social-btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 13px; border-radius: 8px; font-size: 14px; font-weight: 500;
+    cursor: pointer; border: 1.5px solid var(--line); transition: all 0.15s;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+  .social-btn:hover { transform: translateY(-1px); }
+  .social-btn.kakao { background: #FEE500; color: #3A1D1D; border-color: #FEE500; }
+  .social-btn.google { background: var(--white); color: var(--ink); }
+  .social-btn.naver { background: #03C75A; color: var(--white); border-color: #03C75A; }
+  .social-icon { width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; }
+
+  .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+  .divider span { font-size: 12px; color: var(--muted); }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -615,7 +634,21 @@
   <!-- STEP 2: 정보입력 + 공간 · 날짜 -->
   <div class="section" id="step-1">
     <div class="section-title">잠시, 연락처만 남겨주세요</div>
-    <div class="section-sub">견적 결과를 저장해두고<br>담당자가 맞춤 상담을 도와드릴게요</div>
+    <div class="section-sub">간편 로그인으로 자동 입력하거나<br>직접 입력해주세요</div>
+
+    <div class="social-list">
+      <button class="social-btn kakao" type="button" onclick="socialLogin('kakao')">
+        <span class="social-icon">💬</span> 카카오로 간편입력
+      </button>
+      <button class="social-btn google" type="button" onclick="socialLogin('google')">
+        <span class="social-icon">G</span> 구글로 간편입력
+      </button>
+      <button class="social-btn naver" type="button" onclick="socialLogin('naver')">
+        <span class="social-icon">N</span> 네이버로 간편입력
+      </button>
+    </div>
+
+    <div class="divider"><span>또는 직접 입력</span></div>
 
     <div class="form-group">
       <label>이름</label>
@@ -946,6 +979,34 @@
 </div>
 
 <script>
+  // Supabase 초기화
+  const SUPABASE_URL = 'https://ntldrtnpewfvechqxjzj.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_rmTxWljULBYeHVnswvJkKw_FaJ6KNXB';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  async function socialLogin(provider) {
+    const providerName = provider === 'naver' ? 'custom:naver' : provider;
+    // 현재 진행 중인 견적 단계를 기억해두기 위해 redirect 후 그대로 simulator 페이지로 복귀
+    const { error } = await sb.auth.signInWithOAuth({
+      provider: providerName,
+      options: { redirectTo: window.location.origin + '/simulator_v2.html' }
+    });
+    if (error) alert('로그인 중 문제가 발생했습니다: ' + error.message);
+  }
+
+  // 로그인 후 돌아왔을 때 이름 자동 입력
+  async function fillFromSession() {
+    const { data } = await sb.auth.getSession();
+    if (data.session) {
+      const user = data.session.user;
+      const name = user.user_metadata?.full_name || user.user_metadata?.name || '';
+      if (name) document.getElementById('f-name-early').value = name;
+      // STEP 2(공간/정보입력) 화면이면 바로 다음 입력 가능 상태로 갱신
+      if (typeof updateNextBtn === 'function') updateNextBtn();
+    }
+  }
+  fillFromSession();
+
   let currentStep = 0;
   const totalSteps = 6;
 
