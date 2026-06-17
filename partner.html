@@ -202,9 +202,12 @@
   async function socialLogin(provider) {
     // 카카오·구글은 기본 제공자, 네이버는 Custom Provider(custom:naver)
     const providerName = provider === 'naver' ? 'custom:naver' : provider;
+    const opts = { redirectTo: window.location.origin + '/partner.html' };
+    // 카카오 비즈 앱 전환 완료 — 닉네임/프로필/이메일 동의항목 요청
+    if (provider === 'kakao') opts.scopes = 'profile_nickname profile_image account_email';
     const { error } = await sb.auth.signInWithOAuth({
       provider: providerName,
-      options: { redirectTo: window.location.origin + '/partner.html' }
+      options: opts
     });
     if (error) {
       alert('로그인 중 문제가 발생했습니다: ' + error.message);
