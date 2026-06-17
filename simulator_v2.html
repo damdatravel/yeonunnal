@@ -664,10 +664,10 @@
     <div class="card-grid single">
       <div class="option-card" data-group="space" data-val="yedan" data-add="0" onclick="selectCard(this)">
         <div class="check-badge"></div>
-        <img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=700&q=80" alt="카페 예단 가든" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:12px;">
+        <img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=700&q=80" alt="여는날 in 영종" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:12px;">
         <span class="emoji">🌿</span>
-        <div class="card-name">여는날 in 예단 — 카페 예단 가든</div>
-        <div class="card-desc">정원·가든 컨셉 / 웨딩·시네마·파티 최적 / 영종도 예단포 위치</div>
+        <div class="card-name">여는날 in 영종</div>
+        <div class="card-desc">정원·가든 컨셉 / 웨딩·시네마·파티 최적 / 영종도 위치</div>
         <div class="card-price">기본 포함</div>
       </div>
       <div class="option-card" data-group="space" data-val="eulwang" data-add="0" onclick="selectCard(this)">
@@ -676,7 +676,7 @@
         <span class="emoji">🌊</span>
         <div class="card-name">여는날 in 을왕 — 을왕리 해변</div>
         <div class="card-desc">해변·선셋 컨셉 / 웨딩·프로포즈 / 노을이 배경이 되는 공간</div>
-        <div class="card-price">기본 포함</div>
+        <div class="card-price" style="color:var(--muted);">장소 협의 중</div>
       </div>
       <div class="option-card" data-group="space" data-val="masian" data-add="0" onclick="selectCard(this)">
         <div class="check-badge"></div>
@@ -684,21 +684,21 @@
         <span class="emoji">🌲</span>
         <div class="card-name">여는날 in 마시안 — 마시안 해변·숲</div>
         <div class="card-desc">소나무 숲·노을 컨셉 / 리마인드·시네마·프로포즈 / 나이트도 가능</div>
-        <div class="card-price">기본 포함</div>
+        <div class="card-price" style="color:var(--muted);">장소 협의 중</div>
       </div>
     </div>
 
     <div id="space-preview-yedan" class="space-preview">
-      <div class="sp-title">🌿 카페 예단 가든</div>
+      <div class="sp-title">🌿 여는날 in 영종</div>
       <div class="sp-desc">정원과 가든이 어우러진 공간. 영국 정원 웨딩, 초원 소박 웨딩 등 시네마 컨셉 촬영에 최적화. 실내+야외 복합 구성 가능.</div>
     </div>
     <div id="space-preview-eulwang" class="space-preview">
-      <div class="sp-title">🌊 을왕리 해변</div>
-      <div class="sp-desc">인천의 대표 해변. 그리스 해변 웨딩, 선셋 프로포즈 연출 최적. 조수 시간 사전 조율 필요.</div>
+      <div class="sp-title">🌊 을왕리 해변 <span style="color:var(--muted);font-weight:400;">(장소 협의 중)</span></div>
+      <div class="sp-desc">인천의 대표 해변. 그리스 해변 웨딩, 선셋 프로포즈 연출 최적. 조수 시간 사전 조율 필요. 현재 장소 섭외를 진행 중이며, 확정 전까지는 상담을 통해 일정을 조율해드립니다.</div>
     </div>
     <div id="space-preview-masian" class="space-preview">
-      <div class="sp-title">🌲 마시안 해변·소나무 숲</div>
-      <div class="sp-desc">소나무 숲과 해변이 함께하는 공간. 전통 혼례, 숲속 신비 웨딩 컨셉 연출. 나이트 재즈 웨딩도 가능.</div>
+      <div class="sp-title">🌲 마시안 해변·소나무 숲 <span style="color:var(--muted);font-weight:400;">(장소 협의 중)</span></div>
+      <div class="sp-desc">소나무 숲과 해변이 함께하는 공간. 전통 혼례, 숲속 신비 웨딩 컨셉 연출. 나이트 재즈 웨딩도 가능. 현재 장소 섭외를 진행 중이며, 확정 전까지는 상담을 통해 일정을 조율해드립니다.</div>
     </div>
 
     <div class="section-title" style="margin-top:8px; font-size:16px;">희망 날짜</div>
@@ -1055,7 +1055,7 @@
     parents: '부모님의 여는날', corporate: '기업·단체 행사'
   };
   const spaceNames = {
-    yedan: '카페 예단 가든', eulwang: '을왕리 해변', masian: '마시안 해변·숲'
+    yedan: '여는날 in 영종', eulwang: '을왕리 해변 (협의 중)', masian: '마시안 해변·숲 (협의 중)'
   };
   const seasonNames = {
     spring: '봄 (3~5월)', summer: '여름 (6~8월)', fall: '가을 (9~11월)',
