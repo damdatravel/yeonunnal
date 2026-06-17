@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>여는날 — 내 행사 만들기</title>
+<title>여는날 — 간편 견적내기</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=Noto+Sans+KR:wght@300;400;500&display=swap');
 
@@ -465,14 +465,14 @@
 
 <div class="hero">
   <div class="hero-eyebrow">당신의 새로운 날을 엽니다</div>
-  <h1>내 <em>특별한 날</em>을<br>직접 만들어보세요</h1>
+  <h1>간편 <em>견적내기</em></h1>
   <p>행사 유형부터 옵션까지 선택하면<br>바로 견적을 확인할 수 있어요</p>
 </div>
 
 <!-- STEP BAR -->
 <div class="steps-bar">
   <div class="step-tab active" id="tab-0"><div class="step-num">1</div> 행사 선택</div>
-  <div class="step-tab" id="tab-1"><div class="step-num">2</div> 공간 · 날짜</div>
+  <div class="step-tab" id="tab-1"><div class="step-num">2</div> 정보 · 공간 · 날짜</div>
   <div class="step-tab" id="tab-2"><div class="step-num">3</div> 인원 · 규모</div>
   <div class="step-tab" id="tab-3"><div class="step-num">4</div> 옵션 구성</div>
   <div class="step-tab" id="tab-4"><div class="step-num">5</div> 견적 확인</div>
@@ -612,13 +612,26 @@
     </div>
   </div>
 
-  <!-- STEP 2: 공간 · 날짜 -->
+  <!-- STEP 2: 정보입력 + 공간 · 날짜 -->
   <div class="section" id="step-1">
-    <div class="section-title">어디서 여실 건가요?</div>
+    <div class="section-title">잠시, 연락처만 남겨주세요</div>
+    <div class="section-sub">견적 결과를 저장해두고<br>담당자가 맞춤 상담을 도와드릴게요</div>
+
+    <div class="form-group">
+      <label>이름</label>
+      <input type="text" id="f-name-early" placeholder="이름을 입력해주세요">
+    </div>
+    <div class="form-group" style="margin-bottom:28px;">
+      <label>연락처</label>
+      <input type="tel" id="f-phone-early" placeholder="010-0000-0000">
+    </div>
+
+    <div class="section-title" style="font-size:22px;">어디서 여실 건가요?</div>
     <div class="section-sub">영종도의 각 공간은 분위기가 달라요</div>
     <div class="card-grid single">
       <div class="option-card" data-group="space" data-val="yedan" data-add="0" onclick="selectCard(this)">
         <div class="check-badge"></div>
+        <img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=700&q=80" alt="카페 예단 가든" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:12px;">
         <span class="emoji">🌿</span>
         <div class="card-name">여는날 in 예단 — 카페 예단 가든</div>
         <div class="card-desc">정원·가든 컨셉 / 웨딩·시네마·파티 최적 / 영종도 예단포 위치</div>
@@ -626,6 +639,7 @@
       </div>
       <div class="option-card" data-group="space" data-val="eulwang" data-add="0" onclick="selectCard(this)">
         <div class="check-badge"></div>
+        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=700&q=80" alt="을왕리 해변 선셋" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:12px;">
         <span class="emoji">🌊</span>
         <div class="card-name">여는날 in 을왕 — 을왕리 해변</div>
         <div class="card-desc">해변·선셋 컨셉 / 웨딩·프로포즈 / 노을이 배경이 되는 공간</div>
@@ -633,6 +647,7 @@
       </div>
       <div class="option-card" data-group="space" data-val="masian" data-add="0" onclick="selectCard(this)">
         <div class="check-badge"></div>
+        <img src="https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=700&q=80" alt="마시안 해변 소나무 숲" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:12px;">
         <span class="emoji">🌲</span>
         <div class="card-name">여는날 in 마시안 — 마시안 해변·숲</div>
         <div class="card-desc">소나무 숲·노을 컨셉 / 리마인드·시네마·프로포즈 / 나이트도 가능</div>
@@ -810,6 +825,19 @@
           <div class="toggle-check"></div>
         </div>
       </div>
+      <div class="toggle-item" data-add="400000" onclick="toggleOption(this)">
+        <div class="toggle-left">
+          <span class="toggle-emoji">🚚</span>
+          <div>
+            <div class="toggle-name">푸드트럭 · 음료바</div>
+            <div class="toggle-desc">이동형 푸드트럭 — 포토존 겸용</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div class="toggle-price">+40만원~</div>
+          <div class="toggle-check"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -866,19 +894,11 @@
   <!-- STEP 6: 상담 예약 -->
   <div class="section" id="step-5">
     <div class="section-title">상담을 예약해드릴게요</div>
-    <div class="section-sub">연락처를 남겨주시면 담당자가<br>24시간 내에 연락드려요</div>
+    <div class="section-sub">남겨주신 연락처로 담당자가<br>24시간 내에 연락드려요</div>
 
     <div id="final-summary" class="notice-box" style="margin-bottom:20px;">
     </div>
 
-    <div class="form-group">
-      <label>이름</label>
-      <input type="text" id="f-name" placeholder="이름을 입력해주세요">
-    </div>
-    <div class="form-group">
-      <label>연락처</label>
-      <input type="tel" id="f-phone" placeholder="010-0000-0000">
-    </div>
     <div class="form-group">
       <label>카카오톡 ID (선택)</label>
       <input type="text" id="f-kakao" placeholder="카카오톡 ID를 입력해주세요">
@@ -1045,8 +1065,16 @@
     const btn = document.getElementById('btn-next');
     if (currentStep === 0 && !state.event) {
       btn.disabled = true; btn.textContent = '행사를 선택해주세요';
-    } else if (currentStep === 1 && (!state.space || !state.season)) {
-      btn.disabled = true; btn.textContent = '공간과 시즌을 선택해주세요';
+    } else if (currentStep === 1) {
+      const name = document.getElementById('f-name-early').value.trim();
+      const phone = document.getElementById('f-phone-early').value.trim();
+      if (!name || !phone) {
+        btn.disabled = true; btn.textContent = '이름과 연락처를 입력해주세요';
+      } else if (!state.space || !state.season) {
+        btn.disabled = true; btn.textContent = '공간과 시즌을 선택해주세요';
+      } else {
+        btn.disabled = false; btn.textContent = '다음 →';
+      }
     } else {
       btn.disabled = false;
       btn.textContent = currentStep === totalSteps - 2 ? '상담 예약하기 →' :
@@ -1112,8 +1140,8 @@
   }
 
   function submitForm() {
-    const name = document.getElementById('f-name').value.trim();
-    const phone = document.getElementById('f-phone').value.trim();
+    const name = document.getElementById('f-name-early').value.trim();
+    const phone = document.getElementById('f-phone-early').value.trim();
     if (!name || !phone) {
       alert('이름과 연락처를 입력해주세요');
       return;
@@ -1137,6 +1165,8 @@
 
   // init
   updateNextBtn();
+  document.getElementById('f-name-early').addEventListener('input', updateNextBtn);
+  document.getElementById('f-phone-early').addEventListener('input', updateNextBtn);
 </script>
 </body>
 </html>
