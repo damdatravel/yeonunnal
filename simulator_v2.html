@@ -469,6 +469,16 @@
   .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
   .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }
   .divider span { font-size: 12px; color: var(--muted); }
+
+  .login-status {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--cream); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px;
+    font-size: 13px; color: var(--ink);
+  }
+  .login-status button {
+    background: none; border: none; color: var(--muted); font-size: 12px;
+    text-decoration: underline; cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+  }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
@@ -635,6 +645,8 @@
   <div class="section" id="step-1">
     <div class="section-title">잠시, 연락처만 남겨주세요</div>
     <div class="section-sub">간편 로그인으로 자동 입력하거나<br>직접 입력해주세요</div>
+
+    <div id="login-status-box"></div>
 
     <div class="social-list">
       <button class="social-btn kakao" type="button" onclick="socialLogin('kakao')">
@@ -997,18 +1009,35 @@
     if (error) alert('로그인 중 문제가 발생했습니다: ' + error.message);
   }
 
-  // 로그인 후 돌아왔을 때 이름 자동 입력
+  // 로그인 후 돌아왔을 때 이름 자동 입력 + 로그인 상태 표시
   async function fillFromSession() {
     const { data } = await sb.auth.getSession();
     if (data.session) {
       const user = data.session.user;
       const name = user.user_metadata?.full_name || user.user_metadata?.name || '';
       if (name) document.getElementById('f-name-early').value = name;
-      // STEP 2(공간/정보입력) 화면이면 바로 다음 입력 가능 상태로 갱신
+
+      const provider = user.app_metadata?.provider || '';
+      const providerLabel = provider === 'kakao' ? '카카오' : provider === 'google' ? '구글' : provider;
+      const box = document.getElementById('login-status-box');
+      if (box) {
+        box.innerHTML = `
+          <div class="login-status">
+            <span>${providerLabel ? providerLabel + ' 계정으로 로그인됨' : '로그인됨'} ${name ? '· ' + name + '님' : ''}</span>
+            <button type="button" onclick="logoutSimulator()">로그아웃</button>
+          </div>`;
+      }
+      document.querySelector('.social-list').style.display = 'none';
+
       if (typeof updateNextBtn === 'function') updateNextBtn();
     }
   }
   fillFromSession();
+
+  async function logoutSimulator() {
+    await sb.auth.signOut();
+    location.reload();
+  }
 
   let currentStep = 0;
   const totalSteps = 6;
