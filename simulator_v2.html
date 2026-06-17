@@ -987,9 +987,12 @@
   async function socialLogin(provider) {
     const providerName = provider === 'naver' ? 'custom:naver' : provider;
     // 현재 진행 중인 견적 단계를 기억해두기 위해 redirect 후 그대로 simulator 페이지로 복귀
+    const opts = { redirectTo: window.location.origin + '/simulator_v2.html' };
+    // 카카오 비즈 앱 전환 완료 — 닉네임/프로필/이메일 동의항목 요청
+    if (provider === 'kakao') opts.scopes = 'profile_nickname profile_image account_email';
     const { error } = await sb.auth.signInWithOAuth({
       provider: providerName,
-      options: { redirectTo: window.location.origin + '/simulator_v2.html' }
+      options: opts
     });
     if (error) alert('로그인 중 문제가 발생했습니다: ' + error.message);
   }
