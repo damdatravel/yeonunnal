@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>여는날 — 협력사 로그인</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=Noto+Sans+KR:wght@300;400;500&display=swap');
+
+  :root {
+    --ink: #1a1610;
+    --paper: #faf8f4;
+    --cream: #f2ede4;
+    --gold: #c8a96e;
+    --gold-light: #e8d5a8;
+    --muted: #8a7d6a;
+    --line: #e0d8cc;
+    --white: #ffffff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+  }
+  header {
+    background: var(--ink);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo { font-family: 'Noto Serif KR', serif; font-size: 20px; color: var(--gold); letter-spacing: 0.08em; text-decoration:none; }
+  .home-link { color: var(--muted); font-size: 13px; text-decoration: none; display:flex; align-items:center; gap:6px; }
+  .home-link:hover { color: var(--gold); }
+
+  main { max-width: 420px; margin: 0 auto; padding: 56px 24px 80px; }
+
+  .tabs { display: flex; gap: 0; margin-bottom: 32px; border-bottom: 1px solid var(--line); }
+  .tab-btn {
+    flex: 1; text-align: center; padding: 14px 0; font-size: 14px; color: var(--muted);
+    border-bottom: 2px solid transparent; cursor: pointer; background: none; border-top:none; border-left:none; border-right:none;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+  .tab-btn.active { color: var(--ink); border-bottom-color: var(--gold); font-weight: 500; }
+
+  .panel { display: none; }
+  .panel.active { display: block; animation: fadeUp 0.25s ease; }
+  @keyframes fadeUp { from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+
+  .page-title { font-family:'Noto Serif KR', serif; font-size: 24px; margin-bottom: 8px; }
+  .page-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
+
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display:block; font-size:12px; color:var(--muted); margin-bottom:6px; letter-spacing:0.05em; }
+  .form-group input, .form-group select, .form-group textarea {
+    width:100%; border:1.5px solid var(--line); border-radius:8px; padding:12px 14px;
+    font-size:14px; font-family:'Noto Sans KR', sans-serif; font-weight:300; background:var(--white);
+    color:var(--ink); outline:none; transition:border-color 0.15s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--gold); }
+  .form-group textarea { resize:none; height:80px; }
+
+  .btn-submit {
+    width:100%; background:var(--gold); color:var(--white); border:none; border-radius:8px;
+    padding:14px; font-size:15px; font-weight:500; cursor:pointer; margin-top:8px;
+    font-family:'Noto Sans KR', sans-serif; transition: background 0.2s;
+  }
+  .btn-submit:hover { background:#b8945a; }
+
+  .helper-link { display:block; text-align:center; font-size:12px; color:var(--muted); margin-top:16px; text-decoration:none; }
+  .helper-link:hover { color: var(--gold); }
+
+  .notice-box {
+    background: var(--cream); border-radius: 10px; padding: 14px 16px;
+    font-size: 12px; color: var(--muted); line-height: 1.7; margin-bottom: 24px;
+  }
+  .notice-box strong { color: var(--ink); font-weight:500; }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo">여는날</a>
+  <a href="index.html" class="home-link">← 홈으로</a>
+</header>
+
+<main>
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-login" onclick="showPanel('login')">로그인</button>
+    <button class="tab-btn" id="tab-apply" onclick="showPanel('apply')">협력 신청</button>
+  </div>
+
+  <!-- LOGIN -->
+  <div class="panel active" id="panel-login">
+    <div class="page-title">협력사 로그인</div>
+    <div class="page-sub">등록된 협력사 계정으로 로그인해주세요<br>정산 내역과 신청 현황을 확인할 수 있어요</div>
+
+    <div class="form-group">
+      <label>아이디 (이메일)</label>
+      <input type="email" placeholder="partner@example.com">
+    </div>
+    <div class="form-group">
+      <label>비밀번호</label>
+      <input type="password" placeholder="비밀번호 입력">
+    </div>
+    <button class="btn-submit" onclick="alert('로그인 기능은 준비 중입니다. 카카오채널로 문의해주세요.')">로그인</button>
+    <a href="#" class="helper-link" onclick="showPanel('apply'); return false;">아직 협력사가 아니신가요? 협력 신청하기 →</a>
+  </div>
+
+  <!-- APPLY -->
+  <div class="panel" id="panel-apply">
+    <div class="page-title">협력 신청</div>
+    <div class="page-sub">플로리스트, 스냅·영상, 헤어메이크업, 푸드트럭, 답례품 등<br>여는날과 함께할 협력사를 찾고 있어요</div>
+
+    <div class="notice-box">
+      <strong>안내</strong><br>
+      신청서 검토 후 영업일 기준 2~3일 내 카카오채널로 연락드려요
+    </div>
+
+    <div class="form-group">
+      <label>업체명</label>
+      <input type="text" placeholder="업체명을 입력해주세요">
+    </div>
+    <div class="form-group">
+      <label>담당자 이름</label>
+      <input type="text" placeholder="이름을 입력해주세요">
+    </div>
+    <div class="form-group">
+      <label>연락처</label>
+      <input type="tel" placeholder="010-0000-0000">
+    </div>
+    <div class="form-group">
+      <label>협력 분야</label>
+      <select>
+        <option value="">선택해주세요</option>
+        <option>플로리스트 · 꽃장식</option>
+        <option>스냅 · 영상 촬영</option>
+        <option>헤어 · 메이크업</option>
+        <option>푸드트럭 · 음료바</option>
+        <option>답례품</option>
+        <option>버스킹 · 음악</option>
+        <option>기타</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>소개 / 포트폴리오 링크 (선택)</label>
+      <textarea placeholder="간단한 소개나 인스타그램, 포트폴리오 링크를 남겨주세요"></textarea>
+    </div>
+    <button class="btn-submit" onclick="alert('신청이 접수되었습니다. 빠르게 연락드릴게요!')">신청서 제출</button>
+  </div>
+</main>
+
+<script>
+  function showPanel(name) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    document.getElementById('tab-' + name).classList.add('active');
+  }
+</script>
+</body>
+</html>
