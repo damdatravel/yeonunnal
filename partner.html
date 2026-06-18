@@ -107,7 +107,31 @@
     text-decoration: underline; cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
   }
 
-  /* ── 카카오톡 플로팅 버튼 ── */
+  /* ── 대시보드 ── */
+  .project-card{background:var(--white);border:1.5px solid var(--line);border-radius:12px;padding:18px;margin-bottom:12px;transition:border-color .2s;}
+  .project-card:hover{border-color:var(--gold-light);}
+  .project-card.closed{opacity:.55;}
+  .pc-title{font-family:'Noto Serif KR',serif;font-size:15px;font-weight:400;margin-bottom:6px;}
+  .pc-meta{font-size:12px;color:var(--muted);line-height:1.8;}
+  .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500;margin-bottom:8px;}
+  .badge-open{background:rgba(39,174,96,.12);color:#27ae60;}
+  .badge-closed{background:var(--cream);color:var(--muted);}
+  .btn-respond{display:inline-block;background:var(--gold);color:var(--white);border:none;border-radius:6px;
+    padding:8px 18px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;margin-top:10px;}
+  .btn-respond:hover{background:#b8945a;}
+  .btn-responded{background:var(--cream);color:var(--muted);border:1px solid var(--line);border-radius:6px;
+    padding:8px 18px;font-size:13px;cursor:default;font-family:'Noto Sans KR',sans-serif;margin-top:10px;}
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;}
+  .modal-box{background:var(--white);border-radius:12px;padding:28px 24px;max-width:420px;width:100%;}
+  .modal-title{font-family:'Noto Serif KR',serif;font-size:18px;margin-bottom:6px;}
+  .modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;}
+  .participate-btns{display:flex;gap:10px;margin-bottom:16px;}
+  .pbtn{flex:1;padding:12px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;
+    border:1.5px solid var(--line);background:var(--white);font-family:'Noto Sans KR',sans-serif;transition:all .15s;}
+  .pbtn.yes.selected{background:rgba(39,174,96,.1);border-color:#27ae60;color:#27ae60;}
+  .pbtn.no.selected{background:rgba(192,57,43,.08);border-color:#c0392b;color:#c0392b;}
+  .pbtn:hover{border-color:var(--gold);}
+ */
   .kakao-float {
     position: fixed;
     right: 20px;
@@ -192,6 +216,7 @@
   <div class="tabs">
     <button class="tab-btn active" id="tab-login" onclick="showPanel('login')">로그인</button>
     <button class="tab-btn" id="tab-apply" onclick="showPanel('apply')">협력 신청</button>
+    <button class="tab-btn" id="tab-dashboard" onclick="showPanel('dashboard')" style="display:none">📋 공고 현황</button>
   </div>
 
   <!-- LOGIN -->
@@ -272,7 +297,40 @@
     </label>
     <button class="btn-submit" id="ap-submit-btn" onclick="submitApplication()">신청서 제출</button>
   </div>
+
+  <!-- DASHBOARD -->
+  <div class="panel" id="panel-dashboard">
+    <div class="page-title">공고 현황</div>
+    <div class="page-sub" id="dashboard-sub">현재 모집 중인 프로젝트를 확인하고 참여 여부를 알려주세요</div>
+    <div id="project-list"><div style="text-align:center;padding:32px 0;color:var(--muted);font-size:14px;">불러오는 중...</div></div>
+  </div>
 </main>
+
+<!-- 참여 신청 모달 -->
+<div class="modal-overlay" id="respond-modal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-project-title">프로젝트명</div>
+    <div class="modal-sub" id="modal-project-meta"></div>
+    <div class="participate-btns">
+      <button class="pbtn yes" id="pbtn-yes" onclick="selectParticipate('참여')">✅ 참여하겠습니다</button>
+      <button class="pbtn no" id="pbtn-no" onclick="selectParticipate('불참')">❌ 이번엔 어렵습니다</button>
+    </div>
+    <div id="price-section">
+      <div class="form-group">
+        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">견적 금액 (원, 선택)</label>
+        <input type="number" id="resp-price" placeholder="예: 350000" style="width:100%;border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;font-size:14px;font-family:'Noto Sans KR',sans-serif;outline:none;">
+      </div>
+      <div class="form-group">
+        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">메모 (선택)</label>
+        <textarea id="resp-memo" placeholder="준비 가능한 내용, 포함/불포함 항목, 조건 등" style="width:100%;border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;resize:none;height:72px;outline:none;"></textarea>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:4px;">
+      <button id="resp-submit-btn" onclick="submitResponse()" style="flex:1;background:var(--gold);color:var(--white);border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">제출하기</button>
+      <button onclick="closeModal()" style="flex:0 0 80px;background:var(--cream);color:var(--muted);border:none;border-radius:8px;padding:12px;font-size:14px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">취소</button>
+    </div>
+  </div>
+</div>
 
 <div class="kakao-float" id="kakaoFloat">
   <div class="kakao-float__tooltip">카카오톡으로 상담하기</div>
@@ -355,8 +413,10 @@
 
     document.getElementById('apply-login-status').innerHTML = statusHtml;
 
-    // 처음 로그인한 협력사라면(신청 이력 확인 전 단계) 곧바로 신청서 작성으로 안내
-    showPanel('apply');
+    // 로그인 성공 시 대시보드 탭 노출 + 대시보드로 이동
+    document.getElementById('tab-dashboard').style.display = 'block';
+    loadDashboard();
+    showPanel('dashboard');
   }
 
   async function logout() {
@@ -430,6 +490,117 @@
       btn.textContent = '신청서 제출';
       btn.disabled = false;
     }
+  }
+
+  // ── 대시보드: 공고 목록 ──
+  let currentProject = null;
+  let selectedParticipate = '';
+  let respondedIds = JSON.parse(localStorage.getItem('respondedIds') || '[]');
+
+  async function loadDashboard() {
+    const el = document.getElementById('project-list');
+    try {
+      const res = await fetch(SHEET_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ type: 'get_projects' })
+      });
+      const data = await res.json();
+      const projects = (data.projects || []).filter(p => p.id);
+      if (projects.length === 0) {
+        el.innerHTML = '<div style="text-align:center;padding:32px 0;color:var(--muted);font-size:14px;">현재 모집 중인 공고가 없습니다</div>'; return;
+      }
+      el.innerHTML = '';
+      projects.slice().reverse().forEach(p => {
+        const isOpen = p.status === '모집중';
+        const responded = respondedIds.includes(p.id);
+        el.innerHTML += `
+          <div class="project-card ${isOpen ? '' : 'closed'}">
+            <span class="badge ${isOpen ? 'badge-open' : 'badge-closed'}">${p.status}</span>
+            <div class="pc-title">${p.title}</div>
+            <div class="pc-meta">
+              📅 행사일: ${p.eventDate} &nbsp;·&nbsp; 📍 장소: ${p.location}<br>
+              🔧 필요 분야: ${p.categories} &nbsp;·&nbsp; ⏰ 마감: ${p.deadline}
+              ${p.detail ? `<br><br>${p.detail}` : ''}
+            </div>
+            ${isOpen
+              ? (responded
+                  ? `<button class="btn-responded">✓ 이미 응답하셨습니다</button>`
+                  : `<button class="btn-respond" onclick="openModal(${JSON.stringify(p)})">참여 여부 알리기</button>`)
+              : ''}
+          </div>`;
+      });
+    } catch(e) {
+      el.innerHTML = '<div style="text-align:center;padding:32px 0;color:var(--muted);">불러오기 실패. 새로고침해주세요.</div>';
+    }
+  }
+
+  function openModal(p) {
+    currentProject = p;
+    selectedParticipate = '';
+    document.getElementById('modal-project-title').textContent = p.title;
+    document.getElementById('modal-project-meta').textContent =
+      `${p.eventDate} · ${p.location} · 마감 ${p.deadline}`;
+    document.getElementById('resp-price').value = '';
+    document.getElementById('resp-memo').value = '';
+    document.getElementById('pbtn-yes').classList.remove('selected');
+    document.getElementById('pbtn-no').classList.remove('selected');
+    document.getElementById('price-section').style.display = 'block';
+    document.getElementById('respond-modal').style.display = 'flex';
+  }
+
+  function closeModal() {
+    document.getElementById('respond-modal').style.display = 'none';
+    currentProject = null;
+    selectedParticipate = '';
+  }
+
+  function selectParticipate(val) {
+    selectedParticipate = val;
+    document.getElementById('pbtn-yes').classList.toggle('selected', val === '참여');
+    document.getElementById('pbtn-no').classList.toggle('selected', val === '불참');
+    document.getElementById('price-section').style.display = val === '참여' ? 'block' : 'none';
+  }
+
+  async function submitResponse() {
+    if (!selectedParticipate) { alert('참여 여부를 선택해주세요.'); return; }
+    if (!currentProject) return;
+
+    const btn = document.getElementById('resp-submit-btn');
+    btn.disabled = true; btn.textContent = '제출 중...';
+
+    try {
+      const res = await fetch(SHEET_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          type: 'submit_response',
+          projectId: currentProject.id,
+          projectTitle: currentProject.title,
+          company: document.getElementById('ap-company') ? document.getElementById('ap-company').value : '',
+          name: document.getElementById('ap-name') ? document.getElementById('ap-name').value : loggedInEmail,
+          phone: document.getElementById('ap-phone') ? document.getElementById('ap-phone').value : '',
+          email: loggedInEmail,
+          participate: selectedParticipate,
+          price: document.getElementById('resp-price').value,
+          memo: document.getElementById('resp-memo').value,
+          userId: loggedInEmail
+        })
+      });
+      const data = await res.json();
+      if (data.duplicate) {
+        alert('이미 이 공고에 응답하셨습니다.');
+      } else {
+        respondedIds.push(currentProject.id);
+        localStorage.setItem('respondedIds', JSON.stringify(respondedIds));
+        alert('응답이 접수되었습니다. 감사합니다!');
+        closeModal();
+        loadDashboard();
+      }
+    } catch(e) {
+      alert('제출 실패. 다시 시도해주세요.');
+    }
+    btn.disabled = false; btn.textContent = '제출하기';
   }
 
   checkSession();
