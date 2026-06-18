@@ -1096,6 +1096,7 @@
   // 구글시트 연동 (Apps Script 웹앱)
   const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzG1GPR8OhMIeBeTFvt7gE5CGiyQx3ggnLiVIah9geT89m-_poYFEwmi9K--NZ0HxDKjg/exec';
   let loggedInProviderLabel = '';
+  let loggedInEmail = '';
 
   async function socialLogin(provider) {
     const providerName = provider === 'naver' ? 'custom:naver' : provider;
@@ -1354,6 +1355,8 @@
           optionsList: selectedOptions,
           totalPrice: total > 0 ? total : '별도 협의',
           loginProvider: loggedInProviderLabel
+          loginProvider: loggedInProviderLabel,
+email: loggedInEmail
         })
       });
     } catch (err) {
@@ -1378,6 +1381,7 @@
     const provider = user.app_metadata?.provider || '';
     const providerLabel = provider === 'kakao' ? '카카오' : provider === 'google' ? '구글' : provider;
     loggedInProviderLabel = providerLabel;
+    loggedInEmail = user.email || '';
     const box = document.getElementById('login-status-box');
     if (box) {
       box.innerHTML = `
