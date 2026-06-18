@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>여는날 — 관리자</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=Noto+Sans+KR:wght@300;400;500&display=swap');
+  :root {
+    --ink:#1a1610;--paper:#faf8f4;--cream:#f2ede4;--gold:#c8a96e;
+    --gold-light:#e8d5a8;--muted:#8a7d6a;--line:#e0d8cc;--white:#ffffff;
+    --red:#c0392b;--green:#27ae60;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-serif;font-weight:300;min-height:100vh;}
+  header{background:var(--ink);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
+  .logo{font-family:'Noto Serif KR',serif;font-size:18px;color:var(--gold);letter-spacing:.08em;}
+  .admin-badge{font-size:11px;color:var(--muted);border:1px solid var(--muted);padding:2px 8px;border-radius:4px;}
+  .logout-btn{background:none;border:1px solid var(--muted);color:var(--muted);font-size:12px;padding:4px 12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+  .logout-btn:hover{color:var(--gold);border-color:var(--gold);}
+
+  /* LOGIN */
+  #login-screen{display:flex;align-items:center;justify-content:center;min-height:80vh;padding:24px;}
+  .login-box{background:var(--white);border:1px solid var(--line);padding:40px 32px;max-width:360px;width:100%;}
+  .login-box h2{font-family:'Noto Serif KR',serif;font-size:22px;margin-bottom:8px;}
+  .login-box p{font-size:13px;color:var(--muted);margin-bottom:24px;}
+  .form-group{margin-bottom:14px;}
+  .form-group label{display:block;font-size:11px;color:var(--muted);margin-bottom:5px;letter-spacing:.05em;}
+  .form-group input,.form-group select,.form-group textarea{
+    width:100%;border:1.5px solid var(--line);border-radius:6px;padding:10px 12px;
+    font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--white);color:var(--ink);outline:none;}
+  .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--gold);}
+  .form-group textarea{resize:none;height:72px;}
+  .btn-gold{width:100%;background:var(--gold);color:var(--white);border:none;border-radius:6px;
+    padding:12px;font-size:14px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;margin-top:4px;}
+  .btn-gold:hover{background:#b8945a;}
+  .btn-ink{background:var(--ink);color:var(--white);border:none;border-radius:6px;
+    padding:10px 20px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+  .btn-ink:hover{background:#2a2418;}
+  .btn-danger{background:var(--red);color:var(--white);border:none;border-radius:4px;
+    padding:6px 14px;font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+  .btn-sm{background:var(--cream);color:var(--ink);border:1px solid var(--line);border-radius:4px;
+    padding:5px 12px;font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+  .btn-sm:hover{border-color:var(--gold);}
+
+  /* MAIN */
+  #main-screen{display:none;padding:24px;}
+  .tabs{display:flex;gap:0;border-bottom:1px solid var(--line);margin-bottom:24px;}
+  .tab-btn{padding:12px 20px;font-size:13px;color:var(--muted);border-bottom:2px solid transparent;
+    cursor:pointer;background:none;border-top:none;border-left:none;border-right:none;font-family:'Noto Sans KR',sans-serif;}
+  .tab-btn.active{color:var(--ink);border-bottom-color:var(--gold);font-weight:500;}
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  /* CARDS */
+  .project-card{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:20px;margin-bottom:12px;}
+  .project-card.closed{opacity:.6;}
+  .pc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+  .pc-title{font-family:'Noto Serif KR',serif;font-size:16px;font-weight:400;}
+  .pc-meta{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.7;}
+  .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;}
+  .badge-open{background:rgba(39,174,96,.12);color:var(--green);}
+  .badge-closed{background:var(--cream);color:var(--muted);}
+  .pc-actions{display:flex;gap:8px;margin-top:12px;}
+
+  /* RESPONSE TABLE */
+  .resp-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px;}
+  .resp-table th{background:var(--cream);padding:8px 10px;text-align:left;font-weight:500;border-bottom:1px solid var(--line);}
+  .resp-table td{padding:8px 10px;border-bottom:1px solid var(--line);color:#4a4338;}
+  .resp-table tr:hover td{background:#fffdf9;}
+  .participate-yes{color:var(--green);font-weight:500;}
+  .participate-no{color:var(--red);}
+
+  /* NOTICE */
+  .notice{background:var(--cream);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.7;}
+  .notice strong{color:var(--ink);font-weight:500;}
+  .empty-state{text-align:center;padding:40px 0;color:var(--muted);font-size:14px;}
+
+  /* SECTION TITLE */
+  .section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+  .section-head h3{font-family:'Noto Serif KR',serif;font-size:18px;font-weight:400;}
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <span class="logo">여는날</span>
+    <span class="admin-badge">ADMIN</span>
+  </div>
+  <button class="logout-btn" id="logout-btn" style="display:none" onclick="logout()">로그아웃</button>
+</header>
+
+<!-- 로그인 화면 -->
+<div id="login-screen">
+  <div class="login-box">
+    <h2>관리자 로그인</h2>
+    <p>여는날 운영자 전용 페이지입니다</p>
+    <div class="form-group">
+      <label>비밀번호</label>
+      <input type="password" id="admin-pw" placeholder="관리자 비밀번호 입력" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn-gold" onclick="doLogin()">로그인</button>
+  </div>
+</div>
+
+<!-- 메인 화면 -->
+<div id="main-screen">
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-projects" onclick="showTab('projects')">공고 관리</button>
+    <button class="tab-btn" id="tab-responses" onclick="showTab('responses')">응답 현황</button>
+    <button class="tab-btn" id="tab-new" onclick="showTab('new')">공고 등록</button>
+  </div>
+
+  <!-- 공고 관리 -->
+  <div class="panel active" id="panel-projects">
+    <div class="section-head">
+      <h3>공고 목록</h3>
+      <button class="btn-sm" onclick="loadProjects()">새로고침</button>
+    </div>
+    <div id="project-list"><div class="empty-state">불러오는 중...</div></div>
+  </div>
+
+  <!-- 응답 현황 -->
+  <div class="panel" id="panel-responses">
+    <div class="section-head">
+      <h3>응답 현황</h3>
+    </div>
+    <div class="form-group" style="max-width:320px;margin-bottom:16px;">
+      <label>공고 선택</label>
+      <select id="resp-project-select" onchange="loadResponses()">
+        <option value="">전체 보기</option>
+      </select>
+    </div>
+    <div id="response-area"><div class="empty-state">공고를 선택하세요</div></div>
+  </div>
+
+  <!-- 공고 등록 -->
+  <div class="panel" id="panel-new">
+    <div class="section-head"><h3>새 공고 등록</h3></div>
+    <div style="max-width:540px;">
+      <div class="notice"><strong>안내</strong><br>등록한 공고는 승인된 협력사에게 바로 공개됩니다. 마감일이 지나면 수동으로 마감 처리해주세요.</div>
+      <div class="form-group"><label>행사명 *</label><input type="text" id="n-title" placeholder="예: 여는날 웨딩 2026.08.15"></div>
+      <div class="form-group"><label>행사일 *</label><input type="date" id="n-eventDate"></div>
+      <div class="form-group"><label>장소 *</label><input type="text" id="n-location" placeholder="예: 여는날 in 영종"></div>
+      <div class="form-group">
+        <label>필요 분야 * (복수 선택)</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;" id="cat-checkboxes">
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;" class="form-group">
+            <input type="checkbox" value="플로리스트·꽃장식"> 플로리스트·꽃장식
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;">
+            <input type="checkbox" value="스냅·영상 촬영"> 스냅·영상 촬영
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;">
+            <input type="checkbox" value="헤어·메이크업"> 헤어·메이크업
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;">
+            <input type="checkbox" value="푸드트럭·음료바"> 푸드트럭·음료바
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;">
+            <input type="checkbox" value="답례품"> 답례품
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;">
+            <input type="checkbox" value="버스킹·음악"> 버스킹·음악
+          </label>
+        </div>
+      </div>
+      <div class="form-group"><label>상세 내용</label><textarea id="n-detail" placeholder="협력사에게 전달할 행사 상세 내용, 준비물, 주의사항 등"></textarea></div>
+      <div class="form-group"><label>지원 마감일 *</label><input type="date" id="n-deadline"></div>
+      <button class="btn-gold" style="width:auto;padding:12px 32px;" onclick="postProject()">공고 등록하기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const WEBHOOK = 'https://script.google.com/macros/s/AKfycbzG1GPR8OhMIeBeTFvt7gE5CGiyQx3ggnLiVIah9geT89m-_poYFEwmi9K--NZ0HxDKjg/exec';
+  let adminPw = '';
+  let projects = [];
+
+  // ── 로그인 ──
+  async function doLogin() {
+    const pw = document.getElementById('admin-pw').value;
+    if (!pw) return;
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ type: 'admin_login', password: pw })
+      });
+      const data = await res.json();
+      if (data.auth) {
+        adminPw = pw;
+        sessionStorage.setItem('adminPw', pw);
+        enterAdmin();
+      } else {
+        alert('비밀번호가 맞지 않습니다.');
+      }
+    } catch (e) {
+      alert('연결 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    }
+  }
+
+  function enterAdmin() {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-screen').style.display = 'block';
+    document.getElementById('logout-btn').style.display = 'block';
+    loadProjects();
+  }
+
+  function logout() {
+    adminPw = '';
+    sessionStorage.removeItem('adminPw');
+    location.reload();
+  }
+
+  // ── 탭 전환 ──
+  function showTab(name) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    document.getElementById('tab-' + name).classList.add('active');
+    if (name === 'responses') loadResponses();
+  }
+
+  // ── 공고 목록 ──
+  async function loadProjects() {
+    const el = document.getElementById('project-list');
+    el.innerHTML = '<div class="empty-state">불러오는 중...</div>';
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ type: 'get_projects' })
+      });
+      const data = await res.json();
+      projects = data.projects || [];
+
+      // 응답 현황 셀렉트 업데이트
+      const sel = document.getElementById('resp-project-select');
+      sel.innerHTML = '<option value="">전체 보기</option>';
+      projects.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = p.title;
+        sel.appendChild(opt);
+      });
+
+      if (projects.length === 0) {
+        el.innerHTML = '<div class="empty-state">등록된 공고가 없습니다</div>'; return;
+      }
+
+      el.innerHTML = '';
+      projects.slice().reverse().forEach(p => {
+        const isOpen = p.status === '모집중';
+        el.innerHTML += `
+          <div class="project-card ${isOpen ? '' : 'closed'}">
+            <div class="pc-header">
+              <div>
+                <div class="pc-title">${p.title}</div>
+                <div class="pc-meta">
+                  행사일: ${p.eventDate} &nbsp;·&nbsp; 장소: ${p.location}<br>
+                  필요 분야: ${p.categories} &nbsp;·&nbsp; 마감일: ${p.deadline}
+                </div>
+              </div>
+              <span class="badge ${isOpen ? 'badge-open' : 'badge-closed'}">${p.status}</span>
+            </div>
+            ${p.detail ? `<div style="font-size:12px;color:var(--muted);margin-top:4px;">${p.detail}</div>` : ''}
+            <div class="pc-actions">
+              <button class="btn-sm" onclick="viewResponse('${p.id}')">응답 보기</button>
+              ${isOpen ? `<button class="btn-danger" onclick="closeProject('${p.id}')">마감 처리</button>` : ''}
+            </div>
+          </div>`;
+      });
+    } catch (e) {
+      el.innerHTML = '<div class="empty-state">불러오기 실패. 새로고침해주세요.</div>';
+    }
+  }
+
+  function viewResponse(id) {
+    document.getElementById('resp-project-select').value = id;
+    showTab('responses');
+  }
+
+  // ── 마감 처리 ──
+  async function closeProject(id) {
+    if (!confirm('이 공고를 마감 처리하시겠습니까?')) return;
+    await fetch(WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ type: 'close_project', id, password: adminPw })
+    });
+    loadProjects();
+  }
+
+  // ── 응답 현황 ──
+  async function loadResponses() {
+    const pid = document.getElementById('resp-project-select').value;
+    const el = document.getElementById('response-area');
+    el.innerHTML = '<div class="empty-state">불러오는 중...</div>';
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ type: 'get_responses', projectId: pid, password: adminPw })
+      });
+      const data = await res.json();
+      const resps = data.responses || [];
+      if (resps.length === 0) {
+        el.innerHTML = '<div class="empty-state">응답이 없습니다</div>'; return;
+      }
+      const yesCount = resps.filter(r => r.participate === '참여').length;
+      const noCount = resps.filter(r => r.participate === '불참').length;
+      el.innerHTML = `
+        <div class="notice" style="margin-bottom:12px;">
+          총 <strong>${resps.length}건</strong> &nbsp;·&nbsp; 참여 <strong style="color:var(--green)">${yesCount}</strong>건 &nbsp;·&nbsp; 불참 <strong style="color:var(--red)">${noCount}</strong>건
+        </div>
+        <div style="overflow-x:auto;">
+        <table class="resp-table">
+          <thead>
+            <tr><th>신청일시</th><th>공고명</th><th>업체명</th><th>담당자</th><th>연락처</th><th>이메일</th><th>참여여부</th><th>견적금액</th><th>메모</th></tr>
+          </thead>
+          <tbody>
+            ${resps.map(r => `
+              <tr>
+                <td>${formatDate(r.date)}</td>
+                <td>${r.projectTitle}</td>
+                <td>${r.company}</td>
+                <td>${r.name}</td>
+                <td>${r.phone}</td>
+                <td>${r.email}</td>
+                <td class="${r.participate === '참여' ? 'participate-yes' : 'participate-no'}">${r.participate}</td>
+                <td>${r.price ? Number(r.price).toLocaleString() + '원' : '—'}</td>
+                <td>${r.memo || '—'}</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+        </div>`;
+    } catch (e) {
+      el.innerHTML = '<div class="empty-state">불러오기 실패</div>';
+    }
+  }
+
+  // ── 공고 등록 ──
+  async function postProject() {
+    const title = document.getElementById('n-title').value.trim();
+    const eventDate = document.getElementById('n-eventDate').value;
+    const location = document.getElementById('n-location').value.trim();
+    const deadline = document.getElementById('n-deadline').value;
+    const detail = document.getElementById('n-detail').value.trim();
+    const cats = Array.from(document.querySelectorAll('#cat-checkboxes input:checked')).map(c => c.value).join(', ');
+
+    if (!title || !eventDate || !location || !deadline || !cats) {
+      alert('행사명, 행사일, 장소, 필요 분야, 마감일은 필수입니다.'); return;
+    }
+
+    const btn = event.target;
+    btn.disabled = true; btn.textContent = '등록 중...';
+
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ type: 'post_project', password: adminPw, title, eventDate, location, categories: cats, detail, deadline })
+      });
+      const data = await res.json();
+      if (data.result === 'success') {
+        alert(`공고가 등록되었습니다. (ID: ${data.id})`);
+        document.getElementById('n-title').value = '';
+        document.getElementById('n-eventDate').value = '';
+        document.getElementById('n-location').value = '';
+        document.getElementById('n-detail').value = '';
+        document.getElementById('n-deadline').value = '';
+        document.querySelectorAll('#cat-checkboxes input').forEach(c => c.checked = false);
+        showTab('projects');
+      } else {
+        alert('등록 중 오류: ' + data.message);
+      }
+    } catch(e) {
+      alert('등록 실패. 다시 시도해주세요.');
+    }
+    btn.disabled = false; btn.textContent = '공고 등록하기';
+  }
+
+  function formatDate(d) {
+    if (!d) return '—';
+    const dt = new Date(d);
+    if (isNaN(dt)) return d;
+    return `${dt.getFullYear()}.${String(dt.getMonth()+1).padStart(2,'0')}.${String(dt.getDate()).padStart(2,'0')}`;
+  }
+
+  // 세션 유지
+  window.addEventListener('load', () => {
+    const saved = sessionStorage.getItem('adminPw');
+    if (saved) { adminPw = saved; enterAdmin(); }
+  });
+</script>
+</body>
+</html>
