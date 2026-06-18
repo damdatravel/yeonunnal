@@ -138,10 +138,9 @@
     bottom: 24px;
     z-index: 9999;
     display: flex;
+    flex-direction: row-reverse;
     align-items: center;
     gap: 10px;
-    /* modal-overlay의 transform 영향 차단 */
-    transform: translateZ(0);
   }
 
   .kakao-float__tooltip {
@@ -153,7 +152,6 @@
     font-size: 13px;
     letter-spacing: 0.02em;
     white-space: nowrap;
-    max-width: 160px;
     box-shadow: 0 4px 16px rgba(0,0,0,0.35);
     opacity: 0;
     transform: translateX(8px);
@@ -179,6 +177,7 @@
     text-decoration: none;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     animation: kakao-pulse 2.6s ease-out 1;
+    flex-shrink: 0;
   }
 
   .kakao-float__btn:hover {
