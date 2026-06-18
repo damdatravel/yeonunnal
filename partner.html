@@ -3,207 +3,101 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>여는날 — 협력사 로그인</title>
+<title>여는날 — 협력사 센터</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=Noto+Sans+KR:wght@300;400;500&display=swap');
 
   :root {
-    --ink: #1a1610;
-    --paper: #faf8f4;
-    --cream: #f2ede4;
-    --gold: #c8a96e;
-    --gold-light: #e8d5a8;
-    --muted: #8a7d6a;
-    --line: #e0d8cc;
-    --white: #ffffff;
+    --ink:#1a1610; --paper:#faf8f4; --cream:#f2ede4;
+    --gold:#c8a96e; --gold-light:#e8d5a8; --muted:#8a7d6a;
+    --line:#e0d8cc; --white:#ffffff;
+    --green:#27ae60; --red:#c0392b;
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: var(--paper);
-    color: var(--ink);
-    font-family: 'Noto Sans KR', sans-serif;
-    font-weight: 300;
-    min-height: 100vh;
-  }
-  header {
-    background: var(--ink);
-    padding: 20px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .logo { font-family: 'Noto Serif KR', serif; font-size: 20px; color: var(--gold); letter-spacing: 0.08em; text-decoration:none; }
-  .home-link { color: var(--muted); font-size: 13px; text-decoration: none; display:flex; align-items:center; gap:6px; }
-  .home-link:hover { color: var(--gold); }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-serif;font-weight:300;min-height:100vh;}
 
-  main { max-width: 420px; margin: 0 auto; padding: 56px 24px 80px; }
+  header{background:var(--ink);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;}
+  .logo{font-family:'Noto Serif KR',serif;font-size:20px;color:var(--gold);letter-spacing:.08em;text-decoration:none;}
+  .home-link{color:var(--muted);font-size:13px;text-decoration:none;display:flex;align-items:center;gap:6px;}
+  .home-link:hover{color:var(--gold);}
 
-  .tabs { display: flex; gap: 0; margin-bottom: 32px; border-bottom: 1px solid var(--line); }
-  .tab-btn {
-    flex: 1; text-align: center; padding: 14px 0; font-size: 14px; color: var(--muted);
-    border-bottom: 2px solid transparent; cursor: pointer; background: none; border-top:none; border-left:none; border-right:none;
-    font-family: 'Noto Sans KR', sans-serif;
-  }
-  .tab-btn.active { color: var(--ink); border-bottom-color: var(--gold); font-weight: 500; }
+  main{max-width:480px;margin:0 auto;padding:48px 24px 80px;}
 
-  .panel { display: none; }
-  .panel.active { display: block; animation: fadeUp 0.25s ease; }
-  @keyframes fadeUp { from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+  /* TABS */
+  .tabs{display:flex;gap:0;margin-bottom:32px;border-bottom:1px solid var(--line);}
+  .tab-btn{flex:1;text-align:center;padding:14px 0;font-size:14px;color:var(--muted);
+    border-bottom:2px solid transparent;cursor:pointer;background:none;
+    border-top:none;border-left:none;border-right:none;font-family:'Noto Sans KR',sans-serif;}
+  .tab-btn.active{color:var(--ink);border-bottom-color:var(--gold);font-weight:500;}
+  .panel{display:none;}
+  .panel.active{display:block;animation:fadeUp .25s ease;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 
-  .page-title { font-family:'Noto Serif KR', serif; font-size: 24px; margin-bottom: 8px; }
-  .page-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
+  /* FORM */
+  .page-title{font-family:'Noto Serif KR',serif;font-size:24px;margin-bottom:8px;}
+  .page-sub{font-size:13px;color:var(--muted);margin-bottom:28px;line-height:1.7;}
+  .form-group{margin-bottom:16px;}
+  .form-group label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;letter-spacing:.05em;}
+  .form-group label .req{color:var(--gold);margin-left:2px;}
+  .form-group input,.form-group select,.form-group textarea{
+    width:100%;border:1.5px solid var(--line);border-radius:8px;padding:12px 14px;
+    font-size:14px;font-family:'Noto Sans KR',sans-serif;font-weight:300;
+    background:var(--white);color:var(--ink);outline:none;transition:border-color .15s;}
+  .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--gold);}
+  .form-group textarea{resize:none;height:80px;}
+  .kakao-hint{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.6;}
+  .btn-submit{width:100%;background:var(--gold);color:var(--white);border:none;border-radius:8px;
+    padding:14px;font-size:15px;font-weight:500;cursor:pointer;margin-top:8px;
+    font-family:'Noto Sans KR',sans-serif;transition:background .2s;}
+  .btn-submit:hover{background:#b8945a;}
+  .notice-box{background:var(--cream);border-radius:10px;padding:14px 16px;
+    font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:24px;}
+  .notice-box strong{color:var(--ink);font-weight:500;}
 
-  .form-group { margin-bottom: 16px; }
-  .form-group label { display:block; font-size:12px; color:var(--muted); margin-bottom:6px; letter-spacing:0.05em; }
-  .form-group input, .form-group select, .form-group textarea {
-    width:100%; border:1.5px solid var(--line); border-radius:8px; padding:12px 14px;
-    font-size:14px; font-family:'Noto Sans KR', sans-serif; font-weight:300; background:var(--white);
-    color:var(--ink); outline:none; transition:border-color 0.15s;
-  }
-  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--gold); }
-  .form-group textarea { resize:none; height:80px; }
-
-  .btn-submit {
-    width:100%; background:var(--gold); color:var(--white); border:none; border-radius:8px;
-    padding:14px; font-size:15px; font-weight:500; cursor:pointer; margin-top:8px;
-    font-family:'Noto Sans KR', sans-serif; transition: background 0.2s;
-  }
-  .btn-submit:hover { background:#b8945a; }
-
-  .helper-link { display:block; text-align:center; font-size:12px; color:var(--muted); margin-top:16px; text-decoration:none; }
-  .helper-link:hover { color: var(--gold); }
-
-  .notice-box {
-    background: var(--cream); border-radius: 10px; padding: 14px 16px;
-    font-size: 12px; color: var(--muted); line-height: 1.7; margin-bottom: 24px;
-  }
-  .notice-box strong { color: var(--ink); font-weight:500; }
-
-  /* SOCIAL LOGIN */
-  .social-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
-  .social-btn {
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    width: 100%; padding: 13px; border-radius: 8px; font-size: 14px; font-weight: 500;
-    cursor: pointer; border: 1.5px solid var(--line); transition: all 0.15s;
-    font-family: 'Noto Sans KR', sans-serif;
-  }
-  .social-btn:hover { transform: translateY(-1px); }
-  .social-btn.kakao { background: #FEE500; color: #3A1D1D; border-color: #FEE500; }
-  .social-btn.google { background: var(--white); color: var(--ink); }
-  .social-btn.naver { background: #03C75A; color: var(--white); border-color: #03C75A; }
-  .social-icon { width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; }
-
-  .divider { display: flex; align-items: center; gap: 12px; margin: 24px 0; }
-  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }
-  .divider span { font-size: 12px; color: var(--muted); }
-
-  .login-status {
-    display: flex; align-items: center; justify-content: space-between;
-    background: var(--cream); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px;
-    font-size: 13px; color: var(--ink);
-  }
-  .login-status button {
-    background: none; border: none; color: var(--muted); font-size: 12px;
-    text-decoration: underline; cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
-  }
-
-  /* ── 대시보드 ── */
-  .project-card{background:var(--white);border:1.5px solid var(--line);border-radius:12px;padding:18px;margin-bottom:12px;transition:border-color .2s;}
+  /* PROJECT CARDS */
+  .project-card{background:var(--white);border:1.5px solid var(--line);border-radius:12px;
+    padding:20px;margin-bottom:12px;transition:border-color .2s;}
   .project-card:hover{border-color:var(--gold-light);}
   .project-card.closed{opacity:.55;}
-  .pc-title{font-family:'Noto Serif KR',serif;font-size:15px;font-weight:400;margin-bottom:6px;}
-  .pc-meta{font-size:12px;color:var(--muted);line-height:1.8;}
-  .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500;margin-bottom:8px;}
-  .badge-open{background:rgba(39,174,96,.12);color:#27ae60;}
+  .pc-title{font-family:'Noto Serif KR',serif;font-size:16px;font-weight:400;margin-bottom:8px;}
+  .pc-meta{font-size:12px;color:var(--muted);line-height:1.9;}
+  .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500;margin-bottom:10px;}
+  .badge-open{background:rgba(39,174,96,.12);color:var(--green);}
   .badge-closed{background:var(--cream);color:var(--muted);}
-  .btn-respond{display:inline-block;background:var(--gold);color:var(--white);border:none;border-radius:6px;
-    padding:8px 18px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;margin-top:10px;}
+  .btn-respond{display:inline-block;background:var(--gold);color:var(--white);border:none;
+    border-radius:6px;padding:8px 18px;font-size:13px;font-weight:500;cursor:pointer;
+    font-family:'Noto Sans KR',sans-serif;margin-top:12px;}
   .btn-respond:hover{background:#b8945a;}
-  .btn-responded{background:var(--cream);color:var(--muted);border:1px solid var(--line);border-radius:6px;
-    padding:8px 18px;font-size:13px;cursor:default;font-family:'Noto Sans KR',sans-serif;margin-top:10px;}
-  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;}
+  .btn-responded{background:var(--cream);color:var(--muted);border:1px solid var(--line);
+    border-radius:6px;padding:8px 18px;font-size:13px;cursor:default;
+    font-family:'Noto Sans KR',sans-serif;margin-top:12px;}
+  .empty-state{text-align:center;padding:40px 0;color:var(--muted);font-size:14px;line-height:1.8;}
+
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;
+    display:flex;align-items:center;justify-content:center;padding:16px;}
   .modal-box{background:var(--white);border-radius:12px;padding:28px 24px;max-width:420px;width:100%;}
   .modal-title{font-family:'Noto Serif KR',serif;font-size:18px;margin-bottom:6px;}
   .modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;}
   .participate-btns{display:flex;gap:10px;margin-bottom:16px;}
   .pbtn{flex:1;padding:12px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;
     border:1.5px solid var(--line);background:var(--white);font-family:'Noto Sans KR',sans-serif;transition:all .15s;}
-  .pbtn.yes.selected{background:rgba(39,174,96,.1);border-color:#27ae60;color:#27ae60;}
-  .pbtn.no.selected{background:rgba(192,57,43,.08);border-color:#c0392b;color:#c0392b;}
+  .pbtn.yes.selected{background:rgba(39,174,96,.1);border-color:var(--green);color:var(--green);}
+  .pbtn.no.selected{background:rgba(192,57,43,.08);border-color:var(--red);color:var(--red);}
   .pbtn:hover{border-color:var(--gold);}
- */
-  .kakao-float {
-    position: fixed;
-    right: 20px;
-    bottom: 24px;
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .kakao-float__tooltip {
-    background: #2a2218;
-    color: #f5f0e8;
-    border: 1px solid #c8a96e55;
-    padding: 8px 14px;
-    border-radius: 8px;
-    font-size: 13px;
-    letter-spacing: 0.02em;
-    white-space: nowrap;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.35);
-    opacity: 0;
-    transform: translateX(8px);
-    transition: opacity 0.25s ease, transform 0.25s ease;
-    pointer-events: none;
-  }
-
-  .kakao-float:hover .kakao-float__tooltip,
-  .kakao-float.show-tip .kakao-float__tooltip {
-    opacity: 1;
-    transform: translateX(0);
-  }
-
-  .kakao-float__btn {
-    width: 58px;
-    height: 58px;
-    border-radius: 50%;
-    background: #FEE500;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.4), 0 0 0 0 rgba(254,229,0,0.5);
-    text-decoration: none;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    animation: kakao-pulse 2.6s ease-out 1;
-  }
-
-  .kakao-float__btn:hover {
-    transform: scale(1.08);
-  }
-
-  .kakao-float__btn svg {
-    width: 30px;
-    height: 30px;
-  }
-
-  @keyframes kakao-pulse {
-    0%   { box-shadow: 0 6px 20px rgba(0,0,0,0.4), 0 0 0 0 rgba(254,229,0,0.55); }
-    70%  { box-shadow: 0 6px 20px rgba(0,0,0,0.4), 0 0 0 16px rgba(254,229,0,0); }
-    100% { box-shadow: 0 6px 20px rgba(0,0,0,0.4), 0 0 0 0 rgba(254,229,0,0); }
-  }
-
-  @media (max-width: 480px) {
-    .kakao-float__tooltip { display: none; }
-    .kakao-float { right: 16px; bottom: 16px; }
-    .kakao-float__btn { width: 52px; height: 52px; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .kakao-float__btn { animation: none; }
-  }
+  .modal-form-group{margin-bottom:14px;}
+  .modal-form-group label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;}
+  .modal-form-group input,.modal-form-group textarea{
+    width:100%;border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;
+    font-size:14px;font-family:'Noto Sans KR',sans-serif;outline:none;transition:border-color .15s;}
+  .modal-form-group input:focus,.modal-form-group textarea:focus{border-color:var(--gold);}
+  .modal-form-group textarea{resize:none;height:72px;}
+  .modal-btns{display:flex;gap:10px;margin-top:4px;}
+  .modal-btn-submit{flex:1;background:var(--gold);color:var(--white);border:none;border-radius:8px;
+    padding:12px;font-size:14px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+  .modal-btn-cancel{flex:0 0 72px;background:var(--cream);color:var(--muted);border:none;
+    border-radius:8px;padding:12px;font-size:14px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -214,68 +108,40 @@
 
 <main>
   <div class="tabs">
-    <button class="tab-btn active" id="tab-login" onclick="showPanel('login')">로그인</button>
-    <button class="tab-btn" id="tab-apply" onclick="showPanel('apply')">협력 신청</button>
-    <button class="tab-btn" id="tab-dashboard" onclick="showPanel('dashboard')" style="display:none">📋 공고 현황</button>
+    <button class="tab-btn active" id="tab-apply" onclick="showPanel('apply')">협력 신청</button>
+    <button class="tab-btn" id="tab-projects" onclick="showPanel('projects')">📋 공고 현황</button>
   </div>
 
-  <!-- LOGIN -->
-  <div class="panel active" id="panel-login">
-    <div class="page-title">협력사 로그인</div>
-    <div class="page-sub">간편 로그인으로 빠르게 시작하세요<br>정산 내역과 신청 현황을 확인할 수 있어요</div>
-
-    <div class="social-list">
-      <button class="social-btn kakao" onclick="socialLogin('kakao')">
-        <span class="social-icon">💬</span> 카카오로 로그인
-      </button>
-      <button class="social-btn google" onclick="socialLogin('google')">
-        <span class="social-icon">G</span> 구글로 로그인
-      </button>
-      <button class="social-btn naver" style="opacity:0.5;cursor:not-allowed;" onclick="alert('네이버 로그인은 현재 점검 중입니다. 카카오 또는 구글 로그인을 이용해주세요.')">
-        <span class="social-icon">N</span> 네이버로 로그인 (준비 중)
-      </button>
-    </div>
-
-    <div class="divider"><span>또는</span></div>
-
-    <div class="form-group">
-      <label>아이디 (이메일)</label>
-      <input type="email" placeholder="partner@example.com">
-    </div>
-    <div class="form-group">
-      <label>비밀번호</label>
-      <input type="password" placeholder="비밀번호 입력">
-    </div>
-    <button class="btn-submit" onclick="alert('이메일 로그인 기능은 준비 중입니다. 소셜 로그인을 이용해주세요.')">로그인</button>
-    <a href="#" class="helper-link" onclick="showPanel('apply'); return false;">아직 협력사가 아니신가요? 협력 신청하기 →</a>
-  </div>
-
-  <!-- APPLY -->
-  <div class="panel" id="panel-apply">
+  <!-- 협력 신청 -->
+  <div class="panel active" id="panel-apply">
     <div class="page-title">협력 신청</div>
     <div class="page-sub">플로리스트, 스냅·영상, 헤어메이크업, 푸드트럭, 답례품 등<br>여는날과 함께할 협력사를 찾고 있어요</div>
 
-    <div id="apply-login-status"></div>
-
     <div class="notice-box">
       <strong>안내</strong><br>
-      신청서 검토 후 영업일 기준 2~3일 내 카카오채널로 연락드려요
+      신청서 검토 후 영업일 기준 2~3일 내 카카오톡으로 연락드려요.<br>
+      승인된 협력사에게는 새 행사 공고를 카카오톡으로 먼저 알려드립니다.
     </div>
 
     <div class="form-group">
-      <label>업체명</label>
+      <label>업체명 <span class="req">*</span></label>
       <input type="text" id="ap-company" placeholder="업체명을 입력해주세요">
     </div>
     <div class="form-group">
-      <label>담당자 이름</label>
+      <label>담당자 이름 <span class="req">*</span></label>
       <input type="text" id="ap-name" placeholder="이름을 입력해주세요">
     </div>
     <div class="form-group">
-      <label>연락처</label>
+      <label>연락처 <span class="req">*</span></label>
       <input type="tel" id="ap-phone" placeholder="010-0000-0000">
     </div>
     <div class="form-group">
-      <label>협력 분야</label>
+      <label>카카오톡 ID <span class="req">*</span></label>
+      <input type="text" id="ap-kakao" placeholder="카카오톡 검색용 아이디">
+      <p class="kakao-hint">💬 승인 후 공고 알림 및 소통은 카카오톡으로 진행됩니다.<br>카카오톡 앱 → 더보기 → 설정 → 카카오계정에서 확인하실 수 있어요.</p>
+    </div>
+    <div class="form-group">
+      <label>협력 분야 <span class="req">*</span></label>
       <select id="ap-category">
         <option value="">선택해주세요</option>
         <option>플로리스트 · 꽃장식</option>
@@ -298,141 +164,74 @@
     <button class="btn-submit" id="ap-submit-btn" onclick="submitApplication()">신청서 제출</button>
   </div>
 
-  <!-- DASHBOARD -->
-  <div class="panel" id="panel-dashboard">
+  <!-- 공고 현황 -->
+  <div class="panel" id="panel-projects">
     <div class="page-title">공고 현황</div>
-    <div class="page-sub" id="dashboard-sub">현재 모집 중인 프로젝트를 확인하고 참여 여부를 알려주세요</div>
-    <div id="project-list"><div style="text-align:center;padding:32px 0;color:var(--muted);font-size:14px;">불러오는 중...</div></div>
+    <div class="page-sub">현재 모집 중인 프로젝트를 확인하고 참여 여부를 알려주세요</div>
+    <div id="project-list"><div class="empty-state">불러오는 중...</div></div>
   </div>
 </main>
 
 <!-- 참여 신청 모달 -->
 <div class="modal-overlay" id="respond-modal" style="display:none">
   <div class="modal-box">
-    <div class="modal-title" id="modal-project-title">프로젝트명</div>
+    <div class="modal-title" id="modal-project-title"></div>
     <div class="modal-sub" id="modal-project-meta"></div>
+
     <div class="participate-btns">
       <button class="pbtn yes" id="pbtn-yes" onclick="selectParticipate('참여')">✅ 참여하겠습니다</button>
       <button class="pbtn no" id="pbtn-no" onclick="selectParticipate('불참')">❌ 이번엔 어렵습니다</button>
     </div>
+
     <div id="price-section">
-      <div class="form-group">
-        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">견적 금액 (원, 선택)</label>
-        <input type="number" id="resp-price" placeholder="예: 350000" style="width:100%;border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;font-size:14px;font-family:'Noto Sans KR',sans-serif;outline:none;">
+      <div class="modal-form-group">
+        <label>업체명 *</label>
+        <input type="text" id="resp-company" placeholder="업체명">
       </div>
-      <div class="form-group">
-        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">메모 (선택)</label>
-        <textarea id="resp-memo" placeholder="준비 가능한 내용, 포함/불포함 항목, 조건 등" style="width:100%;border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;resize:none;height:72px;outline:none;"></textarea>
+      <div class="modal-form-group">
+        <label>카카오톡 ID *</label>
+        <input type="text" id="resp-kakao" placeholder="카카오톡 검색용 아이디">
+      </div>
+      <div class="modal-form-group">
+        <label>견적 금액 (원, 선택)</label>
+        <input type="number" id="resp-price" placeholder="예: 350000">
+      </div>
+      <div class="modal-form-group">
+        <label>메모 (선택)</label>
+        <textarea id="resp-memo" placeholder="준비 가능한 내용, 포함/불포함 항목, 조건 등"></textarea>
       </div>
     </div>
-    <div style="display:flex;gap:10px;margin-top:4px;">
-      <button id="resp-submit-btn" onclick="submitResponse()" style="flex:1;background:var(--gold);color:var(--white);border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">제출하기</button>
-      <button onclick="closeModal()" style="flex:0 0 80px;background:var(--cream);color:var(--muted);border:none;border-radius:8px;padding:12px;font-size:14px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">취소</button>
+
+    <div class="modal-btns">
+      <button class="modal-btn-submit" id="resp-submit-btn" onclick="submitResponse()">제출하기</button>
+      <button class="modal-btn-cancel" onclick="closeModal()">취소</button>
     </div>
   </div>
 </div>
 
-<div class="kakao-float" id="kakaoFloat">
-  <a class="kakao-float__btn"
-     href="http://pf.kakao.com/_XExfXX/chat"
-     target="_blank"
-     rel="noopener"
-     aria-label="카카오톡 채널 상담하기">
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 3C6.477 3 2 6.58 2 11c0 2.86 1.86 5.37 4.65 6.8-.2.74-.73 2.7-.84 3.12-.13.52.19.51.4.37.17-.11 2.7-1.83 3.8-2.58.63.09 1.28.14 1.99.14 5.523 0 10-3.58 10-8s-4.477-8-10-8z"
-        fill="#1a1610"/>
-    </svg>
-  </a>
-  <div class="kakao-float__tooltip">카카오톡으로 상담하기</div>
-</div>
-
 <script>
-  window.addEventListener('load', () => {
-    const el = document.getElementById('kakaoFloat');
-    setTimeout(() => el.classList.add('show-tip'), 1500);
-    setTimeout(() => el.classList.remove('show-tip'), 5500);
-  });
-</script>
+  const WEBHOOK = 'https://script.google.com/macros/s/AKfycbzG1GPR8OhMIeBeTFvt7gE5CGiyQx3ggnLiVIah9geT89m-_poYFEwmi9K--NZ0HxDKjg/exec';
 
-<script>
-  // Supabase 초기화
-  const SUPABASE_URL = 'https://ntldrtnpewfvechqxjzj.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_rmTxWljULBYeHVnswvJkKw_FaJ6KNXB';
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-  // 구글시트 연동 (Apps Script 웹앱)
-  const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzG1GPR8OhMIeBeTFvt7gE5CGiyQx3ggnLiVIah9geT89m-_poYFEwmi9K--NZ0HxDKjg/exec';
-
-  let loggedInProvider = '';
-  let loggedInEmail = '';
-
+  // ── 탭 전환 ──
   function showPanel(name) {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
     document.getElementById('panel-' + name).classList.add('active');
     document.getElementById('tab-' + name).classList.add('active');
+    if (name === 'projects') loadProjects();
   }
 
-  async function socialLogin(provider) {
-    // 카카오·구글은 기본 제공자, 네이버는 Custom Provider(custom:naver)
-    const providerName = provider === 'naver' ? 'custom:naver' : provider;
-    const opts = { redirectTo: window.location.origin + '/partner.html' };
-    // 카카오 비즈 앱 전환 완료 — 닉네임/프로필/이메일 동의항목 요청
-    if (provider === 'kakao') opts.scopes = 'profile_nickname profile_image account_email';
-    const { error } = await sb.auth.signInWithOAuth({
-      provider: providerName,
-      options: opts
-    });
-    if (error) {
-      alert('로그인 중 문제가 발생했습니다: ' + error.message);
-    }
-  }
-
-  // 로그인 후 돌아왔을 때: 협력 신청 폼으로 자동 이동 + 정보 자동입력
-  async function checkSession() {
-    const { data } = await sb.auth.getSession();
-    if (!data.session) return;
-
-    const user = data.session.user;
-    const name = user.user_metadata?.full_name || user.user_metadata?.name || '';
-    const email = user.email || '';
-    const provider = user.app_metadata?.provider || '';
-    const providerLabel = provider === 'kakao' ? '카카오' : provider === 'google' ? '구글' : provider;
-
-    loggedInProvider = providerLabel;
-    loggedInEmail = email;
-
-    // 신청서에 이름 자동 채움 (이메일은 연락처가 아니므로 폼 채움엔 사용하지 않음)
-    if (name) document.getElementById('ap-name').value = name;
-
-    const statusHtml = `
-      <div class="login-status">
-        <span>${providerLabel ? providerLabel + ' 계정으로 로그인됨' : '로그인됨'} ${name ? '· ' + name + '님' : ''} ${email ? '(' + email + ')' : ''}</span>
-        <button type="button" onclick="logout()">로그아웃</button>
-      </div>`;
-
-    document.getElementById('apply-login-status').innerHTML = statusHtml;
-
-    // 로그인 성공 시 대시보드 탭 노출 + 대시보드로 이동
-    document.getElementById('tab-dashboard').style.display = 'block';
-    loadDashboard();
-    showPanel('dashboard');
-  }
-
-  async function logout() {
-    await sb.auth.signOut();
-    location.reload();
-  }
-
+  // ── 협력 신청 ──
   async function submitApplication() {
-    const company = document.getElementById('ap-company').value.trim();
-    const name = document.getElementById('ap-name').value.trim();
-    const phone = document.getElementById('ap-phone').value.trim();
+    const company  = document.getElementById('ap-company').value.trim();
+    const name     = document.getElementById('ap-name').value.trim();
+    const phone    = document.getElementById('ap-phone').value.trim();
+    const kakao    = document.getElementById('ap-kakao').value.trim();
     const category = document.getElementById('ap-category').value;
-    const intro = document.getElementById('ap-intro').value.trim();
+    const intro    = document.getElementById('ap-intro').value.trim();
 
-    if (!company || !name || !phone || !category) {
-      alert('업체명, 담당자 이름, 연락처, 협력 분야를 입력해주세요.');
+    if (!company || !name || !phone || !kakao || !category) {
+      alert('업체명, 담당자 이름, 연락처, 카카오톡 ID, 협력 분야는 필수입니다.');
       return;
     }
     if (!document.getElementById('ap-consent').checked) {
@@ -445,18 +244,13 @@
     btn.textContent = '중복 확인 중...';
 
     try {
-      // 1단계: 중복 체크 (전화번호 또는 이메일)
-      const checkRes = await fetch(SHEET_WEBHOOK_URL, {
+      // 중복 체크
+      const checkRes = await fetch(WEBHOOK, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          type: 'check',
-          phone,
-          email: loggedInEmail
-        })
+        body: JSON.stringify({ type: 'check', phone })
       });
       const checkData = await checkRes.json();
-
       if (checkData.duplicate) {
         alert('이미 신청 이력이 있는 업체입니다.\n추가 문의는 카카오채널 @여는날로 연락주세요.');
         btn.textContent = '신청서 제출';
@@ -464,45 +258,38 @@
         return;
       }
 
-      // 2단계: 중복 아닌 경우 실제 제출
+      // 제출
       btn.textContent = '제출 중...';
-      await fetch(SHEET_WEBHOOK_URL, {
+      await fetch(WEBHOOK, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          type: 'partner',
-          company, name, phone, category, intro,
-          loginProvider: loggedInProvider,
-          email: loggedInEmail
-        })
+        body: JSON.stringify({ type: 'partner', company, name, phone, kakaoId: kakao, category, intro })
       });
-      alert('신청이 접수되었습니다. 빠르게 연락드릴게요!');
+      alert('신청이 접수되었습니다.\n검토 후 카카오톡으로 연락드릴게요!');
       btn.textContent = '신청서 제출';
       btn.disabled = false;
-      document.getElementById('ap-company').value = '';
-      document.getElementById('ap-phone').value = '';
-      document.getElementById('ap-category').value = '';
-      document.getElementById('ap-intro').value = '';
+      ['ap-company','ap-name','ap-phone','ap-kakao','ap-category','ap-intro'].forEach(id => {
+        const el = document.getElementById(id);
+        el.value = '';
+      });
       document.getElementById('ap-consent').checked = false;
-    } catch (err) {
+    } catch(err) {
       alert('제출 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
       btn.textContent = '신청서 제출';
       btn.disabled = false;
     }
   }
 
-  // ── 대시보드: 공고 목록 ──
-  let currentProject = null;
-  let selectedParticipate = '';
-  let respondedIds = JSON.parse(localStorage.getItem('respondedIds') || '[]');
-
+  // ── 공고 목록 ──
   let projectMap = {};
+  let respondedIds = JSON.parse(localStorage.getItem('yeonunnal_responded') || '[]');
 
-  async function loadDashboard() {
+  async function loadProjects() {
     const el = document.getElementById('project-list');
+    el.innerHTML = '<div class="empty-state">불러오는 중...</div>';
     try {
-      const res = await fetch(SHEET_WEBHOOK_URL, {
+      const res = await fetch(WEBHOOK, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ type: 'get_projects' })
@@ -513,7 +300,8 @@
       projects.forEach(p => { projectMap[p.id] = p; });
 
       if (projects.length === 0) {
-        el.innerHTML = '<div style="text-align:center;padding:32px 0;color:var(--muted);font-size:14px;">현재 모집 중인 공고가 없습니다</div>'; return;
+        el.innerHTML = '<div class="empty-state">현재 모집 중인 공고가 없습니다<br><span style="font-size:12px;">새 공고는 카카오톡으로 알림을 드려요</span></div>';
+        return;
       }
       el.innerHTML = '';
       projects.slice().reverse().forEach(p => {
@@ -525,7 +313,8 @@
             <div class="pc-title">${p.title}</div>
             <div class="pc-meta">
               📅 행사일: ${p.eventDate} &nbsp;·&nbsp; 📍 장소: ${p.location}<br>
-              🔧 필요 분야: ${p.categories} &nbsp;·&nbsp; ⏰ 마감: ${p.deadline}
+              🔧 필요 분야: ${p.categories}<br>
+              ⏰ 지원 마감: ${p.deadline}
               ${p.detail ? `<br><br>${p.detail}` : ''}
             </div>
             ${isOpen
@@ -536,9 +325,13 @@
           </div>`;
       });
     } catch(e) {
-      el.innerHTML = '<div style="text-align:center;padding:32px 0;color:var(--muted);">불러오기 실패. 새로고침해주세요.</div>';
+      el.innerHTML = '<div class="empty-state">불러오기 실패. 잠시 후 다시 시도해주세요.</div>';
     }
   }
+
+  // ── 모달 ──
+  let currentProject = null;
+  let selectedParticipate = '';
 
   function openModalById(pid) {
     const p = projectMap[pid];
@@ -550,8 +343,9 @@
     currentProject = p;
     selectedParticipate = '';
     document.getElementById('modal-project-title').textContent = p.title;
-    document.getElementById('modal-project-meta').textContent =
-      `${p.eventDate} · ${p.location} · 마감 ${p.deadline}`;
+    document.getElementById('modal-project-meta').textContent = `${p.eventDate} · ${p.location} · 마감 ${p.deadline}`;
+    document.getElementById('resp-company').value = '';
+    document.getElementById('resp-kakao').value = '';
     document.getElementById('resp-price').value = '';
     document.getElementById('resp-memo').value = '';
     document.getElementById('pbtn-yes').classList.remove('selected');
@@ -575,27 +369,32 @@
 
   async function submitResponse() {
     if (!selectedParticipate) { alert('참여 여부를 선택해주세요.'); return; }
+    const company = document.getElementById('resp-company').value.trim();
+    const kakao   = document.getElementById('resp-kakao').value.trim();
+    if (selectedParticipate === '참여' && (!company || !kakao)) {
+      alert('업체명과 카카오톡 ID를 입력해주세요.'); return;
+    }
     if (!currentProject) return;
 
     const btn = document.getElementById('resp-submit-btn');
     btn.disabled = true; btn.textContent = '제출 중...';
 
     try {
-      const res = await fetch(SHEET_WEBHOOK_URL, {
+      const res = await fetch(WEBHOOK, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({
           type: 'submit_response',
           projectId: currentProject.id,
           projectTitle: currentProject.title,
-          company: document.getElementById('ap-company') ? document.getElementById('ap-company').value : '',
-          name: document.getElementById('ap-name') ? document.getElementById('ap-name').value : loggedInEmail,
-          phone: document.getElementById('ap-phone') ? document.getElementById('ap-phone').value : '',
-          email: loggedInEmail,
+          company,
+          name: company,
+          phone: '',
+          email: '',
           participate: selectedParticipate,
           price: document.getElementById('resp-price').value,
           memo: document.getElementById('resp-memo').value,
-          userId: loggedInEmail
+          userId: kakao
         })
       });
       const data = await res.json();
@@ -603,18 +402,16 @@
         alert('이미 이 공고에 응답하셨습니다.');
       } else {
         respondedIds.push(currentProject.id);
-        localStorage.setItem('respondedIds', JSON.stringify(respondedIds));
+        localStorage.setItem('yeonunnal_responded', JSON.stringify(respondedIds));
         alert('응답이 접수되었습니다. 감사합니다!');
         closeModal();
-        loadDashboard();
+        loadProjects();
       }
     } catch(e) {
       alert('제출 실패. 다시 시도해주세요.');
     }
     btn.disabled = false; btn.textContent = '제출하기';
   }
-
-  checkSession();
 </script>
 </body>
 </html>
