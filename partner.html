@@ -382,9 +382,30 @@
 
     const btn = document.getElementById('ap-submit-btn');
     btn.disabled = true;
-    btn.textContent = '제출 중...';
+    btn.textContent = '중복 확인 중...';
 
     try {
+      // 1단계: 중복 체크 (전화번호 또는 이메일)
+      const checkRes = await fetch(SHEET_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          type: 'check',
+          phone,
+          email: loggedInEmail
+        })
+      });
+      const checkData = await checkRes.json();
+
+      if (checkData.duplicate) {
+        alert('이미 신청 이력이 있는 업체입니다.\n추가 문의는 카카오채널 @여는날로 연락주세요.');
+        btn.textContent = '신청서 제출';
+        btn.disabled = false;
+        return;
+      }
+
+      // 2단계: 중복 아닌 경우 실제 제출
+      btn.textContent = '제출 중...';
       await fetch(SHEET_WEBHOOK_URL, {
         method: 'POST',
         mode: 'no-cors',
