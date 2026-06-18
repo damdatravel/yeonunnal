@@ -194,7 +194,7 @@
       <label>소개 / 포트폴리오 링크 (선택)</label>
       <textarea id="ap-intro" placeholder="간단한 소개나 인스타그램, 포트폴리오 링크를 남겨주세요"></textarea>
     </div>
-    <button class="btn-submit" onclick="alert('신청이 접수되었습니다. 빠르게 연락드릴게요!')">신청서 제출</button>
+    <button class="btn-submit" id="ap-submit-btn" onclick="submitApplication()">신청서 제출</button>
   </div>
 </main>
 
@@ -203,6 +203,12 @@
   const SUPABASE_URL = 'https://ntldrtnpewfvechqxjzj.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_rmTxWljULBYeHVnswvJkKw_FaJ6KNXB';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // 구글시트 연동 (Apps Script 웹앱)
+  const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzG1GPR8OhMIeBeTFvt7gE5CGiyQx3ggnLiVIah9geT89m-_poYFEwmi9K--NZ0HxDKjg/exec';
+
+  let loggedInProvider = '';
+  let loggedInEmail = '';
 
   function showPanel(name) {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -237,6 +243,9 @@
     const provider = user.app_metadata?.provider || '';
     const providerLabel = provider === 'kakao' ? '카카오' : provider === 'google' ? '구글' : provider;
 
+    loggedInProvider = providerLabel;
+    loggedInEmail = email;
+
     // 신청서에 이름 자동 채움 (이메일은 연락처가 아니므로 폼 채움엔 사용하지 않음)
     if (name) document.getElementById('ap-name').value = name;
 
@@ -255,6 +264,48 @@
   async function logout() {
     await sb.auth.signOut();
     location.reload();
+  }
+
+  async function submitApplication() {
+    const company = document.getElementById('ap-company').value.trim();
+    const name = document.getElementById('ap-name').value.trim();
+    const phone = document.getElementById('ap-phone').value.trim();
+    const category = document.getElementById('ap-category').value;
+    const intro = document.getElementById('ap-intro').value.trim();
+
+    if (!company || !name || !phone || !category) {
+      alert('업체명, 담당자 이름, 연락처, 협력 분야를 입력해주세요.');
+      return;
+    }
+
+    const btn = document.getElementById('ap-submit-btn');
+    btn.disabled = true;
+    btn.textContent = '제출 중...';
+
+    try {
+      await fetch(SHEET_WEBHOOK_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          type: 'partner',
+          company, name, phone, category, intro,
+          loginProvider: loggedInProvider,
+          email: loggedInEmail
+        })
+      });
+      alert('신청이 접수되었습니다. 빠르게 연락드릴게요!');
+      btn.textContent = '신청서 제출';
+      btn.disabled = false;
+      document.getElementById('ap-company').value = '';
+      document.getElementById('ap-phone').value = '';
+      document.getElementById('ap-category').value = '';
+      document.getElementById('ap-intro').value = '';
+    } catch (err) {
+      alert('제출 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      btn.textContent = '신청서 제출';
+      btn.disabled = false;
+    }
   }
 
   checkSession();
