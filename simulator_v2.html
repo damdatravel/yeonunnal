@@ -1036,6 +1036,10 @@
       <label>추가 요청사항 (선택)</label>
       <textarea id="f-memo" placeholder="특별히 원하시는 컨셉이나 요청사항을 자유롭게 적어주세요"></textarea>
     </div>
+    <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--muted);margin-bottom:16px;cursor:pointer;">
+      <input type="checkbox" id="f-consent" style="margin-top:2px;flex-shrink:0;">
+      <span><a href="privacy.html" target="_blank" style="color:var(--ink);text-decoration:underline;">개인정보 수집·이용</a>에 동의합니다 (필수)</span>
+    </label>
   </div>
 
   <!-- SUCCESS -->
@@ -1250,10 +1254,16 @@
       } else {
         btn.disabled = false; btn.textContent = '다음 →';
       }
+    } else if (currentStep === totalSteps - 1) {
+      const consent = document.getElementById('f-consent').checked;
+      if (!consent) {
+        btn.disabled = true; btn.textContent = '개인정보 동의가 필요해요';
+      } else {
+        btn.disabled = false; btn.textContent = '제출하기 ✓';
+      }
     } else {
       btn.disabled = false;
-      btn.textContent = currentStep === totalSteps - 2 ? '상담 예약하기 →' :
-                        currentStep === totalSteps - 1 ? '제출하기 ✓' : '다음 →';
+      btn.textContent = currentStep === totalSteps - 2 ? '상담 예약하기 →' : '다음 →';
     }
   }
 
@@ -1321,6 +1331,10 @@
       alert('이름과 연락처를 입력해주세요');
       return;
     }
+    if (!document.getElementById('f-consent').checked) {
+      alert('개인정보 수집·이용에 동의해주셔야 신청이 가능합니다.');
+      return;
+    }
     document.getElementById(`step-${currentStep}`).classList.remove('active');
     document.getElementById(`tab-${currentStep}`).classList.remove('active');
     document.getElementById(`tab-${currentStep}`).classList.add('done');
@@ -1371,6 +1385,7 @@
   updateNextBtn();
   document.getElementById('f-name-early').addEventListener('input', updateNextBtn);
   document.getElementById('f-phone-early').addEventListener('input', updateNextBtn);
+  document.getElementById('f-consent').addEventListener('change', updateNextBtn);
 
   // 로그인 후 돌아왔을 때: 진행 상태 복원 + 이름 자동입력 + 로그인 상태 표시
   async function fillFromSession() {
