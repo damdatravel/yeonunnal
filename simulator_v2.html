@@ -996,6 +996,10 @@
   const SUPABASE_KEY = 'sb_publishable_rmTxWljULBYeHVnswvJkKw_FaJ6KNXB';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+  // 구글시트 연동 (Apps Script 웹앱)
+  const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzG1GPR8OhMIeBeTFvt7gE5CGiyQx3ggnLiVIah9geT89m-_poYFEwmi9K--NZ0HxDKjg/exec';
+  let loggedInProviderLabel = '';
+
   async function socialLogin(provider) {
     const providerName = provider === 'naver' ? 'custom:naver' : provider;
     // 로그인 후 돌아왔을 때 진행 중이던 단계/선택을 복원하기 위해 임시 저장
@@ -1212,7 +1216,7 @@
     tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
   }
 
-  function submitForm() {
+  async function submitForm() {
     const name = document.getElementById('f-name-early').value.trim();
     const phone = document.getElementById('f-phone-early').value.trim();
     if (!name || !phone) {
@@ -1234,6 +1238,30 @@
        <div class="si-row"><span class="si-label">인원</span><span class="si-val">${state.guests}명</span></div>
        <div class="si-row"><span class="si-label">예상견적</span><span class="si-val">${total > 0 ? fmtFull(total) + '~' : '별도 협의'}</span></div>`;
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // 구글시트로 견적 데이터 전송
+    try {
+      const selectedOptions = Array.from(document.querySelectorAll('.toggle-item.selected .toggle-name'))
+        .map(el => el.textContent.trim()).join(', ');
+      await fetch(SHEET_WEBHOOK_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          type: 'quote',
+          name, phone,
+          eventName: state.eventName,
+          spaceName: state.spaceName || '미선택',
+          seasonName: state.seasonName || '미선택',
+          guests: state.guests,
+          optionsList: selectedOptions,
+          totalPrice: total > 0 ? total : '별도 협의',
+          loginProvider: loggedInProviderLabel
+        })
+      });
+    } catch (err) {
+      // 시트 전송 실패해도 사용자 경험에는 영향 없음 (이미 완료 화면 표시됨)
+    }
   }
 
   // init
@@ -1252,6 +1280,7 @@
 
     const provider = user.app_metadata?.provider || '';
     const providerLabel = provider === 'kakao' ? '카카오' : provider === 'google' ? '구글' : provider;
+    loggedInProviderLabel = providerLabel;
     const box = document.getElementById('login-status-box');
     if (box) {
       box.innerHTML = `
