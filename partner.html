@@ -266,6 +266,10 @@
       <label>소개 / 포트폴리오 링크 (선택)</label>
       <textarea id="ap-intro" placeholder="간단한 소개나 인스타그램, 포트폴리오 링크를 남겨주세요"></textarea>
     </div>
+    <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--muted);margin-bottom:16px;cursor:pointer;">
+      <input type="checkbox" id="ap-consent" style="margin-top:2px;flex-shrink:0;">
+      <span><a href="privacy.html" target="_blank" style="color:var(--ink);text-decoration:underline;">개인정보 수집·이용</a>에 동의합니다 (필수)</span>
+    </label>
     <button class="btn-submit" id="ap-submit-btn" onclick="submitApplication()">신청서 제출</button>
   </div>
 </main>
@@ -371,6 +375,10 @@
       alert('업체명, 담당자 이름, 연락처, 협력 분야를 입력해주세요.');
       return;
     }
+    if (!document.getElementById('ap-consent').checked) {
+      alert('개인정보 수집·이용에 동의해주셔야 신청이 가능합니다.');
+      return;
+    }
 
     const btn = document.getElementById('ap-submit-btn');
     btn.disabled = true;
@@ -395,6 +403,7 @@
       document.getElementById('ap-phone').value = '';
       document.getElementById('ap-category').value = '';
       document.getElementById('ap-intro').value = '';
+      document.getElementById('ap-consent').checked = false;
     } catch (err) {
       alert('제출 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
       btn.textContent = '신청서 제출';
