@@ -1341,6 +1341,9 @@
     try {
       const selectedOptions = Array.from(document.querySelectorAll('.toggle-item.selected .toggle-name'))
         .map(el => el.textContent.trim()).join(', ');
+      const kakaoId = document.getElementById('f-kakao').value.trim();
+      const consultTime = document.getElementById('f-time').value;
+      const memo = document.getElementById('f-memo').value.trim();
       await fetch(SHEET_WEBHOOK_URL, {
         method: 'POST',
         mode: 'no-cors',
@@ -1355,7 +1358,8 @@
           optionsList: selectedOptions,
           totalPrice: total > 0 ? total : '별도 협의',
           loginProvider: loggedInProviderLabel,
-          email: loggedInEmail
+          email: loggedInEmail,
+          kakaoId, consultTime, memo
         })
       });
     } catch (err) {
