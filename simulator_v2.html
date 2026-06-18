@@ -998,9 +998,12 @@
 
   async function socialLogin(provider) {
     const providerName = provider === 'naver' ? 'custom:naver' : provider;
-    // 현재 진행 중인 견적 단계를 기억해두기 위해 redirect 후 그대로 simulator 페이지로 복귀
+    // 로그인 후 돌아왔을 때 진행 중이던 단계/선택을 복원하기 위해 임시 저장
+    try {
+      sessionStorage.setItem('yeonunnal_resume_step', String(currentStep));
+      sessionStorage.setItem('yeonunnal_resume_state', JSON.stringify(state));
+    } catch (e) {}
     const opts = { redirectTo: window.location.origin + '/simulator_v2.html' };
-    // 카카오 비즈 앱 전환 완료 — 닉네임/프로필/이메일 동의항목 요청
     if (provider === 'kakao') opts.scopes = 'profile_nickname profile_image account_email';
     const { error } = await sb.auth.signInWithOAuth({
       provider: providerName,
@@ -1009,33 +1012,10 @@
     if (error) alert('로그인 중 문제가 발생했습니다: ' + error.message);
   }
 
-  // 로그인 후 돌아왔을 때 이름 자동 입력 + 로그인 상태 표시
-  async function fillFromSession() {
-    const { data } = await sb.auth.getSession();
-    if (data.session) {
-      const user = data.session.user;
-      const name = user.user_metadata?.full_name || user.user_metadata?.name || '';
-      if (name) document.getElementById('f-name-early').value = name;
-
-      const provider = user.app_metadata?.provider || '';
-      const providerLabel = provider === 'kakao' ? '카카오' : provider === 'google' ? '구글' : provider;
-      const box = document.getElementById('login-status-box');
-      if (box) {
-        box.innerHTML = `
-          <div class="login-status">
-            <span>${providerLabel ? providerLabel + ' 계정으로 로그인됨' : '로그인됨'} ${name ? '· ' + name + '님' : ''}</span>
-            <button type="button" onclick="logoutSimulator()">로그아웃</button>
-          </div>`;
-      }
-      document.querySelector('.social-list').style.display = 'none';
-
-      if (typeof updateNextBtn === 'function') updateNextBtn();
-    }
-  }
-  fillFromSession();
-
   async function logoutSimulator() {
     await sb.auth.signOut();
+    sessionStorage.removeItem('yeonunnal_resume_step');
+    sessionStorage.removeItem('yeonunnal_resume_state');
     location.reload();
   }
 
@@ -1260,6 +1240,85 @@
   updateNextBtn();
   document.getElementById('f-name-early').addEventListener('input', updateNextBtn);
   document.getElementById('f-phone-early').addEventListener('input', updateNextBtn);
+
+  // 로그인 후 돌아왔을 때: 진행 상태 복원 + 이름 자동입력 + 로그인 상태 표시
+  async function fillFromSession() {
+    const { data } = await sb.auth.getSession();
+    if (!data.session) return;
+
+    const user = data.session.user;
+    const name = user.user_metadata?.full_name || user.user_metadata?.name || '';
+    if (name) document.getElementById('f-name-early').value = name;
+
+    const provider = user.app_metadata?.provider || '';
+    const providerLabel = provider === 'kakao' ? '카카오' : provider === 'google' ? '구글' : provider;
+    const box = document.getElementById('login-status-box');
+    if (box) {
+      box.innerHTML = `
+        <div class="login-status">
+          <span>${providerLabel ? providerLabel + ' 계정으로 로그인됨' : '로그인됨'} ${name ? '· ' + name + '님' : ''}</span>
+          <button type="button" onclick="logoutSimulator()">로그아웃</button>
+        </div>`;
+    }
+    const socialList = document.querySelector('.social-list');
+    if (socialList) socialList.style.display = 'none';
+
+    // 로그인 직전에 저장해둔 진행 상태 복원
+    try {
+      const savedStepRaw = sessionStorage.getItem('yeonunnal_resume_step');
+      const savedStateRaw = sessionStorage.getItem('yeonunnal_resume_state');
+      if (savedStepRaw !== null && savedStateRaw) {
+        const savedStep = parseInt(savedStepRaw, 10);
+        const savedState = JSON.parse(savedStateRaw);
+        Object.assign(state, savedState);
+
+        // 행사 카드 선택 표시 복원
+        if (state.event) {
+          const eventEl = document.querySelector(`[data-group="event"][data-val="${state.event}"]`);
+          if (eventEl) eventEl.classList.add('selected');
+        }
+        // 공간/시즌 카드 선택 표시 복원 (STEP 2 이상 진행했을 때만 의미 있음)
+        if (state.space) {
+          const spaceEl = document.querySelector(`[data-group="space"][data-val="${state.space}"]`);
+          if (spaceEl) spaceEl.classList.add('selected');
+          const preview = document.getElementById('space-preview-' + state.space);
+          if (preview) preview.classList.add('show');
+        }
+        if (state.season) {
+          const seasonEl = document.querySelector(`[data-group="season"][data-val="${state.season}"]`);
+          if (seasonEl) seasonEl.classList.add('selected');
+        }
+        // 인원 슬라이더 복원
+        const guestSlider = document.getElementById('guest-slider');
+        if (guestSlider) {
+          guestSlider.value = state.guests;
+          document.getElementById('guest-num').textContent = state.guests;
+        }
+
+        // 저장된 스텝으로 이동 (0이면 그대로 STEP 1에 머무름)
+        if (savedStep > 0 && savedStep < totalSteps) {
+          document.getElementById(`step-0`).classList.remove('active');
+          document.getElementById(`tab-0`).classList.remove('active');
+          for (let i = 0; i < savedStep; i++) {
+            document.getElementById(`tab-${i}`).classList.add('done');
+          }
+          currentStep = savedStep;
+          document.getElementById(`step-${currentStep}`).classList.add('active');
+          document.getElementById(`tab-${currentStep}`).classList.add('active');
+          document.getElementById('btn-prev').style.display = 'block';
+          if (currentStep === 4) buildQuote();
+          if (currentStep === 5) buildFinalSummary();
+        }
+
+        sessionStorage.removeItem('yeonunnal_resume_step');
+        sessionStorage.removeItem('yeonunnal_resume_state');
+        calcTotal();
+      }
+    } catch (e) {}
+
+    updateNextBtn();
+  }
+  fillFromSession();
 </script>
 </body>
 </html>
