@@ -106,6 +106,78 @@
     background: none; border: none; color: var(--muted); font-size: 12px;
     text-decoration: underline; cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
   }
+
+  /* ── 카카오톡 플로팅 버튼 ── */
+  .kakao-float {
+    position: fixed;
+    right: 20px;
+    bottom: 24px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .kakao-float__tooltip {
+    background: #2a2218;
+    color: #f5f0e8;
+    border: 1px solid #c8a96e55;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+    opacity: 0;
+    transform: translateX(8px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    pointer-events: none;
+  }
+
+  .kakao-float:hover .kakao-float__tooltip,
+  .kakao-float.show-tip .kakao-float__tooltip {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .kakao-float__btn {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: #FEE500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4), 0 0 0 0 rgba(254,229,0,0.5);
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    animation: kakao-pulse 2.6s ease-out 1;
+  }
+
+  .kakao-float__btn:hover {
+    transform: scale(1.08);
+  }
+
+  .kakao-float__btn svg {
+    width: 30px;
+    height: 30px;
+  }
+
+  @keyframes kakao-pulse {
+    0%   { box-shadow: 0 6px 20px rgba(0,0,0,0.4), 0 0 0 0 rgba(254,229,0,0.55); }
+    70%  { box-shadow: 0 6px 20px rgba(0,0,0,0.4), 0 0 0 16px rgba(254,229,0,0); }
+    100% { box-shadow: 0 6px 20px rgba(0,0,0,0.4), 0 0 0 0 rgba(254,229,0,0); }
+  }
+
+  @media (max-width: 480px) {
+    .kakao-float__tooltip { display: none; }
+    .kakao-float { right: 16px; bottom: 16px; }
+    .kakao-float__btn { width: 52px; height: 52px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .kakao-float__btn { animation: none; }
+  }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
@@ -197,6 +269,28 @@
     <button class="btn-submit" id="ap-submit-btn" onclick="submitApplication()">신청서 제출</button>
   </div>
 </main>
+
+<div class="kakao-float" id="kakaoFloat">
+  <div class="kakao-float__tooltip">카카오톡으로 상담하기</div>
+  <a class="kakao-float__btn"
+     href="http://pf.kakao.com/_XExfXX/chat"
+     target="_blank"
+     rel="noopener"
+     aria-label="카카오톡 채널 상담하기">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 3C6.477 3 2 6.58 2 11c0 2.86 1.86 5.37 4.65 6.8-.2.74-.73 2.7-.84 3.12-.13.52.19.51.4.37.17-.11 2.7-1.83 3.8-2.58.63.09 1.28.14 1.99.14 5.523 0 10-3.58 10-8s-4.477-8-10-8z"
+        fill="#1a1610"/>
+    </svg>
+  </a>
+</div>
+
+<script>
+  window.addEventListener('load', () => {
+    const el = document.getElementById('kakaoFloat');
+    setTimeout(() => el.classList.add('show-tip'), 1500);
+    setTimeout(() => el.classList.remove('show-tip'), 5500);
+  });
+</script>
 
 <script>
   // Supabase 초기화
