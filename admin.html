@@ -283,6 +283,15 @@
                 </div>
               </div>
             </div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:10px;">
+              <label style="font-size:12px;color:var(--muted);">등급</label>
+              <select id="grade-${p.id}" style="font-size:13px;padding:4px 8px;border:1px solid var(--line);border-radius:4px;">
+                <option value="아마추어" ${p.grade==='아마추어'?'selected':''}>아마추어</option>
+                <option value="준프로" ${p.grade==='준프로'?'selected':''}>준프로</option>
+                <option value="프로" ${p.grade==='프로'?'selected':''}>프로</option>
+              </select>
+              <button class="btn-sm" onclick="changeGrade('${p.id}')">등급 변경</button>
+            </div>
             <div class="pc-actions">
               ${currentPartnerTab !== 'approved' ? `<button class="btn-sm" style="border-color:var(--green);color:var(--green);" onclick="setPartnerStatus('${p.id}','approved')">승인</button>` : ''}
               ${currentPartnerTab !== 'rejected' ? `<button class="btn-danger" onclick="setPartnerStatus('${p.id}','rejected')">거절</button>` : ''}
@@ -313,6 +322,23 @@
       loadPartners();
     } catch(e) {
       alert('처리 실패: ' + e.message);
+    }
+  }
+
+  async function changeGrade(id) {
+    const select = document.getElementById('grade-' + id);
+    const grade = select.value;
+    try {
+      const res = await fetch(PARTNERS_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'updateGrade', id, grade, adminPw })
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || '처리 실패');
+      alert('등급이 "' + grade + '"로 변경되었습니다.');
+    } catch(e) {
+      alert('등급 변경 실패: ' + e.message);
     }
   }
 
