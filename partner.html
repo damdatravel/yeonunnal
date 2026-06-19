@@ -408,8 +408,9 @@
     }
   }
 
-  // ── Auth 상태 감지 ──
+  // ── Auth 상태 감지 (로그인/로그아웃/비밀번호복구 등 '변화' 시점) ──
   sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'INITIAL_SESSION') return; // 초기 상태는 init()에서 별도 처리
     if (event === 'PASSWORD_RECOVERY') {
       showScreen('recovery');
       return;
@@ -435,6 +436,24 @@
       showScreen('auth');
     }
   });
+
+  // ── 초기 로드: 페이지 열리는 즉시 현재 로그인 상태 확인 ──
+  // (onAuthStateChange는 '변화'에만 반응할 수도 있어서, 첫 화면 전환은 여기서 직접 보장한다)
+  async function init() {
+    try {
+      const { data, error } = await sb.auth.getSession();
+      if (error) throw error;
+      if (data?.session?.user) {
+        currentUser = data.session.user;
+        await loadPartnerData();
+      } else {
+        showScreen('auth');
+      }
+    } catch (e) {
+      showScreen('auth');
+    }
+  }
+  init();
 
   // ── 파트너 row 삽입 ──
   async function insertPartnerRow(uid, email, d) {
