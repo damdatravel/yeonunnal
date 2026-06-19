@@ -1,4 +1,4 @@
-<!-- VERSION-CHECK: grade-pricing-v1 -->
+<!-- VERSION-CHECK: my-quotes-v2 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -318,6 +318,26 @@
     color: var(--ink);
     font-weight: 500;
   }
+
+  /* MY QUOTES */
+  .myquote-card {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    font-size: 13px;
+  }
+  .myquote-date { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .myquote-title { font-family: 'Noto Serif KR', serif; font-size: 15px; margin-bottom: 6px; }
+  .myquote-meta { color: var(--muted); line-height: 1.7; margin-bottom: 10px; }
+  .myquote-btns { display: flex; gap: 8px; }
+  .myquote-btn {
+    flex: 1; padding: 8px; border-radius: 6px; font-size: 12px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--cream); color: var(--ink);
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+  .myquote-btn.primary { background: var(--gold); color: var(--white); border-color: var(--gold); }
 
   /* QUOTE CARD */
   .quote-card {
@@ -1145,6 +1165,17 @@
   <button class="btn btn-next" id="btn-next" onclick="nextStep()">시작하기 →</button>
 </div>
 
+<!-- 내 견적 보기 모달 -->
+<div id="my-quotes-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:flex-start;justify-content:center;overflow-y:auto;padding:24px 16px;">
+  <div style="background:var(--paper);border-radius:14px;max-width:480px;width:100%;padding:24px 20px;margin-top:24px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div style="font-family:'Noto Serif KR',serif;font-size:18px;">지난 견적 보기</div>
+      <button onclick="closeMyQuotes()" style="background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;">✕</button>
+    </div>
+    <div id="my-quotes-list"><div style="text-align:center;color:var(--muted);padding:24px 0;">불러오는 중...</div></div>
+  </div>
+</div>
+
 <!-- 카카오톡 플로팅 버튼 (bottom-nav 위쪽으로 위치 조정) -->
 <div class="kakao-float" id="kakaoFloat">
   <div class="kakao-float__tooltip">카카오톡으로 상담하기</div>
@@ -1211,7 +1242,8 @@
     season: null, seasonName: '',
     guests: 30,
     optionGrades: {}, flatOptionTotal: 0, optionTotal: 0,
-    corpVenue: null, corpRegion: null
+    corpVenue: null, corpRegion: null,
+    quoteId: null // 기존 견적을 수정하는 경우에만 값이 들어감
   };
 
   // 기업 행사 전용 함수
@@ -1482,7 +1514,7 @@
        <div class="si-row"><span class="si-label">예상견적</span><span class="si-val">${total > 0 ? fmtFull(total) + '~' : '별도 협의'}</span></div>`;
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // 구글시트로 견적 데이터 전송
+    // 구글시트로 견적 데이터 전송 (기존 견적 수정인 경우 update_quote, 아니면 신규 quote)
     try {
       const optionParts = Object.entries(state.optionGrades).map(([name, o]) => `${name}(${o.grade})`);
       if (state.flatOptionTotal > 0) optionParts.push('하객 답례품');
@@ -1491,26 +1523,32 @@
       const kakaoId = document.getElementById('f-kakao').value.trim();
       const consultTime = document.getElementById('f-time').value;
       const memo = document.getElementById('f-memo').value.trim();
-      await fetch(SHEET_WEBHOOK_URL, {
+      const isEditing = !!state.quoteId;
+
+      const payload = {
+        type: isEditing ? 'update_quote' : 'quote',
+        name, phone,
+        eventName: state.eventName,
+        spaceName: state.spaceName || '미선택',
+        seasonName: state.seasonName || '미선택',
+        guests: state.guests,
+        optionsList: selectedOptions,
+        optionGradeDetail: JSON.stringify(state.optionGrades),
+        proGradeIncluded: hasProGrade ? 'Y' : 'N',
+        totalPrice: total > 0 ? total : '별도 협의',
+        loginProvider: loggedInProviderLabel,
+        email: loggedInEmail,
+        kakaoId, consultTime, memo
+      };
+      if (isEditing) payload.quoteId = state.quoteId;
+
+      const res = await fetch(SHEET_WEBHOOK_URL, {
         method: 'POST',
-        mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          type: 'quote',
-          name, phone,
-          eventName: state.eventName,
-          spaceName: state.spaceName || '미선택',
-          seasonName: state.seasonName || '미선택',
-          guests: state.guests,
-          optionsList: selectedOptions,
-          optionGradeDetail: JSON.stringify(state.optionGrades),
-          proGradeIncluded: hasProGrade ? 'Y' : 'N',
-          totalPrice: total > 0 ? total : '별도 협의',
-          loginProvider: loggedInProviderLabel,
-          email: loggedInEmail,
-          kakaoId, consultTime, memo
-        })
+        body: JSON.stringify(payload)
       });
+      const result = await res.json();
+      if (result.quoteId) state.quoteId = result.quoteId;
     } catch (err) {
       // 시트 전송 실패해도 사용자 경험에는 영향 없음 (이미 완료 화면 표시됨)
     }
@@ -1541,7 +1579,8 @@
         <div class="login-status">
           <span>${providerLabel ? providerLabel + ' 계정으로 로그인됨' : '로그인됨'} ${name ? '· ' + name + '님' : ''}</span>
           <button type="button" onclick="logoutSimulator()">로그아웃</button>
-        </div>`;
+        </div>
+        <button type="button" style="width:100%;background:var(--cream);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;margin-bottom:16px;" onclick="openMyQuotes()">📋 지난 견적 보기</button>`;
     }
     const socialList = document.querySelector('.social-list');
     if (socialList) socialList.style.display = 'none';
@@ -1602,6 +1641,141 @@
     updateNextBtn();
   }
   fillFromSession();
+
+  // ── 내 견적 보기 ──
+  function openMyQuotes() {
+    document.getElementById('my-quotes-modal').style.display = 'flex';
+    loadMyQuotes();
+  }
+
+  function closeMyQuotes() {
+    document.getElementById('my-quotes-modal').style.display = 'none';
+  }
+
+  let myQuotesMap = {};
+
+  async function loadMyQuotes() {
+    const el = document.getElementById('my-quotes-list');
+    el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:24px 0;">불러오는 중...</div>';
+    try {
+      const res = await fetch(SHEET_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ type: 'get_my_quotes', email: loggedInEmail })
+      });
+      const data = await res.json();
+      const quotes = data.quotes || [];
+      myQuotesMap = {};
+      quotes.forEach(q => { myQuotesMap[q.quoteId] = q; });
+
+      if (quotes.length === 0) {
+        el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:24px 0;">지난 견적 신청 내역이 없습니다</div>';
+        return;
+      }
+      el.innerHTML = '';
+      quotes.forEach(q => {
+        el.innerHTML += `
+          <div class="myquote-card">
+            <div class="myquote-date">${q.date}</div>
+            <div class="myquote-title">${q.eventName}</div>
+            <div class="myquote-meta">
+              공간: ${q.spaceName} · 인원: ${q.guests}명<br>
+              옵션: ${q.optionsList || '없음'}<br>
+              예상견적: ${typeof q.totalPrice === 'number' ? fmtFull(q.totalPrice) + '~' : q.totalPrice}
+              ${q.proGradeIncluded === 'Y' ? '<br><span style="color:var(--gold);">⚠ 프로 등급 포함 — 실제 견적 상담 후 확정</span>' : ''}
+            </div>
+            <div class="myquote-btns">
+              <button class="myquote-btn" data-qid="${q.quoteId}" onclick="printQuoteById(this.dataset.qid)">🖨️ 인쇄/다운로드</button>
+              <button class="myquote-btn primary" data-qid="${q.quoteId}" onclick="loadQuoteForEditById(this.dataset.qid)">✏️ 수정하기</button>
+            </div>
+          </div>`;
+      });
+    } catch(e) {
+      el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:24px 0;">불러오기 실패. 잠시 후 다시 시도해주세요.</div>';
+    }
+  }
+
+  function printQuoteById(qid) {
+    const q = myQuotesMap[qid];
+    if (q) printQuote(q);
+  }
+
+  function loadQuoteForEditById(qid) {
+    const q = myQuotesMap[qid];
+    if (q) loadQuoteForEdit(q);
+  }
+
+  function printQuote(q) {
+    const priceText = typeof q.totalPrice === 'number' ? fmtFull(q.totalPrice) + '~' : q.totalPrice;
+    const w = window.open('', '_blank');
+    w.document.write(`
+      <html><head><title>여는날 견적서 - ${q.date}</title>
+      <style>
+        body{font-family:'Noto Sans KR',sans-serif;padding:40px;color:#1a1610;}
+        h1{font-size:20px;border-bottom:2px solid #c8a96e;padding-bottom:12px;}
+        table{width:100%;border-collapse:collapse;margin-top:20px;}
+        td{padding:10px;border-bottom:1px solid #e0d8cc;font-size:14px;}
+        td:first-child{color:#8a7d6a;width:120px;}
+        .total{font-size:18px;font-weight:bold;color:#c8a96e;}
+      </style></head><body>
+        <h1>여는날 견적서</h1>
+        <table>
+          <tr><td>신청일</td><td>${q.date}</td></tr>
+          <tr><td>행사</td><td>${q.eventName}</td></tr>
+          <tr><td>공간</td><td>${q.spaceName}</td></tr>
+          <tr><td>인원</td><td>${q.guests}명</td></tr>
+          <tr><td>선택 옵션</td><td>${q.optionsList || '없음'}</td></tr>
+          <tr><td>예상 견적</td><td class="total">${priceText}</td></tr>
+        </table>
+        <p style="margin-top:30px;font-size:12px;color:#8a7d6a;">
+          본 견적서는 예상 금액이며, 실제 견적은 상담 후 확정됩니다.<br>
+          여는날 — yeonunnal.com · 카카오채널 @여는날
+        </p>
+      </body></html>`);
+    w.document.close();
+    w.print();
+  }
+
+  function loadQuoteForEdit(q) {
+    state.quoteId = q.quoteId;
+    state.guests = parseInt(q.guests) || 30;
+    try { state.optionGrades = JSON.parse(q.optionGradeDetail || '{}'); } catch(e) { state.optionGrades = {}; }
+    state.flatOptionTotal = (q.optionsList || '').includes('하객 답례품') ? 150000 : 0;
+
+    closeMyQuotes();
+
+    // STEP 4(옵션 구성)로 바로 이동해서 수정하게 한다
+    document.getElementById(`step-${currentStep}`).classList.remove('active');
+    document.getElementById(`tab-${currentStep}`).classList.remove('active');
+    currentStep = 3;
+    document.getElementById('step-3').classList.add('active');
+    document.getElementById('tab-3').classList.add('active');
+    for (let i = 0; i < 3; i++) document.getElementById(`tab-${i}`).classList.add('done');
+    document.getElementById('btn-prev').style.display = 'block';
+
+    // 등급 선택 UI 복원
+    Object.entries(state.optionGrades).forEach(([name, o]) => {
+      const row = document.getElementById('grade-row-' + name);
+      const item = document.querySelector(`.toggle-item[data-option="${name}"]`);
+      if (!row || !item) return;
+      row.classList.add('open');
+      item.classList.add('selected');
+      item.querySelector('.toggle-price').textContent = o.grade === '프로' ? fmtFull(o.price) + '~' : fmtFull(o.price);
+      row.querySelectorAll('.grade-pill').forEach(p => {
+        if (p.textContent.indexOf(o.grade) === 0) p.classList.add('active');
+      });
+    });
+    if (state.flatOptionTotal > 0) {
+      const flatItem = document.querySelector('.toggle-item[data-add="150000"]');
+      if (flatItem) flatItem.classList.add('selected');
+    }
+
+    updateProNotice();
+    calcTotal();
+    updateNextBtn();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    alert('이전 견적을 불러왔습니다. 옵션을 수정한 뒤 마지막 단계까지 진행하면 같은 견적이 업데이트됩니다.');
+  }
 </script>
 </body>
 </html>
