@@ -1,4 +1,4 @@
-<!-- VERSION-CHECK: timeout-fix-v3 -->
+<!-- VERSION-CHECK: nolock-fix-v4 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -342,7 +342,12 @@
   const SUPABASE_KEY = 'sb_publishable_rmTxWljULBYeHVnswvJkKw_FaJ6KNXB';
   const WEBHOOK = 'https://script.google.com/macros/s/AKfycbzG1GPR8OhMIeBeTFvt7gE5CGiyQx3ggnLiVIah9geT89m-_poYFEwmi9K--NZ0HxDKjg/exec';
 
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  // 브라우저 탭 간 잠금(Web Locks API)을 일부 환경에서 멈춰버리는 문제가 있어
+  // 잠금 없이 바로 실행하는 방식으로 우회한다 (이 페이지는 멀티탭 동시 세션갱신을 다루지 않아도 됨)
+  const noopLock = async (name, acquireTimeout, fn) => fn();
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: { lock: noopLock }
+  });
   let currentUser = null;
   let currentPartner = null;
   let projectMap = {};
