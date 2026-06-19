@@ -1,4 +1,4 @@
-<!-- VERSION-CHECK: error-surface-v7 -->
+<!-- VERSION-CHECK: doubleclick-fix-v8 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -220,7 +220,7 @@
         <input type="checkbox" id="su-consent">
         <span><a href="privacy.html" target="_blank">개인정보 수집·이용</a>에 동의합니다 (필수)</span>
       </label>
-      <button class="btn-gold" onclick="doSignup()">신청하기</button>
+      <button class="btn-gold" id="su-submit-btn" onclick="doSignup()">신청하기</button>
     </div>
 
     <!-- 로그인 -->
@@ -501,6 +501,9 @@
 
   // ── 회원가입 ──
   async function doSignup() {
+    const btn = document.getElementById('su-submit-btn');
+    if (btn.disabled) return; // 중복 클릭 방지
+
     const email    = document.getElementById('su-email').value.trim();
     const pw       = document.getElementById('su-pw').value;
     const pw2      = document.getElementById('su-pw2').value;
@@ -520,6 +523,9 @@
       alert('개인정보 수집·이용에 동의해주세요.'); return;
     }
 
+    btn.disabled = true;
+    btn.textContent = '처리 중...';
+
     const partnerData = { company, name, phone, kakao_id: kakao, category, intro };
     localStorage.setItem('pendingPartner', JSON.stringify(partnerData));
 
@@ -534,11 +540,13 @@
         // 이메일 확인 비활성화 상태 — 즉시 파트너 row 삽입
         await insertPartnerRow(data.user.id, email, partnerData);
         localStorage.removeItem('pendingPartner');
-        // onAuthStateChange가 대시보드/pending 화면으로 이동
+        // onAuthStateChange가 대시보드/pending 화면으로 이동 (성공이라 버튼 복구 불필요)
       } else {
         // 이메일 확인 활성화 상태
         alert('가입이 완료되었습니다!\n입력하신 이메일로 인증 메일이 발송되었습니다.\n이메일 인증 후 로그인해주세요.');
         showAuthTab('login');
+        btn.disabled = false;
+        btn.textContent = '신청하기';
       }
     } catch(e) {
       if (e.message?.includes('already registered')) {
@@ -547,6 +555,8 @@
       } else {
         alert('가입 중 오류가 발생했습니다: ' + e.message);
       }
+      btn.disabled = false;
+      btn.textContent = '신청하기';
     }
   }
 
