@@ -1,3 +1,4 @@
+<!-- VERSION-CHECK: grade-pricing-v1 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -287,6 +288,35 @@
     color: #fff;
     font-size: 11px;
     font-weight: 700;
+  }
+
+  /* GRADE PICKER */
+  .grade-row {
+    display: none;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin: -2px 0 10px;
+    padding: 0 2px;
+  }
+  .grade-row.open { display: grid; }
+  .grade-pill {
+    border: 1.5px solid var(--line);
+    background: var(--white);
+    border-radius: 8px;
+    padding: 8px 4px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: all 0.15s;
+  }
+  .grade-pill:hover { border-color: var(--gold-light); }
+  .grade-pill.active {
+    border-color: var(--gold);
+    background: #fffbf2;
+    color: var(--ink);
+    font-weight: 500;
   }
 
   /* QUOTE CARD */
@@ -845,7 +875,7 @@
   <!-- STEP 4: 옵션 -->
   <div class="section" id="step-3">
     <div class="section-title">어떻게 꾸밀까요?</div>
-    <div class="section-sub">원하는 옵션을 선택해주세요 (복수 선택 가능)</div>
+    <div class="section-sub">원하는 옵션을 선택하고, 등급을 골라주세요<br>등급에 따라 비용과 전문성이 달라져요</div>
 
     <div id="mini-quote-bar" class="mini-quote">
       <span class="mq-label">현재 예상 견적</span>
@@ -853,7 +883,7 @@
     </div>
 
     <div class="toggle-list">
-      <div class="toggle-item" data-add="500000" onclick="toggleOption(this)">
+      <div class="toggle-item" data-option="버스킹 퍼포머" onclick="toggleOption(this)">
         <div class="toggle-left">
           <span class="toggle-emoji">🎵</span>
           <div>
@@ -862,11 +892,17 @@
           </div>
         </div>
         <div style="text-align:right">
-          <div class="toggle-price">+50만원~</div>
+          <div class="toggle-price">등급 선택</div>
           <div class="toggle-check"></div>
         </div>
       </div>
-      <div class="toggle-item" data-add="300000" onclick="toggleOption(this)">
+      <div class="grade-row" id="grade-row-버스킹 퍼포머">
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'버스킹 퍼포머','아마추어',200000)">아마추어<br>20만원</button>
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'버스킹 퍼포머','준프로',400000)">준프로<br>40만원</button>
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'버스킹 퍼포머','프로',650000)">프로<br>65만원~</button>
+      </div>
+
+      <div class="toggle-item" data-option="스냅 사진 촬영" onclick="toggleOption(this)">
         <div class="toggle-left">
           <span class="toggle-emoji">📸</span>
           <div>
@@ -875,11 +911,17 @@
           </div>
         </div>
         <div style="text-align:right">
-          <div class="toggle-price">+30만원~</div>
+          <div class="toggle-price">등급 선택</div>
           <div class="toggle-check"></div>
         </div>
       </div>
-      <div class="toggle-item" data-add="500000" onclick="toggleOption(this)">
+      <div class="grade-row" id="grade-row-스냅 사진 촬영">
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'스냅 사진 촬영','아마추어',200000)">아마추어<br>20만원</button>
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'스냅 사진 촬영','준프로',350000)">준프로<br>35만원</button>
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'스냅 사진 촬영','프로',550000)">프로<br>55만원~</button>
+      </div>
+
+      <div class="toggle-item" data-option="영상 촬영·편집" onclick="toggleOption(this)">
         <div class="toggle-left">
           <span class="toggle-emoji">🎥</span>
           <div>
@@ -888,11 +930,17 @@
           </div>
         </div>
         <div style="text-align:right">
-          <div class="toggle-price">+50만원~</div>
+          <div class="toggle-price">등급 선택</div>
           <div class="toggle-check"></div>
         </div>
       </div>
-      <div class="toggle-item" data-add="300000" onclick="toggleOption(this)">
+      <div class="grade-row" id="grade-row-영상 촬영·편집">
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'영상 촬영·편집','아마추어',300000)">아마추어<br>30만원</button>
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'영상 촬영·편집','준프로',500000)">준프로<br>50만원</button>
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'영상 촬영·편집','프로',800000)">프로<br>80만원~</button>
+      </div>
+
+      <div class="toggle-item" data-option="플라워 장식" onclick="toggleOption(this)">
         <div class="toggle-left">
           <span class="toggle-emoji">💐</span>
           <div>
@@ -901,11 +949,17 @@
           </div>
         </div>
         <div style="text-align:right">
-          <div class="toggle-price">+30만원~</div>
+          <div class="toggle-price">등급 선택</div>
           <div class="toggle-check"></div>
         </div>
       </div>
-      <div class="toggle-item" data-add="400000" onclick="toggleOption(this)">
+      <div class="grade-row" id="grade-row-플라워 장식">
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'플라워 장식','아마추어',200000)">아마추어<br>20만원</button>
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'플라워 장식','준프로',350000)">준프로<br>35만원</button>
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'플라워 장식','프로',550000)">프로<br>55만원~</button>
+      </div>
+
+      <div class="toggle-item" data-option="헤어·메이크업" onclick="toggleOption(this)">
         <div class="toggle-left">
           <span class="toggle-emoji">💄</span>
           <div>
@@ -914,11 +968,17 @@
           </div>
         </div>
         <div style="text-align:right">
-          <div class="toggle-price">+40만원~</div>
+          <div class="toggle-price">등급 선택</div>
           <div class="toggle-check"></div>
         </div>
       </div>
-      <div class="toggle-item" data-add="200000" onclick="toggleOption(this)">
+      <div class="grade-row" id="grade-row-헤어·메이크업">
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'헤어·메이크업','아마추어',200000)">아마추어<br>20만원</button>
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'헤어·메이크업','준프로',350000)">준프로<br>35만원</button>
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'헤어·메이크업','프로',550000)">프로<br>55만원~</button>
+      </div>
+
+      <div class="toggle-item" data-option="불꽃·특수효과" onclick="toggleOption(this)">
         <div class="toggle-left">
           <span class="toggle-emoji">🎆</span>
           <div>
@@ -927,11 +987,17 @@
           </div>
         </div>
         <div style="text-align:right">
-          <div class="toggle-price">+20만원~</div>
+          <div class="toggle-price">등급 선택</div>
           <div class="toggle-check"></div>
         </div>
       </div>
-      <div class="toggle-item" data-add="150000" onclick="toggleOption(this)">
+      <div class="grade-row" id="grade-row-불꽃·특수효과">
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'불꽃·특수효과','아마추어',150000)">아마추어<br>15만원</button>
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'불꽃·특수효과','준프로',250000)">준프로<br>25만원</button>
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'불꽃·특수효과','프로',400000)">프로<br>40만원~</button>
+      </div>
+
+      <div class="toggle-item" data-add="150000" onclick="toggleFlatOption(this)">
         <div class="toggle-left">
           <span class="toggle-emoji">🎁</span>
           <div>
@@ -944,7 +1010,8 @@
           <div class="toggle-check"></div>
         </div>
       </div>
-      <div class="toggle-item" data-add="400000" onclick="toggleOption(this)">
+
+      <div class="toggle-item" data-option="푸드트럭·음료바" onclick="toggleOption(this)">
         <div class="toggle-left">
           <span class="toggle-emoji">🚚</span>
           <div>
@@ -953,10 +1020,20 @@
           </div>
         </div>
         <div style="text-align:right">
-          <div class="toggle-price">+40만원~</div>
+          <div class="toggle-price">등급 선택</div>
           <div class="toggle-check"></div>
         </div>
       </div>
+      <div class="grade-row" id="grade-row-푸드트럭·음료바">
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'푸드트럭·음료바','아마추어',250000)">아마추어<br>25만원</button>
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'푸드트럭·음료바','준프로',400000)">준프로<br>40만원</button>
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'푸드트럭·음료바','프로',600000)">프로<br>60만원~</button>
+      </div>
+    </div>
+
+    <div class="notice-box" id="pro-grade-notice" style="display:none;">
+      <strong>안내</strong><br>
+      "프로" 등급을 선택하신 항목은 표시된 가격이 시작가이며, 실제 견적은 매칭 후 협력사 확인을 거쳐 안내드립니다.
     </div>
   </div>
 
@@ -1133,7 +1210,7 @@
     space: null, spaceName: '',
     season: null, seasonName: '',
     guests: 30,
-    options: [], optionTotal: 0,
+    optionGrades: {}, flatOptionTotal: 0, optionTotal: 0,
     corpVenue: null, corpRegion: null
   };
 
@@ -1204,14 +1281,55 @@
   }
 
   function toggleOption(el) {
+    const optionName = el.dataset.option;
+    const row = document.getElementById('grade-row-' + optionName);
+    const isOpen = row.classList.contains('open');
+
+    if (isOpen) {
+      // 다시 클릭 → 접으면서 선택 취소
+      row.classList.remove('open');
+      if (state.optionGrades[optionName]) {
+        delete state.optionGrades[optionName];
+        el.classList.remove('selected');
+        el.querySelector('.toggle-price').textContent = '등급 선택';
+        row.querySelectorAll('.grade-pill').forEach(p => p.classList.remove('active'));
+        calcTotal();
+        updateProNotice();
+      }
+    } else {
+      row.classList.add('open');
+    }
+  }
+
+  function selectGrade(event, optionName, grade, price) {
+    event.stopPropagation(); // 등급 버튼 클릭이 상위 toggle-item의 접기 동작으로 안 이어지게
+    state.optionGrades[optionName] = { grade, price };
+
+    const row = document.getElementById('grade-row-' + optionName);
+    row.querySelectorAll('.grade-pill').forEach(p => p.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+
+    const item = document.querySelector(`.toggle-item[data-option="${optionName}"]`);
+    item.classList.add('selected');
+    item.querySelector('.toggle-price').textContent =
+      grade === '프로' ? fmtFull(price) + '~' : fmtFull(price);
+
+    calcTotal();
+    updateProNotice();
+  }
+
+  function toggleFlatOption(el) {
+    // 등급 구분이 없는 단일 옵션용 (예: 하객 답례품)
     el.classList.toggle('selected');
     const add = parseInt(el.dataset.add) || 0;
-    if (el.classList.contains('selected')) {
-      state.optionTotal += add;
-    } else {
-      state.optionTotal -= add;
-    }
+    state.flatOptionTotal = (state.flatOptionTotal || 0) + (el.classList.contains('selected') ? add : -add);
     calcTotal();
+  }
+
+  function updateProNotice() {
+    const hasPro = Object.values(state.optionGrades).some(o => o.grade === '프로');
+    const notice = document.getElementById('pro-grade-notice');
+    if (notice) notice.style.display = hasPro ? 'block' : 'none';
   }
 
   function updateGuest(val) {
@@ -1222,7 +1340,12 @@
 
   function calcTotal() {
     const catering = state.guests * 30000;
-    const total = state.basePrice + catering + state.optionTotal;
+    let optionTotal = 0;
+    Object.values(state.optionGrades).forEach(o => { optionTotal += o.price; });
+    optionTotal += state.flatOptionTotal || 0;
+    state.optionTotal = optionTotal;
+
+    const total = state.basePrice + catering + optionTotal;
     const mini = document.getElementById('mini-price');
     if (mini) mini.textContent = total > 0 ? fmt(total) + '원~' : '—';
     return { total, catering };
@@ -1275,7 +1398,15 @@
     document.getElementById('q-guest').textContent = state.guests + '명';
     document.getElementById('q-base').textContent = fmtFull(state.basePrice);
     document.getElementById('q-catering').textContent = fmtFull(catering);
-    document.getElementById('q-options').textContent = state.optionTotal > 0 ? fmtFull(state.optionTotal) : '없음';
+
+    const gradeEntries = Object.entries(state.optionGrades);
+    let optionsText = '없음';
+    if (gradeEntries.length > 0 || state.flatOptionTotal > 0) {
+      const parts = gradeEntries.map(([name, o]) => `${name}(${o.grade})`);
+      if (state.flatOptionTotal > 0) parts.push('하객 답례품');
+      optionsText = parts.join(', ') + ' · ' + fmtFull(state.optionTotal);
+    }
+    document.getElementById('q-options').textContent = optionsText;
     document.getElementById('q-total').innerHTML = total > 0 ? fmt(total) + '<small>원~</small>' : '별도 협의';
   }
 
@@ -1353,8 +1484,10 @@
 
     // 구글시트로 견적 데이터 전송
     try {
-      const selectedOptions = Array.from(document.querySelectorAll('.toggle-item.selected .toggle-name'))
-        .map(el => el.textContent.trim()).join(', ');
+      const optionParts = Object.entries(state.optionGrades).map(([name, o]) => `${name}(${o.grade})`);
+      if (state.flatOptionTotal > 0) optionParts.push('하객 답례품');
+      const selectedOptions = optionParts.join(', ');
+      const hasProGrade = Object.values(state.optionGrades).some(o => o.grade === '프로');
       const kakaoId = document.getElementById('f-kakao').value.trim();
       const consultTime = document.getElementById('f-time').value;
       const memo = document.getElementById('f-memo').value.trim();
@@ -1370,6 +1503,8 @@
           seasonName: state.seasonName || '미선택',
           guests: state.guests,
           optionsList: selectedOptions,
+          optionGradeDetail: JSON.stringify(state.optionGrades),
+          proGradeIncluded: hasProGrade ? 'Y' : 'N',
           totalPrice: total > 0 ? total : '별도 협의',
           loginProvider: loggedInProviderLabel,
           email: loggedInEmail,
