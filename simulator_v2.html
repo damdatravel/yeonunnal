@@ -1,4 +1,4 @@
-<!-- VERSION-CHECK: my-quotes-v2 -->
+<!-- VERSION-CHECK: category-menu-v3 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -637,63 +637,100 @@
   <!-- STEP 1: 행사 유형 -->
   <div class="section active" id="step-0">
     <div class="section-title">어떤 날을 여실 건가요?</div>
-    <div class="section-sub">행사 유형을 선택해주세요</div>
-    <div class="card-grid">
-      <div class="option-card" data-group="event" data-val="wedding" data-base="4500000" onclick="selectCard(this)">
-        <div class="check-badge"></div>
+    <div class="section-sub" id="step0-sub">먼저 카테고리를 선택해주세요</div>
+
+    <!-- 대분류 -->
+    <div class="card-grid triple" id="category-grid">
+      <div class="option-card" onclick="selectCategory('wedding')" style="text-align:center;">
         <span class="emoji">💍</span>
-        <div class="card-name">여는날 웨딩</div>
-        <div class="card-desc">야외 가든 웨딩<br>최대 100명</div>
-        <div class="card-price">450만원~</div>
+        <div class="card-name" style="font-size:14px;">웨딩</div>
+        <div class="card-desc" style="font-size:11px;">결혼식·리마인드<br>효도웨딩</div>
       </div>
-      <div class="option-card" data-group="event" data-val="cinema" data-base="5500000" onclick="selectCard(this)">
-        <div class="check-badge"></div>
-        <span class="emoji">🎬</span>
-        <div class="card-name">시네마 웨딩</div>
-        <div class="card-desc">영화 장면 재현<br>최대 100명</div>
-        <div class="card-price">550만원~</div>
-      </div>
-      <div class="option-card" data-group="event" data-val="propose" data-base="500000" onclick="selectCard(this)">
-        <div class="check-badge"></div>
-        <span class="emoji">💌</span>
-        <div class="card-name">프로포즈</div>
-        <div class="card-desc">나만의 특별한<br>프로포즈 연출</div>
-        <div class="card-price">50만원~</div>
-      </div>
-      <div class="option-card" data-group="event" data-val="remind" data-base="3800000" onclick="selectCard(this)">
-        <div class="check-badge"></div>
-        <span class="emoji">💑</span>
-        <div class="card-name">다시 여는날</div>
-        <div class="card-desc">결혼기념일<br>리마인드 웨딩</div>
-        <div class="card-price">380만원~</div>
-      </div>
-      <div class="option-card" data-group="event" data-val="dol" data-base="1500000" onclick="selectCard(this)">
-        <div class="check-badge"></div>
-        <span class="emoji">👶</span>
-        <div class="card-name">백일 · 돌잔치</div>
-        <div class="card-desc">소중한 아이의<br>첫 번째 파티</div>
-        <div class="card-price">100만원~</div>
-      </div>
-      <div class="option-card" data-group="event" data-val="party" data-base="800000" onclick="selectCard(this)">
-        <div class="check-badge"></div>
+      <div class="option-card" onclick="selectCategory('event')" style="text-align:center;">
         <span class="emoji">🎉</span>
-        <div class="card-name">생일 · 파티</div>
-        <div class="card-desc">특별한 날을<br>더 특별하게</div>
-        <div class="card-price">80만원~</div>
+        <div class="card-name" style="font-size:14px;">이벤트</div>
+        <div class="card-desc" style="font-size:11px;">프로포즈·돌잔치<br>생일파티</div>
       </div>
-      <div class="option-card" data-group="event" data-val="parents" data-base="3000000" onclick="selectCard(this)">
-        <div class="check-badge"></div>
-        <span class="emoji">👨‍👩‍👧</span>
-        <div class="card-name">부모님의 여는날</div>
-        <div class="card-desc">효도 웨딩<br>10~20명</div>
-        <div class="card-price">300만원~</div>
-      </div>
-      <div class="option-card" data-group="event" data-val="corporate" data-base="0" onclick="selectCorporate(this)">
-        <div class="check-badge"></div>
+      <div class="option-card" onclick="selectCategory('corporate')" style="text-align:center;">
         <span class="emoji">🏢</span>
-        <div class="card-name">기업 · 단체 행사</div>
-        <div class="card-desc">팀빌딩, 기념식<br>워크숍, 송년회</div>
-        <div class="card-price">별도 상담</div>
+        <div class="card-name" style="font-size:14px;">행사</div>
+        <div class="card-desc" style="font-size:11px;">기업·단체<br>행사</div>
+      </div>
+    </div>
+
+    <!-- 소분류 영역 -->
+    <div id="subcategory-area" style="display:none;">
+      <button type="button" onclick="backToCategory()"
+        style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:0;margin-bottom:16px;font-family:'Noto Sans KR',sans-serif;">
+        ← 카테고리 다시 선택
+      </button>
+
+      <!-- 웨딩 -->
+      <div class="card-grid" id="wedding-options" style="display:none;">
+        <div class="option-card" data-group="event" data-val="wedding" data-base="4500000" onclick="selectCard(this)">
+          <div class="check-badge"></div>
+          <span class="emoji">💍</span>
+          <div class="card-name">여는날 웨딩</div>
+          <div class="card-desc">야외 가든 웨딩<br>최대 100명</div>
+          <div class="card-price">450만원~</div>
+        </div>
+        <div class="option-card" data-group="event" data-val="cinema" data-base="5500000" onclick="selectCard(this)">
+          <div class="check-badge"></div>
+          <span class="emoji">🎬</span>
+          <div class="card-name">시네마 웨딩</div>
+          <div class="card-desc">영화 장면 재현<br>최대 100명</div>
+          <div class="card-price">550만원~</div>
+        </div>
+        <div class="option-card" data-group="event" data-val="remind" data-base="3800000" onclick="selectCard(this)">
+          <div class="check-badge"></div>
+          <span class="emoji">💑</span>
+          <div class="card-name">다시 여는날</div>
+          <div class="card-desc">결혼기념일<br>리마인드 웨딩</div>
+          <div class="card-price">380만원~</div>
+        </div>
+        <div class="option-card" data-group="event" data-val="parents" data-base="3000000" onclick="selectCard(this)">
+          <div class="check-badge"></div>
+          <span class="emoji">👨‍👩‍👧</span>
+          <div class="card-name">부모님의 여는날</div>
+          <div class="card-desc">효도 웨딩<br>10~20명</div>
+          <div class="card-price">300만원~</div>
+        </div>
+      </div>
+
+      <!-- 이벤트 -->
+      <div class="card-grid triple" id="event-options" style="display:none;">
+        <div class="option-card" data-group="event" data-val="propose" data-base="500000" onclick="selectCard(this)">
+          <div class="check-badge"></div>
+          <span class="emoji">💌</span>
+          <div class="card-name" style="font-size:13px;">프로포즈</div>
+          <div class="card-desc" style="font-size:11px;">나만의 특별한<br>프로포즈 연출</div>
+          <div class="card-price" style="font-size:12px;">50만원~</div>
+        </div>
+        <div class="option-card" data-group="event" data-val="dol" data-base="1500000" onclick="selectCard(this)">
+          <div class="check-badge"></div>
+          <span class="emoji">👶</span>
+          <div class="card-name" style="font-size:13px;">백일 · 돌잔치</div>
+          <div class="card-desc" style="font-size:11px;">소중한 아이의<br>첫 번째 파티</div>
+          <div class="card-price" style="font-size:12px;">100만원~</div>
+        </div>
+        <div class="option-card" data-group="event" data-val="party" data-base="800000" onclick="selectCard(this)">
+          <div class="check-badge"></div>
+          <span class="emoji">🎉</span>
+          <div class="card-name" style="font-size:13px;">생일 · 파티</div>
+          <div class="card-desc" style="font-size:11px;">특별한 날을<br>더 특별하게</div>
+          <div class="card-price" style="font-size:12px;">80만원~</div>
+        </div>
+      </div>
+
+      <!-- 행사 -->
+      <div class="card-grid single" id="corporate-options" style="display:none;">
+        <div class="option-card" data-group="event" data-val="corporate" data-base="0" onclick="selectCorporate(this)">
+          <div class="check-badge"></div>
+          <span class="emoji">🏢</span>
+          <div class="card-name">기업 · 단체 행사</div>
+          <div class="card-desc">팀빌딩, 기념식<br>워크숍, 송년회</div>
+          <div class="card-price">별도 상담</div>
+        </div>
       </div>
     </div>
 
@@ -1246,6 +1283,24 @@
     quoteId: null // 기존 견적을 수정하는 경우에만 값이 들어감
   };
 
+  // 대분류(웨딩/이벤트/행사) 선택 → 소분류 펼치기
+  const categoryLabels = { wedding: '웨딩', event: '이벤트', corporate: '행사' };
+  function selectCategory(cat) {
+    document.getElementById('category-grid').style.display = 'none';
+    document.getElementById('subcategory-area').style.display = 'block';
+    document.getElementById('step0-sub').textContent = `${categoryLabels[cat]} 중에서 골라주세요`;
+    ['wedding-options', 'event-options', 'corporate-options'].forEach(id => {
+      document.getElementById(id).style.display = 'none';
+    });
+    document.getElementById(cat + '-options').style.display = 'grid';
+  }
+
+  function backToCategory() {
+    document.getElementById('category-grid').style.display = 'grid';
+    document.getElementById('subcategory-area').style.display = 'none';
+    document.getElementById('step0-sub').textContent = '먼저 카테고리를 선택해주세요';
+  }
+
   // 기업 행사 전용 함수
   function selectCorporate(el) {
     document.querySelectorAll('[data-group="event"]').forEach(c => c.classList.remove('selected'));
@@ -1480,11 +1535,26 @@
     document.getElementById(`step-${currentStep}`).classList.add('active');
     document.getElementById(`tab-${currentStep}`).classList.add('active');
     document.getElementById(`tab-${currentStep}`).classList.remove('done');
-    if (currentStep === 0) document.getElementById('btn-prev').style.display = 'none';
+    if (currentStep === 0) {
+      document.getElementById('btn-prev').style.display = 'none';
+      syncStep0View();
+    }
     updateNextBtn();
     window.scrollTo({ top: 0, behavior: 'smooth' });
     const tab = document.getElementById(`tab-${currentStep}`);
     tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }
+
+  // STEP1으로 되돌아왔을 때, 이미 골랐던 행사가 있으면 그 카테고리를 자동으로 펼쳐서 보여준다
+  const eventToCategory = {
+    wedding: 'wedding', cinema: 'wedding', remind: 'wedding', parents: 'wedding',
+    propose: 'event', dol: 'event', party: 'event',
+    corporate: 'corporate'
+  };
+  function syncStep0View() {
+    if (!state.event) return;
+    const cat = eventToCategory[state.event];
+    if (cat) selectCategory(cat);
   }
 
   async function submitForm() {
@@ -1618,6 +1688,7 @@
         }
 
         // 저장된 스텝으로 이동 (0이면 그대로 STEP 1에 머무름)
+        syncStep0View();
         if (savedStep > 0 && savedStep < totalSteps) {
           document.getElementById(`step-0`).classList.remove('active');
           document.getElementById(`tab-0`).classList.remove('active');
