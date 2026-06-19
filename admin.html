@@ -110,6 +110,7 @@
     <button class="tab-btn active" id="tab-projects" onclick="showTab('projects')">공고 관리</button>
     <button class="tab-btn" id="tab-responses" onclick="showTab('responses')">응답 현황</button>
     <button class="tab-btn" id="tab-new" onclick="showTab('new')">공고 등록</button>
+    <button class="tab-btn" id="tab-partners" onclick="showTab('partners')">협력사 승인</button>
   </div>
 
   <!-- 공고 관리 -->
@@ -171,10 +172,25 @@
       <button class="btn-gold" style="width:auto;padding:12px 32px;" onclick="postProject()">공고 등록하기</button>
     </div>
   </div>
+
+  <!-- 협력사 승인 -->
+  <div class="panel" id="panel-partners">
+    <div class="section-head">
+      <h3>협력사 승인</h3>
+      <button class="btn-sm" onclick="loadPartners()">새로고침</button>
+    </div>
+    <div class="tabs" style="border-bottom:1px solid var(--line);margin-bottom:16px;">
+      <button class="tab-btn active" id="ptab-pending" onclick="showPartnerTab('pending')" style="font-size:12px;padding:8px 14px;">심사중</button>
+      <button class="tab-btn" id="ptab-approved" onclick="showPartnerTab('approved')" style="font-size:12px;padding:8px 14px;">승인됨</button>
+      <button class="tab-btn" id="ptab-rejected" onclick="showPartnerTab('rejected')" style="font-size:12px;padding:8px 14px;">거절됨</button>
+    </div>
+    <div id="partner-list"><div class="empty-state">불러오는 중...</div></div>
+  </div>
 </div>
 
 <script>
   const WEBHOOK = 'https://script.google.com/macros/s/AKfycbzG1GPR8OhMIeBeTFvt7gE5CGiyQx3ggnLiVIah9geT89m-_poYFEwmi9K--NZ0HxDKjg/exec';
+  const PARTNERS_API = '/api/partners';
   let adminPw = '';
   let projects = [];
 
@@ -221,6 +237,83 @@
     document.getElementById('panel-' + name).classList.add('active');
     document.getElementById('tab-' + name).classList.add('active');
     if (name === 'responses') loadResponses();
+    if (name === 'partners') loadPartners();
+  }
+
+  // ── 협력사 승인 ──
+  let currentPartnerTab = 'pending';
+
+  function showPartnerTab(status) {
+    currentPartnerTab = status;
+    document.querySelectorAll('#panel-partners .tab-btn').forEach(t => t.classList.remove('active'));
+    document.getElementById('ptab-' + status).classList.add('active');
+    loadPartners();
+  }
+
+  async function loadPartners() {
+    const el = document.getElementById('partner-list');
+    el.innerHTML = '<div class="empty-state">불러오는 중...</div>';
+    try {
+      const res = await fetch(PARTNERS_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'list', status: currentPartnerTab, adminPw })
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || '불러오기 실패');
+      const data = json.partners;
+
+      if (!data || data.length === 0) {
+        el.innerHTML = `<div class="empty-state">${labelOf(currentPartnerTab)} 협력사가 없습니다</div>`;
+        return;
+      }
+      el.innerHTML = '';
+      data.forEach(p => {
+        const created = p.created_at ? new Date(p.created_at) : null;
+        const dateStr = created ? `${created.getFullYear()}.${String(created.getMonth()+1).padStart(2,'0')}.${String(created.getDate()).padStart(2,'0')}` : '';
+        el.innerHTML += `
+          <div class="project-card">
+            <div class="pc-header">
+              <div>
+                <div class="pc-title">${p.company} <span style="font-size:12px;color:var(--muted);font-weight:400;">· ${p.category}</span></div>
+                <div class="pc-meta">
+                  담당자: ${p.name} &nbsp;·&nbsp; 연락처: ${p.phone} &nbsp;·&nbsp; 카카오ID: ${p.kakao_id}<br>
+                  이메일: ${p.email} &nbsp;·&nbsp; 신청일: ${dateStr}
+                  ${p.intro ? `<br>소개: ${p.intro}` : ''}
+                </div>
+              </div>
+            </div>
+            <div class="pc-actions">
+              ${currentPartnerTab !== 'approved' ? `<button class="btn-sm" style="border-color:var(--green);color:var(--green);" onclick="setPartnerStatus('${p.id}','approved')">승인</button>` : ''}
+              ${currentPartnerTab !== 'rejected' ? `<button class="btn-danger" onclick="setPartnerStatus('${p.id}','rejected')">거절</button>` : ''}
+              ${currentPartnerTab !== 'pending' ? `<button class="btn-sm" onclick="setPartnerStatus('${p.id}','pending')">심사중으로 되돌리기</button>` : ''}
+            </div>
+          </div>`;
+      });
+    } catch(e) {
+      el.innerHTML = '<div class="empty-state">불러오기 실패: ' + e.message + '</div>';
+    }
+  }
+
+  function labelOf(status) {
+    return status === 'pending' ? '심사중인' : status === 'approved' ? '승인된' : '거절된';
+  }
+
+  async function setPartnerStatus(id, status) {
+    const labels = { approved: '승인', rejected: '거절', pending: '심사중으로 되돌리기' };
+    if (!confirm(`이 업체를 "${labels[status]}" 처리하시겠습니까?`)) return;
+    try {
+      const res = await fetch(PARTNERS_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'updateStatus', id, status, adminPw })
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || '처리 실패');
+      loadPartners();
+    } catch(e) {
+      alert('처리 실패: ' + e.message);
+    }
   }
 
   // ── 공고 목록 ──
