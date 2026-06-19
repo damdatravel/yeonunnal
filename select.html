@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>여는날 — 협력사 선택</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=Noto+Sans+KR:wght@300;400;500&display=swap');
+  :root {
+    --ink:#1a1610; --paper:#faf8f4; --cream:#f2ede4;
+    --gold:#c8a96e; --gold-light:#e8d5a8; --muted:#8a7d6a;
+    --line:#e0d8cc; --white:#ffffff; --green:#27ae60; --red:#c0392b;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-serif;font-weight:300;min-height:100vh;}
+  header{background:var(--ink);padding:20px 24px;text-align:center;}
+  .logo{font-family:'Noto Serif KR',serif;font-size:20px;color:var(--gold);letter-spacing:.08em;}
+  .wrap{max-width:560px;margin:0 auto;padding:40px 24px 80px;}
+
+  .intro-box{margin-bottom:28px;}
+  .page-title{font-family:'Noto Serif KR',serif;font-size:22px;margin-bottom:10px;}
+  .page-sub{font-size:13px;color:var(--muted);line-height:1.8;}
+  .event-meta{background:var(--cream);border-radius:10px;padding:14px 16px;margin-top:16px;font-size:13px;color:var(--ink);line-height:1.8;}
+  .event-meta b{color:var(--muted);font-weight:500;font-size:12px;display:inline-block;width:56px;}
+
+  .guide-box{background:var(--cream);border-radius:10px;padding:14px 16px;font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:28px;}
+  .guide-box strong{color:var(--ink);font-weight:500;}
+
+  .card{background:var(--white);border:1.5px solid var(--line);border-radius:14px;padding:22px;margin-bottom:16px;transition:border-color .2s;}
+  .card:hover{border-color:var(--gold-light);}
+  .card-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:6px;}
+  .card-company{font-family:'Noto Serif KR',serif;font-size:17px;}
+  .grade-badge{font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(200,169,110,.15);color:var(--gold);font-weight:500;white-space:nowrap;}
+  .card-category{font-size:12px;color:var(--muted);margin-bottom:12px;}
+  .card-intro{font-size:13px;color:#4a4338;line-height:1.8;margin-bottom:14px;white-space:pre-wrap;}
+  .card-portfolio{display:inline-block;font-size:12px;color:var(--gold);text-decoration:underline;margin-bottom:16px;}
+  .btn-select{width:100%;background:var(--gold);color:var(--white);border:none;border-radius:8px;
+    padding:13px;font-size:14px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+  .btn-select:hover{background:#b8945a;}
+  .btn-select:disabled{background:var(--line);cursor:not-allowed;}
+
+  .status-screen{text-align:center;padding:60px 24px;max-width:420px;margin:0 auto;}
+  .status-icon{font-size:48px;margin-bottom:18px;}
+  .status-title{font-family:'Noto Serif KR',serif;font-size:20px;margin-bottom:10px;}
+  .status-desc{font-size:13px;color:var(--muted);line-height:1.9;}
+  .loading-txt{text-align:center;padding:80px 24px;color:var(--muted);font-size:14px;}
+</style>
+</head>
+<body>
+
+<header><span class="logo">여는날</span></header>
+
+<div class="wrap" id="app">
+  <div class="loading-txt">잠시만 기다려주세요...</div>
+</div>
+
+<script>
+  const WEBHOOK = 'https://script.google.com/macros/s/AKfycbzG1GPR8OhMIeBeTFvt7gE5CGiyQx3ggnLiVIah9geT89m-_poYFEwmi9K--NZ0HxDKjg/exec';
+  const app = document.getElementById('app');
+  const token = new URLSearchParams(location.search).get('token') || '';
+
+  let currentData = null;
+
+  function renderError(title, desc) {
+    app.innerHTML = `
+      <div class="status-screen">
+        <div class="status-icon">⚠️</div>
+        <div class="status-title">${title}</div>
+        <div class="status-desc">${desc}</div>
+      </div>`;
+  }
+
+  function renderCompleted(data) {
+    app.innerHTML = `
+      <div class="status-screen">
+        <div class="status-icon">✅</div>
+        <div class="status-title">선택이 완료되었습니다</div>
+        <div class="status-desc">
+          <strong style="color:var(--ink);">${data.selectedCompany || ''}</strong>님과 함께하기로 결정되었습니다.<br><br>
+          이후 진행 사항은 여는날 담당자가 카카오톡으로 안내드립니다.
+        </div>
+      </div>`;
+  }
+
+  function renderList(data) {
+    const p = data.project || {};
+    const recs = data.recommendations || [];
+
+    if (recs.length === 0) {
+      renderError('추천 정보를 불러올 수 없습니다', '담당자에게 문의해주세요.');
+      return;
+    }
+
+    app.innerHTML = `
+      <div class="intro-box">
+        <div class="page-title">협력사를 선택해주세요</div>
+        <div class="page-sub">담당자가 안내해드린 내용을 참고하여, 함께할 한 분을 골라주세요.</div>
+        <div class="event-meta">
+          <div><b>행사</b>${p.title || ''}</div>
+          <div><b>일시</b>${p.eventDate || ''}</div>
+          <div><b>장소</b>${p.location || ''}</div>
+        </div>
+      </div>
+      <div class="guide-box">
+        <strong>안내</strong><br>
+        연락처와 정확한 견적은 비공개로 진행되며, 선택 후 여는날 담당자가 직접 연결해드립니다.<br>
+        한 분을 선택하시면 변경이 어려우니 신중히 결정해주세요.
+      </div>
+      <div id="card-list">
+        ${recs.map(r => `
+          <div class="card">
+            <div class="card-top">
+              <span class="card-company">${r.company}</span>
+              <span class="grade-badge">${r.grade || ''}</span>
+            </div>
+            <div class="card-category">${r.category || ''}</div>
+            ${r.intro ? `<div class="card-intro">${escapeHtml(r.intro)}</div>` : ''}
+            ${r.portfolioUrl ? `<a class="card-portfolio" href="${escapeAttr(r.portfolioUrl)}" target="_blank" rel="noopener">포트폴리오 보러가기 →</a>` : ''}
+            <button class="btn-select" data-uid="${escapeAttr(r.userId)}" data-company="${escapeAttr(r.company)}" onclick="selectPartner(this)">이 분으로 선택하기</button>
+          </div>`).join('')}
+      </div>`;
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  }
+  function escapeAttr(s) {
+    return String(s).replace(/"/g, '&quot;');
+  }
+
+  async function selectPartner(btn) {
+    const uid = btn.dataset.uid;
+    const company = btn.dataset.company;
+    if (!confirm(`"${company}"님으로 최종 선택하시겠습니까?\n선택 후에는 변경이 어렵습니다.`)) return;
+
+    document.querySelectorAll('.btn-select').forEach(b => { b.disabled = true; });
+    btn.textContent = '처리 중...';
+
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ type: 'select_final_partner', token, userId: uid })
+      });
+      const data = await res.json();
+      if (data.result !== 'success') {
+        alert('처리 중 문제가 발생했습니다: ' + (data.message || ''));
+        document.querySelectorAll('.btn-select').forEach(b => { b.disabled = false; });
+        btn.textContent = '이 분으로 선택하기';
+        return;
+      }
+      renderCompleted({ selectedCompany: company });
+    } catch (e) {
+      alert('처리 실패. 다시 시도해주세요.');
+      document.querySelectorAll('.btn-select').forEach(b => { b.disabled = false; });
+      btn.textContent = '이 분으로 선택하기';
+    }
+  }
+
+  async function init() {
+    if (!token) {
+      renderError('잘못된 접근입니다', '전달받은 링크를 다시 확인해주세요.');
+      return;
+    }
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ type: 'get_recommendations', token })
+      });
+      const data = await res.json();
+      if (data.result !== 'success') {
+        if (data.message === 'expired') {
+          renderError('링크가 만료되었습니다', '담당자에게 새 링크를 요청해주세요.');
+        } else {
+          renderError('잘못된 접근입니다', '전달받은 링크를 다시 확인해주세요.');
+        }
+        return;
+      }
+      currentData = data;
+      if (data.completed) {
+        renderCompleted(data);
+      } else {
+        renderList(data);
+      }
+    } catch (e) {
+      renderError('불러오기 실패', '잠시 후 다시 시도해주세요.');
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>
