@@ -1,4 +1,4 @@
-<!-- VERSION-CHECK: debug-markers-v9 -->
+<!-- VERSION-CHECK: race-condition-fix-v10 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -345,6 +345,7 @@
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   let currentUser = null;
   let currentPartner = null;
+  let partnerInsertAttempted = false; // signUp 직후 코드와 onAuthStateChange 콜백이 동시에 저장 시도하는 것을 막는 가드
   let projectMap = {};
   let respondedIds = JSON.parse(localStorage.getItem('yeonunnal_responded') || '[]');
 
@@ -425,7 +426,7 @@
           try {
             const pData = JSON.parse(pending);
             const { data: existing } = await sb.from('partners').select('id').eq('id', session.user.id).single();
-            if (!existing) await insertPartnerRow(session.user.id, session.user.email, pData);
+            if (!existing) await tryInsertPartnerOnce(session.user.id, session.user.email, pData);
             localStorage.removeItem('pendingPartner');
           } catch(e) {}
         }
@@ -476,8 +477,15 @@
   init();
 
   // ── 파트너 row 삽입 ──
+  // 동시에 두 군데(가입 직후 코드 / onAuthStateChange 콜백)에서 호출돼도
+  // 실제 저장은 딱 한 번만 일어나도록 막는 가드. 동기적으로 체크+설정하므로 안전하다.
+  async function tryInsertPartnerOnce(uid, email, d) {
+    if (partnerInsertAttempted) return;
+    partnerInsertAttempted = true;
+    await insertPartnerRow(uid, email, d);
+  }
+
   async function insertPartnerRow(uid, email, d) {
-    alert('[디버그 1.5] insertPartnerRow 함수 진입함. uid=' + uid);
     const { error } = await sb.from('partners').insert({
       id: uid, email,
       company: d.company, name: d.name, phone: d.phone,
@@ -539,9 +547,7 @@
 
       if (data.session) {
         // 이메일 확인 비활성화 상태 — 즉시 파트너 row 삽입
-        alert('[디버그 1] signUp 성공, session 있음. 이제 partners 저장 시도합니다.');
-        await insertPartnerRow(data.user.id, email, partnerData);
-        alert('[디버그 2] partners 저장 완료!');
+        await tryInsertPartnerOnce(data.user.id, email, partnerData);
         localStorage.removeItem('pendingPartner');
         // onAuthStateChange가 대시보드/pending 화면으로 이동 (성공이라 버튼 복구 불필요)
       } else {
