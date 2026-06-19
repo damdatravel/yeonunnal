@@ -1,4 +1,4 @@
-<!-- VERSION-CHECK: lockfix-2107-v6 -->
+<!-- VERSION-CHECK: error-surface-v7 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -477,12 +477,17 @@
 
   // ── 파트너 row 삽입 ──
   async function insertPartnerRow(uid, email, d) {
-    await sb.from('partners').insert({
+    const { error } = await sb.from('partners').insert({
       id: uid, email,
       company: d.company, name: d.name, phone: d.phone,
       kakao_id: d.kakao_id, category: d.category, intro: d.intro || '',
       status: 'pending'
     });
+    if (error) {
+      console.error('partners 테이블 저장 실패:', error);
+      alert('협력사 정보 저장 중 문제가 발생했습니다.\n\n오류 내용: ' + error.message + '\n\n이 내용을 캡쳐해서 전달해주세요.');
+      throw error;
+    }
     // Apps Script 시트에도 기록
     fetch(WEBHOOK, {
       method: 'POST', mode: 'no-cors',
