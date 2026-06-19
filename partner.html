@@ -224,8 +224,13 @@
         <p class="fg-hint">⚠️ 자기 신고 항목입니다. 검토 과정에서 담당자가 등급을 조정할 수 있어요.</p>
       </div>
       <div class="fg">
-        <label>소개 / 포트폴리오 링크 (선택)</label>
-        <textarea id="su-intro" placeholder="인스타그램, 포트폴리오 링크, 간단한 소개 등"></textarea>
+        <label>소개 (선택)</label>
+        <textarea id="su-intro" placeholder="간단한 소개, 활동 경력 등"></textarea>
+      </div>
+      <div class="fg">
+        <label>포트폴리오 링크 (선택)</label>
+        <input type="url" id="su-portfolio" placeholder="인스타그램 게시물, 유튜브 등 URL">
+        <p class="fg-hint">🔗 고객 추천 단계에서 프로필과 함께 노출됩니다. 연락처는 공개되지 않아요.</p>
       </div>
       <label class="consent-row">
         <input type="checkbox" id="su-consent">
@@ -503,6 +508,7 @@
       id: uid, email,
       company: d.company, name: d.name, phone: d.phone,
       kakao_id: d.kakao_id, category: d.category, grade: d.grade || '아마추어', intro: d.intro || '',
+      portfolio_url: d.portfolio_url || '',
       status: 'pending'
     });
     if (error) {
@@ -516,7 +522,8 @@
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({
         type: 'partner', company: d.company, name: d.name,
-        phone: d.phone, kakaoId: d.kakao_id, category: d.category, grade: d.grade || '아마추어', intro: d.intro || ''
+        phone: d.phone, kakaoId: d.kakao_id, category: d.category, grade: d.grade || '아마추어',
+        intro: d.intro || '', portfolioUrl: d.portfolio_url || ''
       })
     });
   }
@@ -536,6 +543,7 @@
     const category = document.getElementById('su-category').value;
     const grade    = document.getElementById('su-grade').value;
     const intro    = document.getElementById('su-intro').value.trim();
+    const portfolio = document.getElementById('su-portfolio').value.trim();
 
     if (!email || !pw || !pw2 || !company || !name || !phone || !kakao || !category || !grade) {
       alert('모든 필수 항목을 입력해주세요.'); return;
@@ -549,7 +557,7 @@
     btn.disabled = true;
     btn.textContent = '처리 중...';
 
-    const partnerData = { company, name, phone, kakao_id: kakao, category, grade, intro };
+    const partnerData = { company, name, phone, kakao_id: kakao, category, grade, intro, portfolio_url: portfolio };
     localStorage.setItem('pendingPartner', JSON.stringify(partnerData));
 
     try {
@@ -655,6 +663,7 @@
         <div class="info-row"><span class="info-label">등급</span><span>${p.grade || '아마추어'}</span></div>
         <div class="info-row"><span class="info-label">이메일</span><span>${p.email}</span></div>
         ${p.intro ? `<div class="info-row"><span class="info-label">소개</span><span>${p.intro}</span></div>` : ''}
+        ${p.portfolio_url ? `<div class="info-row"><span class="info-label">포트폴리오</span><span><a href="${p.portfolio_url}" target="_blank" style="color:var(--ink);text-decoration:underline;">${p.portfolio_url}</a></span></div>` : ''}
       </div>
       <p style="font-size:12px;color:var(--muted);margin-top:16px;line-height:1.7;">
         정보 수정이 필요하시면 카카오채널 @여는날로 연락해주세요.
@@ -762,7 +771,11 @@
           participate: selectedParticipate,
           price: document.getElementById('resp-price').value,
           memo: document.getElementById('resp-memo').value,
-          userId: currentPartner.email
+          userId: currentPartner.email,
+          category: currentPartner.category || '',
+          grade: currentPartner.grade || '아마추어',
+          portfolioUrl: currentPartner.portfolio_url || '',
+          intro: currentPartner.intro || ''
         })
       });
       const data = await res.json();
