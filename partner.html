@@ -1,4 +1,4 @@
-<!-- VERSION-CHECK: race-condition-fix-v10 -->
+<!-- VERSION-CHECK: grade-system-v11 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -213,6 +213,16 @@
         </select>
       </div>
       <div class="fg">
+        <label>활동 등급 <span class="req">*</span></label>
+        <select id="su-grade">
+          <option value="">선택해주세요</option>
+          <option value="아마추어">아마추어 — 취미·경험 위주로 활동 중</option>
+          <option value="준프로">준프로 — 정기적으로 외부 행사 진행 경험 있음</option>
+          <option value="프로">프로 — 해당 분야로 주업 또는 다수의 행사 진행 경력</option>
+        </select>
+        <p class="fg-hint">⚠️ 자기 신고 항목입니다. 검토 과정에서 담당자가 등급을 조정할 수 있어요.</p>
+      </div>
+      <div class="fg">
         <label>소개 / 포트폴리오 링크 (선택)</label>
         <textarea id="su-intro" placeholder="인스타그램, 포트폴리오 링크, 간단한 소개 등"></textarea>
       </div>
@@ -280,6 +290,7 @@
     <div class="dash-header">
       <div class="dash-badge">PARTNER</div>
       <div class="dash-name" id="dash-name">업체명 협력사입니다</div>
+      <div id="dash-grade" style="font-size:12px;color:rgba(255,255,255,.55);margin-top:6px;"></div>
     </div>
     <div class="tabs" style="margin-top:0">
       <button class="tab-btn active" id="tab-projects" onclick="showDashTab('projects')">📋 공고 현황</button>
@@ -396,6 +407,7 @@
       currentPartner = data;
       if (data.status === 'approved') {
         document.getElementById('dash-name').textContent = `${data.company} 협력사입니다`;
+        document.getElementById('dash-grade').textContent = `${data.category} · ${data.grade || '아마추어'}`;
         document.getElementById('header-company').textContent = `${data.company}님`;
         showScreen('dashboard');
         loadProjects();
@@ -489,7 +501,7 @@
     const { error } = await sb.from('partners').insert({
       id: uid, email,
       company: d.company, name: d.name, phone: d.phone,
-      kakao_id: d.kakao_id, category: d.category, intro: d.intro || '',
+      kakao_id: d.kakao_id, category: d.category, grade: d.grade || '아마추어', intro: d.intro || '',
       status: 'pending'
     });
     if (error) {
@@ -503,7 +515,7 @@
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({
         type: 'partner', company: d.company, name: d.name,
-        phone: d.phone, kakaoId: d.kakao_id, category: d.category, intro: d.intro || ''
+        phone: d.phone, kakaoId: d.kakao_id, category: d.category, grade: d.grade || '아마추어', intro: d.intro || ''
       })
     });
   }
@@ -521,9 +533,10 @@
     const phone    = document.getElementById('su-phone').value.trim();
     const kakao    = document.getElementById('su-kakao').value.trim();
     const category = document.getElementById('su-category').value;
+    const grade    = document.getElementById('su-grade').value;
     const intro    = document.getElementById('su-intro').value.trim();
 
-    if (!email || !pw || !pw2 || !company || !name || !phone || !kakao || !category) {
+    if (!email || !pw || !pw2 || !company || !name || !phone || !kakao || !category || !grade) {
       alert('모든 필수 항목을 입력해주세요.'); return;
     }
     if (pw !== pw2) { alert('비밀번호가 일치하지 않습니다.'); return; }
@@ -535,7 +548,7 @@
     btn.disabled = true;
     btn.textContent = '처리 중...';
 
-    const partnerData = { company, name, phone, kakao_id: kakao, category, intro };
+    const partnerData = { company, name, phone, kakao_id: kakao, category, grade, intro };
     localStorage.setItem('pendingPartner', JSON.stringify(partnerData));
 
     try {
@@ -638,6 +651,7 @@
         <div class="info-row"><span class="info-label">연락처</span><span>${p.phone}</span></div>
         <div class="info-row"><span class="info-label">카카오ID</span><span>${p.kakao_id}</span></div>
         <div class="info-row"><span class="info-label">분야</span><span>${p.category}</span></div>
+        <div class="info-row"><span class="info-label">등급</span><span>${p.grade || '아마추어'}</span></div>
         <div class="info-row"><span class="info-label">이메일</span><span>${p.email}</span></div>
         ${p.intro ? `<div class="info-row"><span class="info-label">소개</span><span>${p.intro}</span></div>` : ''}
       </div>
