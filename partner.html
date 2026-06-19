@@ -1,4 +1,4 @@
-<!-- VERSION-CHECK: init-fix-v2 -->
+<!-- VERSION-CHECK: timeout-fix-v3 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -442,7 +442,26 @@
   // (onAuthStateChange는 '변화'에만 반응할 수도 있어서, 첫 화면 전환은 여기서 직접 보장한다)
   async function init() {
     try {
-      const { data, error } = await sb.auth.getSession();
+      const sessionPromise = sb.auth.getSession();
+      const timeoutPromise = new Promise(resolve =>
+        setTimeout(() => resolve({ timedOut: true }), 4000)
+      );
+      const result = await Promise.race([sessionPromise, timeoutPromise]);
+
+      if (result && result.timedOut) {
+        // 세션 확인이 비정상적으로 오래 걸림 — 일단 로그인 화면을 보여주고,
+        // 응답이 뒤늦게 오면 그때 가서 로그인 상태를 반영한다
+        showScreen('auth');
+        sessionPromise.then(async ({ data }) => {
+          if (data?.session?.user) {
+            currentUser = data.session.user;
+            await loadPartnerData();
+          }
+        }).catch(() => {});
+        return;
+      }
+
+      const { data, error } = result;
       if (error) throw error;
       if (data?.session?.user) {
         currentUser = data.session.user;
