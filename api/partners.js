@@ -17,7 +17,7 @@ module.exports = async function handler(req, res) {
     try { body = JSON.parse(body); } catch (e) { body = {}; }
   }
 
-  const { action, adminPw, status, id } = body || {};
+  const { action, adminPw, status, id, grade } = body || {};
 
   // 관리자 비밀번호 확인 — 이 값을 모르면 키를 알아도 데이터에 접근 불가
   if (adminPw !== ADMIN_PASSWORD) {
@@ -39,6 +39,15 @@ module.exports = async function handler(req, res) {
       const { error } = await supabase
         .from('partners')
         .update({ status })
+        .eq('id', id);
+      if (error) throw error;
+      return res.status(200).json({ success: true });
+    }
+
+    if (action === 'updateGrade') {
+      const { error } = await supabase
+        .from('partners')
+        .update({ grade })
         .eq('id', id);
       if (error) throw error;
       return res.status(200).json({ success: true });
