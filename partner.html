@@ -10,21 +10,27 @@
   :root {
     --ink:#1a1610; --paper:#faf8f4; --cream:#f2ede4;
     --gold:#c8a96e; --gold-light:#e8d5a8; --muted:#8a7d6a;
-    --line:#e0d8cc; --white:#ffffff;
-    --green:#27ae60; --red:#c0392b;
+    --line:#e0d8cc; --white:#ffffff; --green:#27ae60; --red:#c0392b;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-serif;font-weight:300;min-height:100vh;}
 
   header{background:var(--ink);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;}
   .logo{font-family:'Noto Serif KR',serif;font-size:20px;color:var(--gold);letter-spacing:.08em;text-decoration:none;}
-  .home-link{color:var(--muted);font-size:13px;text-decoration:none;display:flex;align-items:center;gap:6px;}
+  .header-right{display:flex;align-items:center;gap:16px;}
+  .header-company{font-size:13px;color:rgba(255,255,255,.6);display:none;}
+  .logout-btn{background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);font-size:12px;padding:6px 14px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;display:none;}
+  .logout-btn:hover{border-color:var(--gold);color:var(--gold);}
+  .home-link{color:var(--muted);font-size:13px;text-decoration:none;}
   .home-link:hover{color:var(--gold);}
 
-  main{max-width:480px;margin:0 auto;padding:48px 24px 80px;}
+  /* LOADING */
+  #screen-loading{display:flex;align-items:center;justify-content:center;min-height:60vh;}
+  .loading-txt{font-size:14px;color:var(--muted);}
 
-  /* TABS */
-  .tabs{display:flex;gap:0;margin-bottom:32px;border-bottom:1px solid var(--line);}
+  /* COMMON */
+  .screen-wrap{max-width:480px;margin:0 auto;padding:48px 24px 80px;}
+  .tabs{display:flex;margin-bottom:32px;border-bottom:1px solid var(--line);}
   .tab-btn{flex:1;text-align:center;padding:14px 0;font-size:14px;color:var(--muted);
     border-bottom:2px solid transparent;cursor:pointer;background:none;
     border-top:none;border-left:none;border-right:none;font-family:'Noto Sans KR',sans-serif;}
@@ -36,42 +42,71 @@
   /* FORM */
   .page-title{font-family:'Noto Serif KR',serif;font-size:24px;margin-bottom:8px;}
   .page-sub{font-size:13px;color:var(--muted);margin-bottom:28px;line-height:1.7;}
-  .form-group{margin-bottom:16px;}
-  .form-group label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;letter-spacing:.05em;}
-  .form-group label .req{color:var(--gold);margin-left:2px;}
-  .form-group input,.form-group select,.form-group textarea{
+  .fg{margin-bottom:16px;}
+  .fg label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;letter-spacing:.05em;}
+  .fg label .req{color:var(--gold);margin-left:2px;}
+  .fg input,.fg select,.fg textarea{
     width:100%;border:1.5px solid var(--line);border-radius:8px;padding:12px 14px;
     font-size:14px;font-family:'Noto Sans KR',sans-serif;font-weight:300;
     background:var(--white);color:var(--ink);outline:none;transition:border-color .15s;}
-  .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--gold);}
-  .form-group textarea{resize:none;height:80px;}
-  .kakao-hint{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.6;}
-  .btn-submit{width:100%;background:var(--gold);color:var(--white);border:none;border-radius:8px;
+  .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--gold);}
+  .fg textarea{resize:none;height:80px;}
+  .fg-hint{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.6;}
+  .btn-gold{width:100%;background:var(--gold);color:var(--white);border:none;border-radius:8px;
     padding:14px;font-size:15px;font-weight:500;cursor:pointer;margin-top:8px;
     font-family:'Noto Sans KR',sans-serif;transition:background .2s;}
-  .btn-submit:hover{background:#b8945a;}
+  .btn-gold:hover{background:#b8945a;}
+  .btn-outline{width:100%;background:transparent;color:var(--muted);border:1px solid var(--line);
+    border-radius:8px;padding:12px;font-size:14px;cursor:pointer;
+    font-family:'Noto Sans KR',sans-serif;margin-top:8px;transition:all .2s;}
+  .btn-outline:hover{border-color:var(--gold);color:var(--gold);}
   .notice-box{background:var(--cream);border-radius:10px;padding:14px 16px;
     font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:24px;}
   .notice-box strong{color:var(--ink);font-weight:500;}
+  .helper-link{display:block;text-align:center;font-size:12px;color:var(--muted);
+    margin-top:16px;cursor:pointer;text-decoration:underline;}
+  .helper-link:hover{color:var(--gold);}
+  .consent-row{display:flex;align-items:flex-start;gap:8px;font-size:12px;
+    color:var(--muted);margin-bottom:16px;cursor:pointer;line-height:1.6;}
+  .consent-row input{margin-top:2px;flex-shrink:0;}
+  .consent-row a{color:var(--ink);text-decoration:underline;}
+
+  /* STATUS SCREENS */
+  .status-screen{text-align:center;padding:48px 24px;max-width:400px;margin:0 auto;}
+  .status-icon{font-size:52px;margin-bottom:20px;}
+  .status-title{font-family:'Noto Serif KR',serif;font-size:22px;margin-bottom:12px;}
+  .status-desc{font-size:14px;color:var(--muted);line-height:1.9;margin-bottom:32px;}
+
+  /* DASHBOARD */
+  .dash-header{background:var(--ink);padding:24px;margin:-48px -24px 32px;border-radius:0 0 12px 12px;}
+  .dash-badge{font-size:11px;color:var(--gold);letter-spacing:.15em;margin-bottom:6px;}
+  .dash-name{font-family:'Noto Serif KR',serif;font-size:20px;color:var(--white);font-weight:400;}
 
   /* PROJECT CARDS */
   .project-card{background:var(--white);border:1.5px solid var(--line);border-radius:12px;
     padding:20px;margin-bottom:12px;transition:border-color .2s;}
   .project-card:hover{border-color:var(--gold-light);}
   .project-card.closed{opacity:.55;}
-  .pc-title{font-family:'Noto Serif KR',serif;font-size:16px;font-weight:400;margin-bottom:8px;}
+  .pc-title{font-family:'Noto Serif KR',serif;font-size:16px;margin-bottom:8px;}
   .pc-meta{font-size:12px;color:var(--muted);line-height:1.9;}
   .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500;margin-bottom:10px;}
   .badge-open{background:rgba(39,174,96,.12);color:var(--green);}
   .badge-closed{background:var(--cream);color:var(--muted);}
-  .btn-respond{display:inline-block;background:var(--gold);color:var(--white);border:none;
-    border-radius:6px;padding:8px 18px;font-size:13px;font-weight:500;cursor:pointer;
+  .btn-respond{background:var(--gold);color:var(--white);border:none;border-radius:6px;
+    padding:8px 18px;font-size:13px;font-weight:500;cursor:pointer;
     font-family:'Noto Sans KR',sans-serif;margin-top:12px;}
   .btn-respond:hover{background:#b8945a;}
   .btn-responded{background:var(--cream);color:var(--muted);border:1px solid var(--line);
     border-radius:6px;padding:8px 18px;font-size:13px;cursor:default;
     font-family:'Noto Sans KR',sans-serif;margin-top:12px;}
-  .empty-state{text-align:center;padding:40px 0;color:var(--muted);font-size:14px;line-height:1.8;}
+  .empty-state{text-align:center;padding:40px 0;color:var(--muted);font-size:14px;line-height:1.9;}
+
+  /* MY INFO */
+  .info-table{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:24px;margin-top:8px;}
+  .info-row{display:grid;grid-template-columns:80px 1fr;gap:10px;padding:8px 0;
+    border-bottom:1px solid var(--line);font-size:14px;}
+  .info-row:last-child{border-bottom:none;}
+  .info-label{color:var(--muted);font-size:12px;padding-top:1px;}
 
   /* MODAL */
   .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;
@@ -84,207 +119,471 @@
     border:1.5px solid var(--line);background:var(--white);font-family:'Noto Sans KR',sans-serif;transition:all .15s;}
   .pbtn.yes.selected{background:rgba(39,174,96,.1);border-color:var(--green);color:var(--green);}
   .pbtn.no.selected{background:rgba(192,57,43,.08);border-color:var(--red);color:var(--red);}
-  .pbtn:hover{border-color:var(--gold);}
-  .modal-form-group{margin-bottom:14px;}
-  .modal-form-group label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;}
-  .modal-form-group input,.modal-form-group textarea{
-    width:100%;border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;
-    font-size:14px;font-family:'Noto Sans KR',sans-serif;outline:none;transition:border-color .15s;}
-  .modal-form-group input:focus,.modal-form-group textarea:focus{border-color:var(--gold);}
-  .modal-form-group textarea{resize:none;height:72px;}
+  .mfg{margin-bottom:14px;}
+  .mfg label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;}
+  .mfg input,.mfg textarea{width:100%;border:1.5px solid var(--line);border-radius:8px;
+    padding:10px 12px;font-size:14px;font-family:'Noto Sans KR',sans-serif;outline:none;transition:border-color .15s;}
+  .mfg input:focus,.mfg textarea:focus{border-color:var(--gold);}
+  .mfg textarea{resize:none;height:72px;}
   .modal-btns{display:flex;gap:10px;margin-top:4px;}
-  .modal-btn-submit{flex:1;background:var(--gold);color:var(--white);border:none;border-radius:8px;
+  .modal-btn-sub{flex:1;background:var(--gold);color:var(--white);border:none;border-radius:8px;
     padding:12px;font-size:14px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
   .modal-btn-cancel{flex:0 0 72px;background:var(--cream);color:var(--muted);border:none;
     border-radius:8px;padding:12px;font-size:14px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+
+  /* RECOVERY */
+  #screen-recovery{display:none;}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
 <header>
   <a href="index.html" class="logo">여는날</a>
-  <a href="index.html" class="home-link">← 홈으로</a>
+  <div class="header-right">
+    <span class="header-company" id="header-company"></span>
+    <button class="logout-btn" id="logout-btn" onclick="doLogout()">로그아웃</button>
+    <a href="index.html" class="home-link">← 홈으로</a>
+  </div>
 </header>
 
-<main>
-  <div class="tabs">
-    <button class="tab-btn active" id="tab-apply" onclick="showPanel('apply')">협력 신청</button>
-    <button class="tab-btn" id="tab-projects" onclick="showPanel('projects')">📋 공고 현황</button>
+<!-- 로딩 -->
+<div id="screen-loading">
+  <div class="loading-txt">잠시만 기다려주세요...</div>
+</div>
+
+<!-- 비로그인 -->
+<div id="screen-auth" style="display:none">
+  <div class="screen-wrap">
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-signup" onclick="showAuthTab('signup')">협력 신청</button>
+      <button class="tab-btn" id="tab-login" onclick="showAuthTab('login')">로그인</button>
+    </div>
+
+    <!-- 협력 신청 -->
+    <div class="panel active" id="panel-signup">
+      <div class="page-title">협력 신청</div>
+      <div class="page-sub">여는날과 함께할 협력사를 모집합니다<br>신청 후 검토가 완료되면 공고를 먼저 받아보실 수 있어요</div>
+      <div class="notice-box">
+        <strong>안내</strong><br>
+        신청 후 영업일 2~3일 내 카카오톡으로 연락드려요.<br>
+        승인 후 이메일과 비밀번호로 로그인하시면 공고를 확인하실 수 있어요.
+      </div>
+      <div class="fg">
+        <label>이메일 (로그인 아이디) <span class="req">*</span></label>
+        <input type="email" id="su-email" placeholder="example@email.com">
+      </div>
+      <div class="fg">
+        <label>비밀번호 <span class="req">*</span></label>
+        <input type="password" id="su-pw" placeholder="8자 이상">
+      </div>
+      <div class="fg">
+        <label>비밀번호 확인 <span class="req">*</span></label>
+        <input type="password" id="su-pw2" placeholder="비밀번호 재입력">
+      </div>
+      <div class="fg">
+        <label>업체명 <span class="req">*</span></label>
+        <input type="text" id="su-company" placeholder="업체명을 입력해주세요">
+      </div>
+      <div class="fg">
+        <label>담당자 이름 <span class="req">*</span></label>
+        <input type="text" id="su-name" placeholder="이름을 입력해주세요">
+      </div>
+      <div class="fg">
+        <label>연락처 <span class="req">*</span></label>
+        <input type="tel" id="su-phone" placeholder="010-0000-0000">
+      </div>
+      <div class="fg">
+        <label>카카오톡 ID <span class="req">*</span></label>
+        <input type="text" id="su-kakao" placeholder="카카오톡 검색용 아이디">
+        <p class="fg-hint">💬 승인 후 공고 알림 및 소통은 카카오톡으로 진행됩니다.<br>카카오톡 앱 → 더보기 → 설정 → 카카오계정에서 확인하실 수 있어요.</p>
+      </div>
+      <div class="fg">
+        <label>협력 분야 <span class="req">*</span></label>
+        <select id="su-category">
+          <option value="">선택해주세요</option>
+          <option>플로리스트 · 꽃장식</option>
+          <option>스냅 · 영상 촬영</option>
+          <option>헤어 · 메이크업</option>
+          <option>푸드트럭 · 음료바</option>
+          <option>답례품</option>
+          <option>버스킹 · 음악</option>
+          <option>기타</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>소개 / 포트폴리오 링크 (선택)</label>
+        <textarea id="su-intro" placeholder="인스타그램, 포트폴리오 링크, 간단한 소개 등"></textarea>
+      </div>
+      <label class="consent-row">
+        <input type="checkbox" id="su-consent">
+        <span><a href="privacy.html" target="_blank">개인정보 수집·이용</a>에 동의합니다 (필수)</span>
+      </label>
+      <button class="btn-gold" onclick="doSignup()">신청하기</button>
+    </div>
+
+    <!-- 로그인 -->
+    <div class="panel" id="panel-login">
+      <div class="page-title">협력사 로그인</div>
+      <div class="page-sub">승인된 협력사만 로그인할 수 있어요</div>
+      <div class="fg">
+        <label>이메일</label>
+        <input type="email" id="li-email" placeholder="가입 시 이메일">
+      </div>
+      <div class="fg">
+        <label>비밀번호</label>
+        <input type="password" id="li-pw" placeholder="비밀번호" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="btn-gold" onclick="doLogin()">로그인</button>
+      <span class="helper-link" onclick="toggleForgot()">비밀번호를 잊으셨나요?</span>
+      <div id="forgot-section" style="display:none;margin-top:16px;">
+        <div class="fg">
+          <label>가입 이메일</label>
+          <input type="email" id="forgot-email" placeholder="이메일 입력">
+        </div>
+        <button class="btn-outline" onclick="doForgotPw()">재설정 메일 발송</button>
+      </div>
+    </div>
   </div>
+</div>
 
-  <!-- 협력 신청 -->
-  <div class="panel active" id="panel-apply">
-    <div class="page-title">협력 신청</div>
-    <div class="page-sub">플로리스트, 스냅·영상, 헤어메이크업, 푸드트럭, 답례품 등<br>여는날과 함께할 협력사를 찾고 있어요</div>
-
-    <div class="notice-box">
-      <strong>안내</strong><br>
-      신청서 검토 후 영업일 기준 2~3일 내 카카오톡으로 연락드려요.<br>
-      승인된 협력사에게는 새 행사 공고를 카카오톡으로 먼저 알려드립니다.
+<!-- 심사 중 -->
+<div id="screen-pending" style="display:none">
+  <div class="status-screen">
+    <div class="status-icon">⏳</div>
+    <div class="status-title">신청이 접수되었습니다</div>
+    <div class="status-desc">
+      영업일 기준 2~3일 내 검토 후<br>카카오톡으로 연락드릴게요<br><br>
+      <span style="font-size:12px;color:var(--muted);">가입 이메일: <span id="pending-email" style="color:var(--ink);"></span></span>
     </div>
-
-    <div class="form-group">
-      <label>업체명 <span class="req">*</span></label>
-      <input type="text" id="ap-company" placeholder="업체명을 입력해주세요">
-    </div>
-    <div class="form-group">
-      <label>담당자 이름 <span class="req">*</span></label>
-      <input type="text" id="ap-name" placeholder="이름을 입력해주세요">
-    </div>
-    <div class="form-group">
-      <label>연락처 <span class="req">*</span></label>
-      <input type="tel" id="ap-phone" placeholder="010-0000-0000">
-    </div>
-    <div class="form-group">
-      <label>카카오톡 ID <span class="req">*</span></label>
-      <input type="text" id="ap-kakao" placeholder="카카오톡 검색용 아이디">
-      <p class="kakao-hint">💬 승인 후 공고 알림 및 소통은 카카오톡으로 진행됩니다.<br>카카오톡 앱 → 더보기 → 설정 → 카카오계정에서 확인하실 수 있어요.</p>
-    </div>
-    <div class="form-group">
-      <label>협력 분야 <span class="req">*</span></label>
-      <select id="ap-category">
-        <option value="">선택해주세요</option>
-        <option>플로리스트 · 꽃장식</option>
-        <option>스냅 · 영상 촬영</option>
-        <option>헤어 · 메이크업</option>
-        <option>푸드트럭 · 음료바</option>
-        <option>답례품</option>
-        <option>버스킹 · 음악</option>
-        <option>기타</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>소개 / 포트폴리오 링크 (선택)</label>
-      <textarea id="ap-intro" placeholder="간단한 소개나 인스타그램, 포트폴리오 링크를 남겨주세요"></textarea>
-    </div>
-    <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--muted);margin-bottom:16px;cursor:pointer;">
-      <input type="checkbox" id="ap-consent" style="margin-top:2px;flex-shrink:0;">
-      <span><a href="privacy.html" target="_blank" style="color:var(--ink);text-decoration:underline;">개인정보 수집·이용</a>에 동의합니다 (필수)</span>
-    </label>
-    <button class="btn-submit" id="ap-submit-btn" onclick="submitApplication()">신청서 제출</button>
+    <button class="btn-outline" style="max-width:200px;margin:0 auto;" onclick="doLogout()">로그아웃</button>
   </div>
+</div>
 
-  <!-- 공고 현황 -->
-  <div class="panel" id="panel-projects">
-    <div class="page-title">공고 현황</div>
-    <div class="page-sub">현재 모집 중인 프로젝트를 확인하고 참여 여부를 알려주세요</div>
-    <div id="project-list"><div class="empty-state">불러오는 중...</div></div>
+<!-- 거절 -->
+<div id="screen-rejected" style="display:none">
+  <div class="status-screen">
+    <div class="status-icon">😔</div>
+    <div class="status-title">아쉽게도 이번엔 어렵겠습니다</div>
+    <div class="status-desc">
+      현재 해당 분야 모집이 마감되었거나<br>조건이 맞지 않아 승인이 어려운 상황이에요.<br><br>
+      추가 문의는 카카오채널 @여는날로 연락해주세요.
+    </div>
+    <button class="btn-outline" style="max-width:200px;margin:0 auto;" onclick="doLogout()">로그아웃</button>
   </div>
-</main>
+</div>
 
-<!-- 참여 신청 모달 -->
+<!-- 대시보드 -->
+<div id="screen-dashboard" style="display:none">
+  <div class="screen-wrap">
+    <div class="dash-header">
+      <div class="dash-badge">PARTNER</div>
+      <div class="dash-name" id="dash-name">업체명 협력사입니다</div>
+    </div>
+    <div class="tabs" style="margin-top:0">
+      <button class="tab-btn active" id="tab-projects" onclick="showDashTab('projects')">📋 공고 현황</button>
+      <button class="tab-btn" id="tab-myinfo" onclick="showDashTab('myinfo')">👤 내 정보</button>
+    </div>
+    <div class="panel active" id="panel-projects">
+      <div id="project-list"><div class="empty-state">불러오는 중...</div></div>
+    </div>
+    <div class="panel" id="panel-myinfo">
+      <div id="myinfo-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 비밀번호 재설정 -->
+<div id="screen-recovery">
+  <div class="screen-wrap">
+    <div class="page-title">새 비밀번호 설정</div>
+    <div class="page-sub">새로 사용할 비밀번호를 입력해주세요</div>
+    <div class="fg">
+      <label>새 비밀번호</label>
+      <input type="password" id="rec-pw" placeholder="8자 이상">
+    </div>
+    <div class="fg">
+      <label>새 비밀번호 확인</label>
+      <input type="password" id="rec-pw2" placeholder="비밀번호 재입력">
+    </div>
+    <button class="btn-gold" onclick="doResetPw()">비밀번호 변경</button>
+  </div>
+</div>
+
+<!-- 참여 모달 -->
 <div class="modal-overlay" id="respond-modal" style="display:none">
   <div class="modal-box">
-    <div class="modal-title" id="modal-project-title"></div>
-    <div class="modal-sub" id="modal-project-meta"></div>
-
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-sub" id="modal-sub"></div>
     <div class="participate-btns">
       <button class="pbtn yes" id="pbtn-yes" onclick="selectParticipate('참여')">✅ 참여하겠습니다</button>
       <button class="pbtn no" id="pbtn-no" onclick="selectParticipate('불참')">❌ 이번엔 어렵습니다</button>
     </div>
-
-    <div id="price-section">
-      <div class="modal-form-group">
-        <label>업체명 *</label>
-        <input type="text" id="resp-company" placeholder="업체명">
-      </div>
-      <div class="modal-form-group">
-        <label>카카오톡 ID *</label>
-        <input type="text" id="resp-kakao" placeholder="카카오톡 검색용 아이디">
-      </div>
-      <div class="modal-form-group">
+    <div id="price-section" style="display:none">
+      <div class="mfg">
         <label>견적 금액 (원, 선택)</label>
         <input type="number" id="resp-price" placeholder="예: 350000">
       </div>
-      <div class="modal-form-group">
+      <div class="mfg">
         <label>메모 (선택)</label>
         <textarea id="resp-memo" placeholder="준비 가능한 내용, 포함/불포함 항목, 조건 등"></textarea>
       </div>
     </div>
-
     <div class="modal-btns">
-      <button class="modal-btn-submit" id="resp-submit-btn" onclick="submitResponse()">제출하기</button>
+      <button class="modal-btn-sub" id="resp-submit-btn" onclick="submitResponse()">제출하기</button>
       <button class="modal-btn-cancel" onclick="closeModal()">취소</button>
     </div>
   </div>
 </div>
 
 <script>
+  const SUPABASE_URL = 'https://ntldrtnpewfvechqxjzj.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_rmTxWljULBYeHVnswvJkKw_FaJ6KNXB';
   const WEBHOOK = 'https://script.google.com/macros/s/AKfycbzG1GPR8OhMIeBeTFvt7gE5CGiyQx3ggnLiVIah9geT89m-_poYFEwmi9K--NZ0HxDKjg/exec';
 
-  // ── 탭 전환 ──
-  function showPanel(name) {
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
-    document.getElementById('panel-' + name).classList.add('active');
-    document.getElementById('tab-' + name).classList.add('active');
-    if (name === 'projects') loadProjects();
-  }
-
-  // ── 협력 신청 ──
-  async function submitApplication() {
-    const company  = document.getElementById('ap-company').value.trim();
-    const name     = document.getElementById('ap-name').value.trim();
-    const phone    = document.getElementById('ap-phone').value.trim();
-    const kakao    = document.getElementById('ap-kakao').value.trim();
-    const category = document.getElementById('ap-category').value;
-    const intro    = document.getElementById('ap-intro').value.trim();
-
-    if (!company || !name || !phone || !kakao || !category) {
-      alert('업체명, 담당자 이름, 연락처, 카카오톡 ID, 협력 분야는 필수입니다.');
-      return;
-    }
-    if (!document.getElementById('ap-consent').checked) {
-      alert('개인정보 수집·이용에 동의해주셔야 신청이 가능합니다.');
-      return;
-    }
-
-    const btn = document.getElementById('ap-submit-btn');
-    btn.disabled = true;
-    btn.textContent = '중복 확인 중...';
-
-    try {
-      // 중복 체크
-      const checkRes = await fetch(WEBHOOK, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ type: 'check', phone })
-      });
-      const checkData = await checkRes.json();
-      if (checkData.duplicate) {
-        alert('이미 신청 이력이 있는 업체입니다.\n추가 문의는 카카오채널 @여는날로 연락주세요.');
-        btn.textContent = '신청서 제출';
-        btn.disabled = false;
-        return;
-      }
-
-      // 제출
-      btn.textContent = '제출 중...';
-      await fetch(WEBHOOK, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ type: 'partner', company, name, phone, kakaoId: kakao, category, intro })
-      });
-      alert('신청이 접수되었습니다.\n검토 후 카카오톡으로 연락드릴게요!');
-      btn.textContent = '신청서 제출';
-      btn.disabled = false;
-      ['ap-company','ap-name','ap-phone','ap-kakao','ap-category','ap-intro'].forEach(id => {
-        const el = document.getElementById(id);
-        el.value = '';
-      });
-      document.getElementById('ap-consent').checked = false;
-    } catch(err) {
-      alert('제출 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
-      btn.textContent = '신청서 제출';
-      btn.disabled = false;
-    }
-  }
-
-  // ── 공고 목록 ──
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  let currentUser = null;
+  let currentPartner = null;
   let projectMap = {};
   let respondedIds = JSON.parse(localStorage.getItem('yeonunnal_responded') || '[]');
 
+  // ── 화면 전환 ──
+  const SCREENS = ['loading','auth','pending','rejected','dashboard','recovery'];
+  function showScreen(name) {
+    SCREENS.forEach(s => {
+      const el = document.getElementById('screen-' + s);
+      if (el) el.style.display = 'none';
+    });
+    const target = document.getElementById('screen-' + name);
+    if (target) target.style.display = 'block';
+    const logoutBtn = document.getElementById('logout-btn');
+    const headerCompany = document.getElementById('header-company');
+    if (name === 'dashboard') {
+      logoutBtn.style.display = 'block';
+      headerCompany.style.display = 'block';
+    } else {
+      logoutBtn.style.display = 'none';
+      headerCompany.style.display = 'none';
+    }
+  }
+
+  function showAuthTab(name) {
+    document.querySelectorAll('#screen-auth .tab-btn').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('#screen-auth .panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    document.getElementById('panel-' + name).classList.add('active');
+  }
+
+  function showDashTab(name) {
+    document.querySelectorAll('#screen-dashboard .tab-btn').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('#screen-dashboard .panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    document.getElementById('panel-' + name).classList.add('active');
+    if (name === 'myinfo') renderMyInfo();
+  }
+
+  // ── 파트너 데이터 로드 ──
+  async function loadPartnerData() {
+    try {
+      const { data, error } = await sb.from('partners').select('*').eq('id', currentUser.id).single();
+      if (error || !data) {
+        document.getElementById('pending-email').textContent = currentUser.email;
+        showScreen('pending');
+        return;
+      }
+      currentPartner = data;
+      if (data.status === 'approved') {
+        document.getElementById('dash-name').textContent = `${data.company} 협력사입니다`;
+        document.getElementById('header-company').textContent = `${data.company}님`;
+        showScreen('dashboard');
+        loadProjects();
+      } else if (data.status === 'rejected') {
+        showScreen('rejected');
+      } else {
+        document.getElementById('pending-email').textContent = currentUser.email;
+        showScreen('pending');
+      }
+    } catch(e) {
+      showScreen('pending');
+    }
+  }
+
+  // ── Auth 상태 감지 ──
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'PASSWORD_RECOVERY') {
+      showScreen('recovery');
+      return;
+    }
+    if (session?.user) {
+      currentUser = session.user;
+      // 이메일 확인 후 첫 로그인: 미완료된 파트너 row 삽입
+      if (event === 'SIGNED_IN') {
+        const pending = localStorage.getItem('pendingPartner');
+        if (pending) {
+          try {
+            const pData = JSON.parse(pending);
+            const { data: existing } = await sb.from('partners').select('id').eq('id', session.user.id).single();
+            if (!existing) await insertPartnerRow(session.user.id, session.user.email, pData);
+            localStorage.removeItem('pendingPartner');
+          } catch(e) {}
+        }
+      }
+      await loadPartnerData();
+    } else {
+      currentUser = null;
+      currentPartner = null;
+      showScreen('auth');
+    }
+  });
+
+  // ── 파트너 row 삽입 ──
+  async function insertPartnerRow(uid, email, d) {
+    await sb.from('partners').insert({
+      id: uid, email,
+      company: d.company, name: d.name, phone: d.phone,
+      kakao_id: d.kakao_id, category: d.category, intro: d.intro || '',
+      status: 'pending'
+    });
+    // Apps Script 시트에도 기록
+    fetch(WEBHOOK, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        type: 'partner', company: d.company, name: d.name,
+        phone: d.phone, kakaoId: d.kakao_id, category: d.category, intro: d.intro || ''
+      })
+    });
+  }
+
+  // ── 회원가입 ──
+  async function doSignup() {
+    const email    = document.getElementById('su-email').value.trim();
+    const pw       = document.getElementById('su-pw').value;
+    const pw2      = document.getElementById('su-pw2').value;
+    const company  = document.getElementById('su-company').value.trim();
+    const name     = document.getElementById('su-name').value.trim();
+    const phone    = document.getElementById('su-phone').value.trim();
+    const kakao    = document.getElementById('su-kakao').value.trim();
+    const category = document.getElementById('su-category').value;
+    const intro    = document.getElementById('su-intro').value.trim();
+
+    if (!email || !pw || !pw2 || !company || !name || !phone || !kakao || !category) {
+      alert('모든 필수 항목을 입력해주세요.'); return;
+    }
+    if (pw !== pw2) { alert('비밀번호가 일치하지 않습니다.'); return; }
+    if (pw.length < 8) { alert('비밀번호는 8자 이상이어야 합니다.'); return; }
+    if (!document.getElementById('su-consent').checked) {
+      alert('개인정보 수집·이용에 동의해주세요.'); return;
+    }
+
+    const partnerData = { company, name, phone, kakao_id: kakao, category, intro };
+    localStorage.setItem('pendingPartner', JSON.stringify(partnerData));
+
+    try {
+      const { data, error } = await sb.auth.signUp({
+        email, password: pw,
+        options: { emailRedirectTo: window.location.origin + '/partner.html' }
+      });
+      if (error) throw error;
+
+      if (data.session) {
+        // 이메일 확인 비활성화 상태 — 즉시 파트너 row 삽입
+        await insertPartnerRow(data.user.id, email, partnerData);
+        localStorage.removeItem('pendingPartner');
+        // onAuthStateChange가 대시보드/pending 화면으로 이동
+      } else {
+        // 이메일 확인 활성화 상태
+        alert('가입이 완료되었습니다!\n입력하신 이메일로 인증 메일이 발송되었습니다.\n이메일 인증 후 로그인해주세요.');
+        showAuthTab('login');
+      }
+    } catch(e) {
+      if (e.message?.includes('already registered')) {
+        alert('이미 가입된 이메일입니다. 로그인 탭을 이용해주세요.');
+        showAuthTab('login');
+      } else {
+        alert('가입 중 오류가 발생했습니다: ' + e.message);
+      }
+    }
+  }
+
+  // ── 로그인 ──
+  async function doLogin() {
+    const email = document.getElementById('li-email').value.trim();
+    const pw    = document.getElementById('li-pw').value;
+    if (!email || !pw) { alert('이메일과 비밀번호를 입력해주세요.'); return; }
+
+    try {
+      const { error } = await sb.auth.signInWithPassword({ email, password: pw });
+      if (error) throw error;
+      // onAuthStateChange가 처리
+    } catch(e) {
+      if (e.message?.includes('Invalid login credentials')) {
+        alert('이메일 또는 비밀번호가 맞지 않습니다.');
+      } else if (e.message?.includes('Email not confirmed')) {
+        alert('이메일 인증이 필요합니다. 가입 시 발송된 인증 메일을 확인해주세요.');
+      } else {
+        alert('로그인 오류: ' + e.message);
+      }
+    }
+  }
+
+  // ── 로그아웃 ──
+  async function doLogout() {
+    await sb.auth.signOut();
+    currentUser = null;
+    currentPartner = null;
+  }
+
+  // ── 비밀번호 찾기 ──
+  function toggleForgot() {
+    const s = document.getElementById('forgot-section');
+    s.style.display = s.style.display === 'none' ? 'block' : 'none';
+  }
+
+  async function doForgotPw() {
+    const email = document.getElementById('forgot-email').value.trim();
+    if (!email) { alert('이메일을 입력해주세요.'); return; }
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/partner.html'
+    });
+    if (error) { alert('오류: ' + error.message); return; }
+    alert('비밀번호 재설정 메일이 발송되었습니다. 이메일을 확인해주세요.');
+    document.getElementById('forgot-section').style.display = 'none';
+  }
+
+  // ── 비밀번호 재설정 ──
+  async function doResetPw() {
+    const pw  = document.getElementById('rec-pw').value;
+    const pw2 = document.getElementById('rec-pw2').value;
+    if (!pw || !pw2) { alert('비밀번호를 입력해주세요.'); return; }
+    if (pw !== pw2)  { alert('비밀번호가 일치하지 않습니다.'); return; }
+    if (pw.length < 8) { alert('8자 이상 입력해주세요.'); return; }
+    const { error } = await sb.auth.updateUser({ password: pw });
+    if (error) { alert('오류: ' + error.message); return; }
+    alert('비밀번호가 변경되었습니다. 다시 로그인해주세요.');
+    await sb.auth.signOut();
+  }
+
+  // ── 내 정보 ──
+  function renderMyInfo() {
+    if (!currentPartner) return;
+    const p = currentPartner;
+    document.getElementById('myinfo-content').innerHTML = `
+      <div class="info-table">
+        <div class="info-row"><span class="info-label">업체명</span><span>${p.company}</span></div>
+        <div class="info-row"><span class="info-label">담당자</span><span>${p.name}</span></div>
+        <div class="info-row"><span class="info-label">연락처</span><span>${p.phone}</span></div>
+        <div class="info-row"><span class="info-label">카카오ID</span><span>${p.kakao_id}</span></div>
+        <div class="info-row"><span class="info-label">분야</span><span>${p.category}</span></div>
+        <div class="info-row"><span class="info-label">이메일</span><span>${p.email}</span></div>
+        ${p.intro ? `<div class="info-row"><span class="info-label">소개</span><span>${p.intro}</span></div>` : ''}
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-top:16px;line-height:1.7;">
+        정보 수정이 필요하시면 카카오채널 @여는날로 연락해주세요.
+      </p>`;
+  }
+
+  // ── 공고 목록 ──
   async function loadProjects() {
     const el = document.getElementById('project-list');
     el.innerHTML = '<div class="empty-state">불러오는 중...</div>';
@@ -300,7 +599,7 @@
       projects.forEach(p => { projectMap[p.id] = p; });
 
       if (projects.length === 0) {
-        el.innerHTML = '<div class="empty-state">현재 모집 중인 공고가 없습니다<br><span style="font-size:12px;">새 공고는 카카오톡으로 알림을 드려요</span></div>';
+        el.innerHTML = '<div class="empty-state">현재 모집 중인 공고가 없습니다<br><span style="font-size:12px;">새 공고 등록 시 카카오톡으로 알려드려요</span></div>';
         return;
       }
       el.innerHTML = '';
@@ -308,19 +607,18 @@
         const isOpen = p.status === '모집중';
         const responded = respondedIds.includes(p.id);
         el.innerHTML += `
-          <div class="project-card ${isOpen ? '' : 'closed'}">
+          <div class="project-card${isOpen ? '' : ' closed'}">
             <span class="badge ${isOpen ? 'badge-open' : 'badge-closed'}">${p.status}</span>
             <div class="pc-title">${p.title}</div>
             <div class="pc-meta">
-              📅 행사일: ${p.eventDate} &nbsp;·&nbsp; 📍 장소: ${p.location}<br>
-              🔧 필요 분야: ${p.categories}<br>
-              ⏰ 지원 마감: ${p.deadline}
-              ${p.detail ? `<br><br>${p.detail}` : ''}
+              📅 행사일: ${p.eventDate} &nbsp;·&nbsp; 📍 ${p.location}<br>
+              🔧 ${p.categories}<br>
+              ⏰ 마감: ${p.deadline}
+              ${p.detail ? '<br><br>' + p.detail : ''}
             </div>
-            ${isOpen
-              ? (responded
-                  ? `<button class="btn-responded">✓ 이미 응답하셨습니다</button>`
-                  : `<button class="btn-respond" data-pid="${p.id}" onclick="openModalById(this.dataset.pid)">참여 여부 알리기</button>`)
+            ${isOpen ? (responded
+              ? '<button class="btn-responded">✓ 이미 응답하셨습니다</button>'
+              : `<button class="btn-respond" data-pid="${p.id}" onclick="openModalById(this.dataset.pid)">참여 여부 알리기</button>`)
               : ''}
           </div>`;
       });
@@ -329,28 +627,25 @@
     }
   }
 
-  // ── 모달 ──
+  // ── 참여 모달 ──
   let currentProject = null;
   let selectedParticipate = '';
 
   function openModalById(pid) {
     const p = projectMap[pid];
-    if (!p) return;
-    openModal(p);
+    if (p) openModal(p);
   }
 
   function openModal(p) {
     currentProject = p;
     selectedParticipate = '';
-    document.getElementById('modal-project-title').textContent = p.title;
-    document.getElementById('modal-project-meta').textContent = `${p.eventDate} · ${p.location} · 마감 ${p.deadline}`;
-    document.getElementById('resp-company').value = '';
-    document.getElementById('resp-kakao').value = '';
+    document.getElementById('modal-title').textContent = p.title;
+    document.getElementById('modal-sub').textContent = `${p.eventDate} · ${p.location} · 마감 ${p.deadline}`;
     document.getElementById('resp-price').value = '';
     document.getElementById('resp-memo').value = '';
     document.getElementById('pbtn-yes').classList.remove('selected');
     document.getElementById('pbtn-no').classList.remove('selected');
-    document.getElementById('price-section').style.display = 'block';
+    document.getElementById('price-section').style.display = 'none';
     document.getElementById('respond-modal').style.display = 'flex';
   }
 
@@ -369,12 +664,7 @@
 
   async function submitResponse() {
     if (!selectedParticipate) { alert('참여 여부를 선택해주세요.'); return; }
-    const company = document.getElementById('resp-company').value.trim();
-    const kakao   = document.getElementById('resp-kakao').value.trim();
-    if (selectedParticipate === '참여' && (!company || !kakao)) {
-      alert('업체명과 카카오톡 ID를 입력해주세요.'); return;
-    }
-    if (!currentProject) return;
+    if (!currentProject || !currentPartner) return;
 
     const btn = document.getElementById('resp-submit-btn');
     btn.disabled = true; btn.textContent = '제출 중...';
@@ -387,14 +677,14 @@
           type: 'submit_response',
           projectId: currentProject.id,
           projectTitle: currentProject.title,
-          company,
-          name: company,
-          phone: '',
-          email: '',
+          company: currentPartner.company,
+          name: currentPartner.name,
+          phone: currentPartner.phone,
+          email: currentPartner.email,
           participate: selectedParticipate,
           price: document.getElementById('resp-price').value,
           memo: document.getElementById('resp-memo').value,
-          userId: kakao
+          userId: currentPartner.email
         })
       });
       const data = await res.json();
