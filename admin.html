@@ -111,6 +111,7 @@
     <button class="tab-btn" id="tab-responses" onclick="showTab('responses')">응답 현황</button>
     <button class="tab-btn" id="tab-new" onclick="showTab('new')">공고 등록</button>
     <button class="tab-btn" id="tab-partners" onclick="showTab('partners')">협력사 승인</button>
+    <button class="tab-btn" id="tab-pricing" onclick="showTab('pricing')">가격 관리</button>
   </div>
 
   <!-- 공고 관리 -->
@@ -195,6 +196,49 @@
     </div>
     <div id="partner-list"><div class="empty-state">불러오는 중...</div></div>
   </div>
+
+  <!-- 가격 관리 -->
+  <div class="panel" id="panel-pricing">
+    <div class="section-head">
+      <h3>가격 관리</h3>
+      <button class="btn-sm" onclick="loadPricing()">새로고침</button>
+    </div>
+    <div class="notice">
+      <strong>안내</strong><br>
+      여기서 바꾸는 가격은 <strong>고객이 견적 시뮬레이터에서 보는 가격</strong>입니다. 협력사에게 실제 지급하는 단가는 공고 등록 시 따로 정하는 것이라 여기와 무관합니다.<br>
+      변경사항은 시뮬레이터(simulator_v2.html) 화면에 바로 반영됩니다.
+    </div>
+
+    <div class="section-head" style="margin-top:8px;"><h3 style="font-size:15px;">행사 기본가</h3></div>
+    <div id="event-price-list" style="margin-bottom:28px;"><div class="empty-state">불러오는 중...</div></div>
+
+    <div class="section-head"><h3 style="font-size:15px;">옵션 가격</h3></div>
+    <div id="option-price-list" style="margin-bottom:28px;"><div class="empty-state">불러오는 중...</div></div>
+
+    <div class="section-head"><h3 style="font-size:15px;">새 옵션 추가</h3></div>
+    <div style="max-width:480px;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:18px;">
+      <div class="form-group"><label>옵션명 *</label><input type="text" id="opt-new-name" placeholder="예: 캘리그라피 웰컴보드"></div>
+      <div class="form-group"><label>이모지</label><input type="text" id="opt-new-emoji" placeholder="예: ✍️" maxlength="4"></div>
+      <div class="form-group"><label>설명</label><input type="text" id="opt-new-desc" placeholder="고객에게 보여줄 짧은 설명"></div>
+      <div class="form-group">
+        <label>가격 타입 *</label>
+        <select id="opt-new-type" onchange="toggleNewOptionPriceFields()">
+          <option value="grade">등급제 (아마추어/준프로/프로)</option>
+          <option value="flat">단일가 (답례품처럼 등급 구분 없음)</option>
+        </select>
+      </div>
+      <div id="opt-new-grade-fields" style="display:flex;gap:8px;">
+        <div class="form-group" style="flex:1;"><label>아마추어가</label><input type="number" id="opt-new-amateur" placeholder="200000"></div>
+        <div class="form-group" style="flex:1;"><label>준프로가</label><input type="number" id="opt-new-semipro" placeholder="350000"></div>
+        <div class="form-group" style="flex:1;"><label>프로가(시작가)</label><input type="number" id="opt-new-pro" placeholder="550000"></div>
+      </div>
+      <div id="opt-new-flat-fields" style="display:none;">
+        <div class="form-group"><label>단일가</label><input type="number" id="opt-new-flat-price" placeholder="150000"></div>
+      </div>
+      <div class="form-group"><label>노출 순서 (숫자 작을수록 위로)</label><input type="number" id="opt-new-order" value="99"></div>
+      <button class="btn-gold" onclick="addNewOption()">옵션 추가하기</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -247,6 +291,7 @@
     document.getElementById('tab-' + name).classList.add('active');
     if (name === 'responses') loadResponses();
     if (name === 'partners') loadPartners();
+    if (name === 'pricing') loadPricing();
   }
 
   // ── 협력사 승인 ──
@@ -583,6 +628,173 @@
     const dt = new Date(d);
     if (isNaN(dt)) return d;
     return `${dt.getFullYear()}.${String(dt.getMonth()+1).padStart(2,'0')}.${String(dt.getDate()).padStart(2,'0')}`;
+  }
+
+  // ── 가격 관리 ──
+  const EVENT_LABELS = {
+    wedding: '여는날 웨딩', cinema: '시네마 웨딩', remind: '다시 여는날',
+    parents: '부모님의 여는날', propose: '프로포즈', dol: '백일·돌잔치', party: '생일·파티'
+  };
+  const EVENT_ORDER = ['wedding', 'cinema', 'remind', 'parents', 'propose', 'dol', 'party'];
+  let pricingOptions = [];
+
+  async function fetchPricing() {
+    const res = await fetch(WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ type: 'get_pricing', password: adminPw })
+    });
+    return res.json();
+  }
+
+  async function loadPricing() {
+    const eEl = document.getElementById('event-price-list');
+    const oEl = document.getElementById('option-price-list');
+    eEl.innerHTML = '<div class="empty-state">불러오는 중...</div>';
+    oEl.innerHTML = '<div class="empty-state">불러오는 중...</div>';
+    try {
+      const data = await fetchPricing();
+      if (data.result !== 'success') throw new Error(data.message || '불러오기 실패');
+
+      // 행사 기본가
+      eEl.innerHTML = EVENT_ORDER.map(key => `
+        <div style="display:flex;align-items:center;gap:10px;background:var(--white);border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin-bottom:8px;max-width:480px;">
+          <span style="flex:1;font-size:13px;">${EVENT_LABELS[key]}</span>
+          <input type="number" id="ev-price-${key}" value="${data.events && data.events[key] || 0}" style="width:140px;border:1px solid var(--line);border-radius:4px;padding:6px 8px;font-size:13px;">
+          <button class="btn-sm" onclick="saveEventPrice('${key}')">저장</button>
+        </div>`).join('');
+
+      // 옵션 가격
+      pricingOptions = (data.options || []).slice().sort((a,b) => a.order - b.order);
+      oEl.innerHTML = pricingOptions.map(o => `
+        <div style="background:var(--white);border:1px solid var(--line);border-radius:8px;padding:14px;margin-bottom:8px;${o.visible === false ? 'opacity:.5;' : ''}">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <span style="font-size:18px;">${o.emoji || ''}</span>
+            <strong style="font-size:13px;flex:1;">${o.name}</strong>
+            <span style="font-size:11px;color:var(--muted);">${o.type === 'flat' ? '단일가' : '등급제'}</span>
+          </div>
+          ${o.type === 'flat' ? `
+            <div style="display:flex;gap:8px;align-items:center;">
+              <label style="font-size:12px;color:var(--muted);width:60px;">단일가</label>
+              <input type="number" id="opt-amateur-${o.key}" value="${o.amateurPrice}" style="flex:1;border:1px solid var(--line);border-radius:4px;padding:6px 8px;font-size:13px;">
+            </div>` : `
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:100px;"><label style="font-size:11px;color:var(--muted);">아마추어</label><input type="number" id="opt-amateur-${o.key}" value="${o.amateurPrice}" style="width:100%;border:1px solid var(--line);border-radius:4px;padding:6px 8px;font-size:13px;"></div>
+              <div style="flex:1;min-width:100px;"><label style="font-size:11px;color:var(--muted);">준프로</label><input type="number" id="opt-semipro-${o.key}" value="${o.semiproPrice}" style="width:100%;border:1px solid var(--line);border-radius:4px;padding:6px 8px;font-size:13px;"></div>
+              <div style="flex:1;min-width:100px;"><label style="font-size:11px;color:var(--muted);">프로(시작가)</label><input type="number" id="opt-pro-${o.key}" value="${o.proPrice}" style="width:100%;border:1px solid var(--line);border-radius:4px;padding:6px 8px;font-size:13px;"></div>
+            </div>`}
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <button class="btn-sm" onclick="saveOption('${o.key}')">저장</button>
+            <button class="btn-sm" onclick="toggleOptionVisibility('${o.key}', ${o.visible !== false})">${o.visible === false ? '활성화' : '비활성화'}</button>
+          </div>
+        </div>`).join('');
+    } catch (e) {
+      eEl.innerHTML = '<div class="empty-state">불러오기 실패</div>';
+      oEl.innerHTML = '<div class="empty-state">불러오기 실패: ' + e.message + '</div>';
+    }
+  }
+
+  async function saveEventPrice(key) {
+    const price = document.getElementById('ev-price-' + key).value;
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ type: 'update_event_price', eventKey: key, price, password: adminPw })
+      });
+      const data = await res.json();
+      if (data.result !== 'success') throw new Error(data.message);
+      alert(EVENT_LABELS[key] + ' 기본가가 저장되었습니다.');
+    } catch (e) {
+      alert('저장 실패: ' + e.message);
+    }
+  }
+
+  async function saveOption(key) {
+    const o = pricingOptions.find(x => x.key === key);
+    if (!o) return;
+    const amateurPrice = document.getElementById('opt-amateur-' + key).value;
+    const semiproPrice = o.type === 'flat' ? 0 : document.getElementById('opt-semipro-' + key).value;
+    const proPrice = o.type === 'flat' ? 0 : document.getElementById('opt-pro-' + key).value;
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          type: 'update_option', key: o.key, name: o.name, emoji: o.emoji, desc: o.desc,
+          optType: o.type, amateurPrice, semiproPrice, proPrice, order: o.order,
+          visible: o.visible !== false, password: adminPw
+        })
+      });
+      const data = await res.json();
+      if (data.result !== 'success') throw new Error(data.message);
+      alert(o.name + ' 가격이 저장되었습니다. 시뮬레이터에 바로 반영됩니다.');
+    } catch (e) {
+      alert('저장 실패: ' + e.message);
+    }
+  }
+
+  async function toggleOptionVisibility(key, currentlyVisible) {
+    const labels = currentlyVisible ? '비활성화' : '활성화';
+    if (!confirm(`이 옵션을 ${labels}하시겠습니까? 비활성화하면 고객 견적 화면에서 더 이상 보이지 않습니다 (데이터는 삭제되지 않습니다).`)) return;
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ type: 'toggle_option_visibility', key, visible: !currentlyVisible, password: adminPw })
+      });
+      const data = await res.json();
+      if (data.result !== 'success') throw new Error(data.message);
+      loadPricing();
+    } catch (e) {
+      alert('처리 실패: ' + e.message);
+    }
+  }
+
+  function toggleNewOptionPriceFields() {
+    const isFlat = document.getElementById('opt-new-type').value === 'flat';
+    document.getElementById('opt-new-grade-fields').style.display = isFlat ? 'none' : 'flex';
+    document.getElementById('opt-new-flat-fields').style.display = isFlat ? 'block' : 'none';
+  }
+
+  async function addNewOption() {
+    const name = document.getElementById('opt-new-name').value.trim();
+    if (!name) { alert('옵션명을 입력해주세요.'); return; }
+    const optType = document.getElementById('opt-new-type').value;
+    const emoji = document.getElementById('opt-new-emoji').value.trim();
+    const desc = document.getElementById('opt-new-desc').value.trim();
+    const order = document.getElementById('opt-new-order').value || 99;
+    const key = 'opt_' + Date.now();
+
+    const payload = { type: 'update_option', key, name, emoji, desc, optType, order, visible: true, password: adminPw };
+    if (optType === 'flat') {
+      payload.amateurPrice = document.getElementById('opt-new-flat-price').value || 0;
+    } else {
+      payload.amateurPrice = document.getElementById('opt-new-amateur').value || 0;
+      payload.semiproPrice = document.getElementById('opt-new-semipro').value || 0;
+      payload.proPrice = document.getElementById('opt-new-pro').value || 0;
+    }
+
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.result !== 'success') throw new Error(data.message);
+      alert('새 옵션 "' + name + '"이 추가되었습니다.');
+      document.getElementById('opt-new-name').value = '';
+      document.getElementById('opt-new-emoji').value = '';
+      document.getElementById('opt-new-desc').value = '';
+      document.getElementById('opt-new-amateur').value = '';
+      document.getElementById('opt-new-semipro').value = '';
+      document.getElementById('opt-new-pro').value = '';
+      document.getElementById('opt-new-flat-price').value = '';
+      loadPricing();
+    } catch (e) {
+      alert('추가 실패: ' + e.message);
+    }
   }
 
   // 세션 유지
