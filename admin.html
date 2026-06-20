@@ -443,8 +443,15 @@
       if (proj) {
         if (proj.completed) {
           const selected = resps.find(r => r.recommendStatus === '최종선정됨');
+          let deadlineStr = '';
+          if (proj.finalSelectedAt) {
+            const d = new Date(proj.finalSelectedAt);
+            d.setMonth(d.getMonth() + 6);
+            deadlineStr = `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+          }
           recommendBox = `<div class="notice" style="background:rgba(39,174,96,.1);">
-            <strong>✅ 고객 선택 완료</strong> — 최종 선정: <strong>${selected ? selected.company : '-'}</strong>
+            <strong>✅ 고객 선택 완료</strong> — 최종 선정: <strong>${selected ? selected.company : '-'}</strong> (선정일: ${proj.finalSelectedAt || '-'})<br>
+            <span style="font-size:11px;">직거래 방지 조항 적용 기간: ${deadlineStr ? deadlineStr + '까지' : '-'}</span>
           </div>`;
         } else if (proj.token) {
           const link = location.origin + '/select.html?token=' + proj.token;
