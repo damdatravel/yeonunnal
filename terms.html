@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>여는날 — 이용약관</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=Noto+Sans+KR:wght@300;400;500&display=swap');
+  :root {
+    --ink:#1a1610; --paper:#faf8f4; --cream:#f2ede4;
+    --gold:#c8a96e; --gold-light:#e8d5a8; --muted:#8a7d6a;
+    --line:#e0d8cc; --white:#ffffff; --green:#27ae60; --red:#c0392b;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-serif;font-weight:300;min-height:100vh;}
+  header{background:var(--ink);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;}
+  .logo{font-family:'Noto Serif KR',serif;font-size:20px;color:var(--gold);letter-spacing:.08em;text-decoration:none;}
+  .home-link{color:var(--muted);font-size:13px;text-decoration:none;}
+  .home-link:hover{color:var(--gold);}
+
+  .wrap{max-width:680px;margin:0 auto;padding:40px 24px 100px;}
+  .page-title{font-family:'Noto Serif KR',serif;font-size:24px;margin-bottom:6px;}
+  .page-sub{font-size:13px;color:var(--muted);margin-bottom:28px;}
+
+  .tabs{display:flex;border-bottom:1px solid var(--line);margin-bottom:32px;}
+  .tab-btn{flex:1;text-align:center;padding:14px 0;font-size:14px;color:var(--muted);
+    border-bottom:2px solid transparent;cursor:pointer;background:none;
+    border-top:none;border-left:none;border-right:none;font-family:'Noto Sans KR',sans-serif;}
+  .tab-btn.active{color:var(--ink);border-bottom-color:var(--gold);font-weight:500;}
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  .doc h2{font-family:'Noto Serif KR',serif;font-size:15px;font-weight:500;margin:28px 0 10px;color:var(--ink);}
+  .doc h2:first-child{margin-top:0;}
+  .doc p, .doc li{font-size:13px;line-height:1.9;color:#4a4338;}
+  .doc ol.num{list-style:none;counter-reset:item;margin:6px 0 6px 0;}
+  .doc ol.num > li{counter-increment:item;margin-bottom:6px;padding-left:24px;position:relative;}
+  .doc ol.num > li::before{content:counter(item) ". ";position:absolute;left:0;color:var(--muted);}
+  .doc ol.alpha{list-style:none;margin:6px 0 6px 8px;}
+  .doc ol.alpha > li{margin-bottom:4px;padding-left:22px;position:relative;}
+  .doc ol.alpha > li::before{content:"- ";position:absolute;left:0;color:var(--muted);}
+  .doc strong{color:var(--ink);font-weight:500;}
+  .key-clause{background:var(--cream);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:14px 16px;margin:10px 0 16px;}
+
+  .footer-box{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);line-height:1.9;}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo">여는날</a>
+  <a href="index.html" class="home-link">← 홈으로</a>
+</header>
+
+<div class="wrap">
+  <div class="page-title">이용약관</div>
+  <div class="page-sub">시행일자: 2026년 6월 20일</div>
+
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-partner" onclick="showTab('partner')">협력사 이용약관</button>
+    <button class="tab-btn" id="tab-customer" onclick="showTab('customer')">고객 이용약관</button>
+  </div>
+
+  <!-- 협력사 이용약관 -->
+  <div class="panel active doc" id="panel-partner">
+    <h2>제1조 (목적)</h2>
+    <p>이 약관은 담다(이하 "회사")가 운영하는 웨딩·이벤트 협력사 매칭 서비스 "여는날"(이하 "서비스")을 통해 협력사로 가입한 자(이하 "협력사")가 서비스를 이용함에 있어, 회사와 협력사 간의 권리, 의무 및 책임사항, 기타 필요한 사항을 정함을 목적으로 합니다.</p>
+
+    <h2>제2조 (정의)</h2>
+    <ol class="num">
+      <li>"서비스"란 회사가 운영하는 여는날(yeonunnal.com) 플랫폼을 통해, 고객의 행사 진행에 필요한 협력사를 모집·추천·매칭하는 일체의 서비스를 말합니다.</li>
+      <li>"협력사"란 본 서비스에 분야별 공급자로 가입하여 승인받은 자를 말합니다.</li>
+      <li>"고객"이란 본 서비스를 통해 행사 진행을 의뢰하는 이용자를 말합니다.</li>
+      <li>"공고"란 회사가 등록하는 개별 행사의 협력사 모집 게시물을 말합니다.</li>
+      <li>"추천"이란 공고에 참여 의사를 밝힌 협력사 중 회사가 고객에게 제시하는 최대 3개사를 말합니다.</li>
+      <li>"최종 선정"이란 고객이 추천된 협력사 중 1개사를 최종적으로 선택하는 것을 말합니다.</li>
+    </ol>
+
+    <h2>제3조 (약관의 효력 및 변경)</h2>
+    <p>이 약관은 협력사 가입 시 동의함으로써 효력이 발생하며, 회사는 관련 법령을 위반하지 않는 범위에서 약관을 변경할 수 있습니다. 약관이 변경되는 경우 회사는 적용일자 및 변경사항을 사전에 공지합니다.</p>
+
+    <h2>제4조 (협력사 가입 및 등급)</h2>
+    <ol class="num">
+      <li>협력사는 회사가 정한 절차에 따라 가입을 신청하고, 회사의 승인을 받아야 서비스를 이용할 수 있습니다.</li>
+      <li>협력사의 활동 등급(아마추어 / 준프로 / 프로)은 가입 시 자기신고를 원칙으로 하며, 회사는 심사 과정에서 이를 조정할 수 있습니다.</li>
+      <li>등급별 지급 기준 및 정산 방식은 회사가 별도로 고지하는 기준에 따릅니다.</li>
+    </ol>
+
+    <h2>제5조 (협력사의 의무)</h2>
+    <ol class="num">
+      <li>협력사는 공고에 대한 참여 여부, 견적 등 일체의 의사표시를 본 서비스를 통해서만 진행하여야 합니다.</li>
+      <li>협력사는 추천 또는 최종 선정 여부와 관계없이, 본 서비스를 통해 알게 된 고객에게 회사의 사전 동의 없이 직접 연락하여 영업·홍보 행위를 하여서는 안 됩니다.</li>
+      <li>고객이 먼저 협력사에 직접 연락한 경우, 협력사는 이를 지체 없이 회사에 알려야 합니다.</li>
+      <li>협력사는 최종 선정된 행사에 대하여, 회사가 지정하는 현장 담당자의 참관 및 진행 관리에 협조하여야 합니다.</li>
+      <li>협력사는 가입 시 제공한 정보(연락처, 분야, 포트폴리오 등)에 변경이 있을 경우 회사에 알려 수정을 요청하여야 합니다.</li>
+    </ol>
+
+    <h2>제6조 (직접 거래 금지 및 위약금)</h2>
+    <div class="key-clause">
+      <ol class="num">
+        <li>최종 선정된 협력사는 <strong>선정일로부터 6개월간</strong>, 회사를 통하지 않고 해당 고객과 동일하거나 유사한 용역에 관하여 직접 계약을 체결하거나 대금을 수령하는 등 직접 거래를 하여서는 안 됩니다.</li>
+        <li>제1항을 위반한 협력사에 대하여 회사는 다음 각 호의 조치를 취할 수 있습니다.
+          <ol class="alpha">
+            <li>협력사 자격의 즉시 박탈</li>
+            <li>위반 거래로 협력사가 직접 수령한 금액(이하 "거래금액")의 <strong>50%에 해당하는 금액</strong>의 위약금 청구</li>
+          </ol>
+        </li>
+        <li>제2항제2호의 위약금은 위약벌로서, 회사가 입은 실제 손해가 위약금을 초과하는 경우 회사는 그 초과분에 대하여 별도로 손해배상을 청구할 수 있습니다.</li>
+        <li>본 조의 "거래금액"은 협력사가 해당 고객으로부터 직접 수령한 금액 전체를 말하며, 협력사는 회사의 요청이 있는 경우 관련 증빙을 제출하여야 합니다.</li>
+      </ol>
+    </div>
+
+    <h2>제7조 (협력사 자격의 정지 및 박탈)</h2>
+    <p>회사는 협력사가 다음 각 호에 해당하는 경우 사전 통지 없이 자격을 정지 또는 박탈할 수 있습니다.</p>
+    <ol class="num">
+      <li>제6조를 위반한 경우</li>
+      <li>허위 정보로 가입하거나 등급을 신고한 경우</li>
+      <li>고객 또는 회사의 명예를 손상시키거나 서비스 운영을 방해한 경우</li>
+      <li>정당한 사유 없이 최종 선정된 행사에 불참한 경우</li>
+    </ol>
+
+    <h2>제8조 (회사의 의무 및 면책)</h2>
+    <ol class="num">
+      <li>회사는 협력사와 고객 간 매칭이 원활히 이루어지도록 노력합니다.</li>
+      <li>회사는 협력사가 제공하는 용역 자체의 품질에 대하여 직접적인 책임을 지지 않으며, 고객과 협력사 간 분쟁 발생 시 본 서비스의 매니지먼트 범위 내에서 중재를 위해 노력합니다.</li>
+    </ol>
+
+    <h2>제9조 (분쟁해결 및 관할법원)</h2>
+    <p>이 약관과 관련하여 분쟁이 발생한 경우, 회사와 협력사는 우선 협의로 해결하도록 노력하며, 협의가 이루어지지 않을 경우 회사의 본점 소재지를 관할하는 법원을 제1심 관할 법원으로 합니다.</p>
+
+    <h2>제10조 (시행일)</h2>
+    <p>이 약관은 2026년 6월 20일부터 시행합니다.</p>
+  </div>
+
+  <!-- 고객 이용약관 -->
+  <div class="panel doc" id="panel-customer">
+    <h2>제1조 (목적)</h2>
+    <p>이 약관은 담다(이하 "회사")가 운영하는 "여는날" 서비스를 이용하는 고객(이하 "고객")과 회사 간의 권리, 의무 및 책임사항, 기타 필요한 사항을 정함을 목적으로 합니다.</p>
+
+    <h2>제2조 (정의)</h2>
+    <ol class="num">
+      <li>"서비스"란 회사가 운영하는 여는날(yeonunnal.com) 플랫폼을 통해, 고객의 행사 진행에 필요한 협력사를 추천·매칭하고 행사 당일까지 관리하는 일체의 서비스를 말합니다.</li>
+      <li>"협력사"란 본 서비스에 분야별 공급자로 가입하여 승인받은 자를 말합니다.</li>
+      <li>"최종 선정"이란 고객이 회사로부터 추천받은 협력사 중 1개사를 최종적으로 선택하는 것을 말합니다.</li>
+    </ol>
+
+    <h2>제3조 (서비스의 내용)</h2>
+    <ol class="num">
+      <li>본 서비스는 고객의 행사(웨딩, 이벤트, 기업 행사 등)에 필요한 협력사를 추천·매칭하는 서비스입니다.</li>
+      <li>본 서비스는 견적 상담, 협력사 추천 및 선정, 행사 당일 현장 진행까지 회사 소속 담당자가 참여하는 종합 매니지먼트를 포함하며, 이는 별도 비용 없이 기본 이용요금에 포함된 서비스입니다.</li>
+    </ol>
+
+    <h2>제4조 (협력사 추천 및 선택)</h2>
+    <ol class="num">
+      <li>회사는 고객이 등록한 행사 정보를 바탕으로 참여 가능한 협력사 중 최대 3개사를 추천합니다.</li>
+      <li>고객은 회사가 제공하는 정보(업체명, 분야, 등급, 소개, 포트폴리오 등)를 토대로 1개사를 최종 선택합니다. 추천된 협력사의 연락처 및 구체적인 견적 정보는 비공개로 진행됩니다.</li>
+      <li>최종 선택 이후에는 원칙적으로 변경이 불가하며, 부득이한 사정으로 변경이 필요한 경우 회사와 별도로 협의하여야 합니다.</li>
+    </ol>
+
+    <h2>제5조 (직접 거래 시 중개수수료)</h2>
+    <div class="key-clause">
+      <ol class="num">
+        <li>고객이 본 서비스를 통해 추천받아 최종 선택한 협력사와, <strong>선택일로부터 6개월 이내</strong>에 회사를 통하지 않고 직접 계약을 체결하거나 거래한 경우, 회사는 해당 거래금액의 <strong>15%에 해당하는 금액</strong>을 중개수수료로 청구할 수 있습니다.</li>
+        <li>본 조의 "거래금액"은 고객이 해당 협력사에게 직접 지급한 금액 전체를 말합니다.</li>
+      </ol>
+    </div>
+
+    <h2>제6조 (이용요금 및 결제)</h2>
+    <ol class="num">
+      <li>서비스 이용요금은 회사가 운영하는 견적 시뮬레이터 또는 상담을 통해 고지된 금액에 따릅니다.</li>
+      <li>결제 방법, 취소 및 환불 기준 등 세부 사항은 회사가 별도로 안내하는 정책에 따릅니다.</li>
+    </ol>
+
+    <h2>제7조 (회사의 의무)</h2>
+    <p>회사는 고객에게 신뢰할 수 있는 협력사를 추천하고, 행사 진행 전반에 대한 매니지먼트를 제공하기 위해 노력합니다.</p>
+
+    <h2>제8조 (면책)</h2>
+    <p>회사는 협력사가 제공하는 용역 자체의 품질이나, 천재지변 등 회사의 통상적인 관리 범위를 벗어난 사유로 발생한 손해에 대해서는 책임을 지지 않습니다.</p>
+
+    <h2>제9조 (분쟁해결 및 관할법원)</h2>
+    <p>이 약관과 관련하여 분쟁이 발생한 경우, 회사와 고객은 우선 협의로 해결하도록 노력하며, 협의가 이루어지지 않을 경우 회사의 본점 소재지를 관할하는 법원을 제1심 관할 법원으로 합니다.</p>
+
+    <h2>제10조 (시행일)</h2>
+    <p>이 약관은 2026년 6월 20일부터 시행합니다.</p>
+  </div>
+
+  <div class="footer-box">
+    상호 담다 &nbsp;·&nbsp; 대표 김봉근 &nbsp;·&nbsp; 사업자등록번호 594-01-02984<br>
+    주소 인천 중구 자연로 667 &nbsp;·&nbsp; 시행일자 2026.06.20
+  </div>
+</div>
+
+<script>
+  function showTab(name) {
+    document.querySelectorAll('.tabs .tab-btn').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.wrap > .panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    document.getElementById('panel-' + name).classList.add('active');
+  }
+  // URL 해시로 진입 시 해당 탭 자동 노출 (예: terms.html#customer)
+  const hash = location.hash.replace('#', '');
+  if (hash === 'customer' || hash === 'partner') showTab(hash);
+</script>
+</body>
+</html>
