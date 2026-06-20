@@ -959,6 +959,44 @@
         <button type="button" class="grade-pill" onclick="selectGrade(event,'버스킹 퍼포머','프로',650000)">프로<br>65만원~</button>
       </div>
 
+      <div class="toggle-item" data-option="사회자 진행" onclick="toggleOption(this)">
+        <div class="toggle-left">
+          <span class="toggle-emoji">🎤</span>
+          <div>
+            <div class="toggle-name">사회자 진행</div>
+            <div class="toggle-desc">행사 전체 사회·진행 — 큐시트 조율 포함</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div class="toggle-price">등급 선택</div>
+          <div class="toggle-check"></div>
+        </div>
+      </div>
+      <div class="grade-row" id="grade-row-사회자 진행">
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'사회자 진행','아마추어',200000)">아마추어<br>20만원</button>
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'사회자 진행','준프로',400000)">준프로<br>40만원</button>
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'사회자 진행','프로',650000)">프로<br>65만원~</button>
+      </div>
+
+      <div class="toggle-item" data-option="코미디언 공연" onclick="toggleOption(this)">
+        <div class="toggle-left">
+          <span class="toggle-emoji">🎭</span>
+          <div>
+            <div class="toggle-name">코미디언 공연</div>
+            <div class="toggle-desc">하객 호응 유도 — 단독 공연 또는 사회 결합</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div class="toggle-price">등급 선택</div>
+          <div class="toggle-check"></div>
+        </div>
+      </div>
+      <div class="grade-row" id="grade-row-코미디언 공연">
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'코미디언 공연','아마추어',250000)">아마추어<br>25만원</button>
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'코미디언 공연','준프로',450000)">준프로<br>45만원</button>
+        <button type="button" class="grade-pill" onclick="selectGrade(event,'코미디언 공연','프로',750000)">프로<br>75만원~</button>
+      </div>
+
       <div class="toggle-item" data-option="스냅 사진 촬영" onclick="toggleOption(this)">
         <div class="toggle-left">
           <span class="toggle-emoji">📸</span>
@@ -1170,6 +1208,10 @@
       <label>추가 요청사항 (선택)</label>
       <textarea id="f-memo" placeholder="특별히 원하시는 컨셉이나 요청사항을 자유롭게 적어주세요"></textarea>
     </div>
+    <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--muted);margin-bottom:10px;cursor:pointer;">
+      <input type="checkbox" id="f-terms" style="margin-top:2px;flex-shrink:0;">
+      <span><a href="terms.html#customer" target="_blank" style="color:var(--ink);text-decoration:underline;">이용약관</a>에 동의합니다 (필수)</span>
+    </label>
     <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--muted);margin-bottom:16px;cursor:pointer;">
       <input type="checkbox" id="f-consent" style="margin-top:2px;flex-shrink:0;">
       <span><a href="privacy.html" target="_blank" style="color:var(--ink);text-decoration:underline;">개인정보 수집·이용</a>에 동의합니다 (필수)</span>
@@ -1466,7 +1508,10 @@
       }
     } else if (currentStep === totalSteps - 1) {
       const consent = document.getElementById('f-consent').checked;
-      if (!consent) {
+      const terms = document.getElementById('f-terms').checked;
+      if (!terms) {
+        btn.disabled = true; btn.textContent = '이용약관 동의가 필요해요';
+      } else if (!consent) {
         btn.disabled = true; btn.textContent = '개인정보 동의가 필요해요';
       } else {
         btn.disabled = false; btn.textContent = '제출하기 ✓';
@@ -1564,6 +1609,10 @@
       alert('이름과 연락처를 입력해주세요');
       return;
     }
+    if (!document.getElementById('f-terms').checked) {
+      alert('이용약관에 동의해주셔야 신청이 가능합니다.');
+      return;
+    }
     if (!document.getElementById('f-consent').checked) {
       alert('개인정보 수집·이용에 동의해주셔야 신청이 가능합니다.');
       return;
@@ -1629,6 +1678,7 @@
   document.getElementById('f-name-early').addEventListener('input', updateNextBtn);
   document.getElementById('f-phone-early').addEventListener('input', updateNextBtn);
   document.getElementById('f-consent').addEventListener('change', updateNextBtn);
+  document.getElementById('f-terms').addEventListener('change', updateNextBtn);
 
   // 로그인 후 돌아왔을 때: 진행 상태 복원 + 이름 자동입력 + 로그인 상태 표시
   async function fillFromSession() {
