@@ -233,6 +233,11 @@
         <p class="fg-hint">🔗 고객 추천 단계에서 프로필과 함께 노출됩니다. 연락처는 공개되지 않아요.</p>
       </div>
       <label class="consent-row">
+        <input type="checkbox" id="su-terms">
+        <span><a href="terms.html#partner" target="_blank">협력사 이용약관</a>에 동의합니다 (필수)<br>
+        <span style="font-size:11px;">직접 거래 금지 및 위약금 조항(제6조)을 포함합니다.</span></span>
+      </label>
+      <label class="consent-row">
         <input type="checkbox" id="su-consent">
         <span><a href="privacy.html" target="_blank">개인정보 수집·이용</a>에 동의합니다 (필수)</span>
       </label>
@@ -550,6 +555,9 @@
     }
     if (pw !== pw2) { alert('비밀번호가 일치하지 않습니다.'); return; }
     if (pw.length < 8) { alert('비밀번호는 8자 이상이어야 합니다.'); return; }
+    if (!document.getElementById('su-terms').checked) {
+      alert('협력사 이용약관에 동의해주세요.'); return;
+    }
     if (!document.getElementById('su-consent').checked) {
       alert('개인정보 수집·이용에 동의해주세요.'); return;
     }
