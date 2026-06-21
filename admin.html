@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>여는날 — 관리자</title>
+<link rel="icon" type="image/png" sizes="32x32" href="images/icon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="images/icon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="images/icon-180.png">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=Noto+Sans+KR:wght@300;400;500&display=swap');
   :root {
@@ -86,7 +89,7 @@
 <header>
   <div style="display:flex;align-items:center;gap:12px;">
     <span class="logo">여는날</span>
-    <span class="admin-badge">ADMIN</span>
+    <span class="admin-badge">ADMIN<span id="admin-name-badge"></span></span>
   </div>
   <button class="logout-btn" id="logout-btn" style="display:none" onclick="logout()">로그아웃</button>
 </header>
@@ -112,6 +115,9 @@
     <button class="tab-btn" id="tab-new" onclick="showTab('new')">공고 등록</button>
     <button class="tab-btn" id="tab-partners" onclick="showTab('partners')">협력사 승인</button>
     <button class="tab-btn" id="tab-pricing" onclick="showTab('pricing')">가격 관리</button>
+    <button class="tab-btn" id="tab-notices" onclick="showTab('notices')">공지사항 관리</button>
+    <button class="tab-btn" id="tab-activitylog" onclick="showTab('activitylog')">활동 로그</button>
+    <button class="tab-btn" id="tab-admins" onclick="showTab('admins')" style="display:none;">관리자 계정</button>
   </div>
 
   <!-- 공고 관리 -->
@@ -239,12 +245,82 @@
       <button class="btn-gold" onclick="addNewOption()">옵션 추가하기</button>
     </div>
   </div>
+
+  <!-- 공지사항 관리 -->
+  <div class="panel" id="panel-notices">
+    <div class="section-head">
+      <h3>공지사항 관리</h3>
+      <button class="btn-sm" onclick="loadNotices()">새로고침</button>
+    </div>
+    <div class="notice">
+      <strong>안내</strong><br>
+      여기서 등록하는 공지는 partner.html "📢 공지사항" 탭에서 협력사들이 볼 수 있습니다.
+    </div>
+    <div id="notice-list" style="margin-bottom:28px;"><div class="empty-state">불러오는 중...</div></div>
+
+    <div class="section-head"><h3 style="font-size:15px;">새 공지 등록</h3></div>
+    <div style="max-width:480px;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:18px;">
+      <div class="form-group"><label>제목 *</label><input type="text" id="notice-new-title" placeholder="예: 협력사 추천 인센티브 안내"></div>
+      <div class="form-group"><label>내용 *</label><textarea id="notice-new-content" placeholder="공지 내용을 입력하세요" style="height:120px;"></textarea></div>
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;margin-bottom:10px;">
+        <input type="checkbox" id="notice-new-allpartners" checked onchange="toggleNoticeCategoryFields()"> 전체 협력사 공개
+      </label>
+      <div id="notice-new-category-fields" style="display:none;margin-bottom:14px;">
+        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">대상 분야 선택 (복수 가능)</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:13px;">
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" class="notice-cat-cb" value="플로리스트 · 꽃장식"> 플로리스트·꽃장식</label>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" class="notice-cat-cb" value="스냅 · 영상 촬영"> 스냅·영상촬영</label>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" class="notice-cat-cb" value="헤어 · 메이크업"> 헤어·메이크업</label>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" class="notice-cat-cb" value="푸드트럭 · 음료바"> 푸드트럭·음료바</label>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" class="notice-cat-cb" value="답례품"> 답례품</label>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" class="notice-cat-cb" value="버스킹 · 음악"> 버스킹·음악</label>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" class="notice-cat-cb" value="사회자 · MC"> 사회자·MC</label>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" class="notice-cat-cb" value="코미디언 · 공연"> 코미디언·공연</label>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" class="notice-cat-cb" value="장소 대여 제공"> 장소 대여 제공</label>
+        </div>
+      </div>
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;margin-bottom:14px;">
+        <input type="checkbox" id="notice-new-important"> 중요 공지로 표시
+      </label>
+      <button class="btn-gold" onclick="postNotice()">공지 등록하기</button>
+    </div>
+  </div>
+
+  <!-- 활동 로그 -->
+  <div class="panel" id="panel-activitylog">
+    <div class="section-head">
+      <h3>활동 로그</h3>
+      <button class="btn-sm" onclick="loadActivityLog()">새로고침</button>
+    </div>
+    <div class="notice"><strong>안내</strong><br>최근 200건까지 표시됩니다. 누가 언제 무엇을 했는지 기록입니다.</div>
+    <div id="activity-log-list"><div class="empty-state">불러오는 중...</div></div>
+  </div>
+
+  <!-- 관리자 계정 (마스터 전용) -->
+  <div class="panel" id="panel-admins">
+    <div class="section-head">
+      <h3>관리자 계정</h3>
+      <button class="btn-sm" onclick="loadAdmins()">새로고침</button>
+    </div>
+    <div class="notice"><strong>안내</strong><br>여기서 추가한 사람은 본인 비밀번호로 로그인하며, 모든 작업 기록에 본인 이름이 남습니다.</div>
+    <div id="admins-list" style="margin-bottom:28px;"><div class="empty-state">불러오는 중...</div></div>
+
+    <div class="section-head"><h3 style="font-size:15px;">관리자 추가</h3></div>
+    <div style="max-width:400px;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:18px;">
+      <div class="form-group"><label>이름 *</label><input type="text" id="admin-new-name" placeholder="예: 김민수"></div>
+      <div class="form-group"><label>이메일 (선택, 메모용)</label><input type="email" id="admin-new-email" placeholder="example@email.com"></div>
+      <div class="form-group"><label>비밀번호 * (4자 이상)</label><input type="password" id="admin-new-password" placeholder="본인만 아는 비밀번호"></div>
+      <button class="btn-gold" onclick="addAdmin()">추가하기</button>
+    </div>
+  </div>
 </div>
 
 <script>
   const WEBHOOK = 'https://script.google.com/macros/s/AKfycbzG1GPR8OhMIeBeTFvt7gE5CGiyQx3ggnLiVIah9geT89m-_poYFEwmi9K--NZ0HxDKjg/exec';
   const PARTNERS_API = '/api/partners';
   let adminPw = '';
+  let adminName = '';
+  let isMasterAdmin = false;
   let projects = [];
 
   // ── 로그인 ──
@@ -258,9 +334,17 @@
         body: JSON.stringify({ type: 'admin_login', password: pw })
       });
       const data = await res.json();
+      if (data.result !== 'success') {
+        alert('연결 오류가 발생했습니다: ' + (data.message || '알 수 없는 오류'));
+        return;
+      }
       if (data.auth) {
         adminPw = pw;
+        adminName = data.adminName || '';
+        isMasterAdmin = !!data.isMaster;
         sessionStorage.setItem('adminPw', pw);
+        sessionStorage.setItem('adminName', adminName);
+        sessionStorage.setItem('isMasterAdmin', isMasterAdmin ? '1' : '');
         enterAdmin();
       } else {
         alert('비밀번호가 맞지 않습니다.');
@@ -274,12 +358,18 @@
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('main-screen').style.display = 'block';
     document.getElementById('logout-btn').style.display = 'block';
+    const badge = document.getElementById('admin-name-badge');
+    if (badge) badge.textContent = adminName ? (' · ' + adminName) : '';
+    const adminsTabBtn = document.getElementById('tab-admins');
+    if (adminsTabBtn) adminsTabBtn.style.display = isMasterAdmin ? '' : 'none';
     loadProjects();
   }
 
   function logout() {
-    adminPw = '';
+    adminPw = ''; adminName = ''; isMasterAdmin = false;
     sessionStorage.removeItem('adminPw');
+    sessionStorage.removeItem('adminName');
+    sessionStorage.removeItem('isMasterAdmin');
     location.reload();
   }
 
@@ -292,6 +382,9 @@
     if (name === 'responses') loadResponses();
     if (name === 'partners') loadPartners();
     if (name === 'pricing') loadPricing();
+    if (name === 'notices') loadNotices();
+    if (name === 'activitylog') loadActivityLog();
+    if (name === 'admins') loadAdmins();
   }
 
   // ── 협력사 승인 ──
@@ -334,6 +427,7 @@
                   담당자: ${p.name} &nbsp;·&nbsp; 연락처: ${p.phone} &nbsp;·&nbsp; 카카오ID: ${p.kakao_id}<br>
                   이메일: ${p.email} &nbsp;·&nbsp; 신청일: ${dateStr}
                   ${p.intro ? `<br>소개: ${p.intro}` : ''}
+                  ${p.category_addendum_agreed_at ? `<br>특약 동의: ${p.category_addendum_key} (${formatDate(p.category_addendum_agreed_at)})` : ''}
                 </div>
               </div>
             </div>
@@ -797,10 +891,196 @@
     }
   }
 
+  // ── 공지사항 관리 ──
+  async function loadNotices() {
+    const el = document.getElementById('notice-list');
+    el.innerHTML = '<div class="empty-state">불러오는 중...</div>';
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ type: 'get_notices', password: adminPw })
+      });
+      const data = await res.json();
+      if (data.result !== 'success') throw new Error(data.message);
+      const notices = data.notices || [];
+      if (notices.length === 0) { el.innerHTML = '<div class="empty-state">등록된 공지가 없습니다</div>'; return; }
+      el.innerHTML = notices.map(n => `
+        <div style="background:var(--white);border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin-bottom:8px;${n.visible === false ? 'opacity:.5;' : ''}">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <strong style="font-size:14px;">${n.important ? '📌 ' : ''}${n.title}</strong>
+            <span style="font-size:11px;color:var(--muted);">${n.date}</span>
+          </div>
+          <div style="font-size:13px;color:#4a4338;white-space:pre-wrap;margin-bottom:6px;">${n.content}</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">대상: ${n.targetCategories ? n.targetCategories.replace(/,/g, ', ') : '전체 협력사'}</div>
+          <button class="btn-sm" onclick="toggleNoticeVisibility('${n.id}', ${n.visible !== false})">${n.visible === false ? '노출하기' : '숨기기'}</button>
+        </div>`).join('');
+    } catch (e) {
+      el.innerHTML = '<div class="empty-state">불러오기 실패: ' + e.message + '</div>';
+    }
+  }
+
+  function toggleNoticeCategoryFields() {
+    const allChecked = document.getElementById('notice-new-allpartners').checked;
+    document.getElementById('notice-new-category-fields').style.display = allChecked ? 'none' : 'block';
+  }
+
+  async function postNotice() {
+    const title = document.getElementById('notice-new-title').value.trim();
+    const content = document.getElementById('notice-new-content').value.trim();
+    const important = document.getElementById('notice-new-important').checked;
+    const allPartners = document.getElementById('notice-new-allpartners').checked;
+    let targetCategories = '';
+    if (!allPartners) {
+      const cats = Array.from(document.querySelectorAll('.notice-cat-cb:checked')).map(c => c.value);
+      if (cats.length === 0) { alert('대상 분야를 1개 이상 선택하거나, "전체 협력사 공개"를 체크해주세요.'); return; }
+      targetCategories = cats.join(',');
+    }
+    if (!title || !content) { alert('제목과 내용을 입력해주세요.'); return; }
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ type: 'post_notice', title, content, important, targetCategories, password: adminPw })
+      });
+      const data = await res.json();
+      if (data.result !== 'success') throw new Error(data.message);
+      document.getElementById('notice-new-title').value = '';
+      document.getElementById('notice-new-content').value = '';
+      document.getElementById('notice-new-important').checked = false;
+      document.getElementById('notice-new-allpartners').checked = true;
+      document.querySelectorAll('.notice-cat-cb').forEach(c => c.checked = false);
+      toggleNoticeCategoryFields();
+      loadNotices();
+    } catch (e) {
+      alert('등록 실패: ' + e.message);
+    }
+  }
+
+  async function toggleNoticeVisibility(id, currentlyVisible) {
+    if (!confirm(currentlyVisible ? '이 공지를 숨기시겠습니까?' : '이 공지를 다시 노출하시겠습니까?')) return;
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ type: 'toggle_notice_visibility', id, visible: !currentlyVisible, password: adminPw })
+      });
+      const data = await res.json();
+      if (data.result !== 'success') throw new Error(data.message);
+      loadNotices();
+    } catch (e) {
+      alert('처리 실패: ' + e.message);
+    }
+  }
+
+  // ── 활동 로그 ──
+  async function loadActivityLog() {
+    const el = document.getElementById('activity-log-list');
+    el.innerHTML = '<div class="empty-state">불러오는 중...</div>';
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ type: 'get_activity_log', password: adminPw })
+      });
+      const data = await res.json();
+      if (data.result !== 'success') throw new Error(data.message);
+      const logs = data.logs || [];
+      if (logs.length === 0) { el.innerHTML = '<div class="empty-state">기록이 없습니다</div>'; return; }
+      el.innerHTML = `
+        <table class="resp-table">
+          <thead><tr><th>일시</th><th>관리자</th><th>작업</th><th>상세</th></tr></thead>
+          <tbody>
+            ${logs.map(l => `<tr><td>${formatDate(l.date)}</td><td>${l.adminName}</td><td>${l.action}</td><td>${l.detail}</td></tr>`).join('')}
+          </tbody>
+        </table>`;
+    } catch (e) {
+      el.innerHTML = '<div class="empty-state">불러오기 실패: ' + e.message + '</div>';
+    }
+  }
+
+  // ── 관리자 계정 관리 (마스터 전용) ──
+  async function loadAdmins() {
+    const el = document.getElementById('admins-list');
+    el.innerHTML = '<div class="empty-state">불러오는 중...</div>';
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ type: 'list_admins', password: adminPw })
+      });
+      const data = await res.json();
+      if (data.result !== 'success') throw new Error(data.message);
+      const admins = data.admins || [];
+      el.innerHTML = `
+        <div class="project-card" style="margin-bottom:8px;"><div class="pc-title">대표 (마스터)</div><div class="pc-meta">항상 활성 · 비밀번호 변경은 Code.gs에서 직접</div></div>
+        ${admins.map(a => `
+          <div class="project-card" style="${a.active ? '' : 'opacity:.5;'}">
+            <div class="pc-header">
+              <div>
+                <div class="pc-title">${a.name}</div>
+                <div class="pc-meta">${a.email || '이메일 없음'} · 등록일 ${a.createdAt}</div>
+              </div>
+              <span class="badge ${a.active ? 'badge-open' : 'badge-closed'}">${a.active ? '활성' : '비활성'}</span>
+            </div>
+            <div class="pc-actions">
+              <button class="btn-sm" onclick="toggleAdminActive('${a.name}', ${a.active})">${a.active ? '비활성화' : '활성화'}</button>
+            </div>
+          </div>`).join('')}`;
+    } catch (e) {
+      el.innerHTML = '<div class="empty-state">불러오기 실패: ' + e.message + '</div>';
+    }
+  }
+
+  async function addAdmin() {
+    const newName = document.getElementById('admin-new-name').value.trim();
+    const newEmail = document.getElementById('admin-new-email').value.trim();
+    const newPassword = document.getElementById('admin-new-password').value;
+    if (!newName || !newPassword) { alert('이름과 비밀번호를 입력해주세요.'); return; }
+    if (newPassword.length < 4) { alert('비밀번호는 4자 이상이어야 합니다.'); return; }
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ type: 'add_admin', newName, newEmail, newPassword, password: adminPw })
+      });
+      const data = await res.json();
+      if (data.result !== 'success') throw new Error(data.message);
+      alert(newName + '님이 관리자로 추가되었습니다.');
+      document.getElementById('admin-new-name').value = '';
+      document.getElementById('admin-new-email').value = '';
+      document.getElementById('admin-new-password').value = '';
+      loadAdmins();
+    } catch (e) {
+      alert('추가 실패: ' + e.message);
+    }
+  }
+
+  async function toggleAdminActive(targetName, currentlyActive) {
+    if (!confirm(`"${targetName}" 계정을 ${currentlyActive ? '비활성화' : '활성화'}하시겠습니까?`)) return;
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ type: 'toggle_admin_active', targetName, active: !currentlyActive, password: adminPw })
+      });
+      const data = await res.json();
+      if (data.result !== 'success') throw new Error(data.message);
+      loadAdmins();
+    } catch (e) {
+      alert('처리 실패: ' + e.message);
+    }
+  }
+
   // 세션 유지
   window.addEventListener('load', () => {
     const saved = sessionStorage.getItem('adminPw');
-    if (saved) { adminPw = saved; enterAdmin(); }
+    if (saved) {
+      adminPw = saved;
+      adminName = sessionStorage.getItem('adminName') || '';
+      isMasterAdmin = sessionStorage.getItem('isMasterAdmin') === '1';
+      enterAdmin();
+    }
   });
 </script>
 </body>
