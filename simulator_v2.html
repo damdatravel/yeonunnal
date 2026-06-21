@@ -5,6 +5,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>여는날 — 간편 견적내기</title>
+<link rel="icon" type="image/png" sizes="32x32" href="images/icon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="images/icon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="images/icon-180.png">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=Noto+Sans+KR:wght@300;400;500&display=swap');
 
@@ -824,11 +827,11 @@
     <div class="divider"><span>또는 직접 입력</span></div>
 
     <div class="form-group">
-      <label>이름</label>
+      <label id="label-name-early">이름</label>
       <input type="text" id="f-name-early" placeholder="이름을 입력해주세요">
     </div>
     <div class="form-group" style="margin-bottom:28px;">
-      <label>연락처</label>
+      <label id="label-phone-early">연락처</label>
       <input type="tel" id="f-phone-early" placeholder="010-0000-0000">
     </div>
 
@@ -1161,7 +1164,24 @@
   function escJsStr(s) { return String(s).replace(/'/g, "\\'"); }
   function escHtml(s) { return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
 
+  // ── 협력사 모드 (지인 행사 견적용) ──
+  let partnerMode = false;
+  let partnerInfo = null; // { category, company, grade }
+  let pricingOptionsCache = [];
+  const CATEGORY_TO_OPTION = {
+    '플로리스트 · 꽃장식': ['플라워 장식'],
+    '스냅 · 영상 촬영': ['스냅 사진 촬영', '영상 촬영·편집'],
+    '헤어 · 메이크업': ['헤어·메이크업'],
+    '푸드트럭 · 음료바': ['푸드트럭·음료바'],
+    '답례품': ['하객 답례품'],
+    '버스킹 · 음악': ['버스킹 퍼포머'],
+    '사회자 · MC': ['사회자 진행'],
+    '코미디언 · 공연': ['코미디언 공연']
+    // 장소 대여 제공, 기타: 시뮬레이터에 대응되는 옵션이 없어 매칭하지 않음
+  };
+
   function renderOptionsList(options) {
+    pricingOptionsCache = options || [];
     const list = document.getElementById('options-toggle-list');
     if (!list || !options || options.length === 0) return;
     list.innerHTML = options.map(o => {
@@ -1202,6 +1222,7 @@
       </div>`;
     }).join('');
     reapplyOptionSelections();
+    if (partnerMode) applyPartnerOwnPricing();
   }
 
   // 옵션 목록을 다시 그린 뒤에도, 이미 선택해뒀던 등급/답례품 상태를 화면에 복원
@@ -1385,6 +1406,90 @@
     const add = parseInt(el.dataset.add) || 0;
     state.flatOptionTotal = (state.flatOptionTotal || 0) + (el.classList.contains('selected') ? add : -add);
     calcTotal();
+  }
+
+  // ── 협력사 모드: 본인 분야는 등급제 대신 직접 가격 입력 ──
+  function applyPartnerOwnPricing() {
+    if (!partnerMode || !partnerInfo) return;
+    const optionNames = CATEGORY_TO_OPTION[partnerInfo.category] || [];
+    optionNames.forEach(optName => {
+      const opt = pricingOptionsCache.find(o => o.name === optName);
+      if (!opt) return;
+      if (opt.type === 'flat') applyOwnFlatPricing(optName);
+      else applyOwnGradePricing(optName);
+    });
+  }
+
+  function applyOwnGradePricing(optName) {
+    const row = document.getElementById('grade-row-' + optName);
+    const item = document.querySelector(`.toggle-item[data-option="${optName}"]`);
+    if (!row || !item) return;
+    const nameEl = item.querySelector('.toggle-name');
+    if (nameEl && !nameEl.dataset.ownTagged) {
+      nameEl.innerHTML = nameEl.textContent + ' <span style="color:var(--gold);font-size:11px;">(내 분야)</span>';
+      nameEl.dataset.ownTagged = '1';
+    }
+    row.innerHTML = `
+      <div style="display:flex;gap:8px;align-items:center;padding:10px;width:100%;">
+        <input type="number" id="own-price-input-${escAttr(optName)}" placeholder="본인 파트 가격 입력 (원)"
+          style="flex:1;border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-size:13px;font-family:'Noto Sans KR',sans-serif;">
+        <button type="button" class="grade-pill" style="flex:0 0 auto;" onclick="applyOwnPrice('${escJsStr(optName)}')">적용</button>
+      </div>`;
+  }
+
+  function applyOwnPrice(optName) {
+    const input = document.getElementById('own-price-input-' + optName);
+    const price = Number(input.value) || 0;
+    if (price <= 0) { alert('가격을 입력해주세요.'); return; }
+    state.optionGrades[optName] = { grade: '직접입력', price };
+    const item = document.querySelector(`.toggle-item[data-option="${optName}"]`);
+    if (item) {
+      item.classList.add('selected');
+      item.querySelector('.toggle-price').textContent = fmtFull(price);
+    }
+    calcTotal();
+    updateProNotice();
+  }
+
+  function applyOwnFlatPricing(optName) {
+    const item = document.querySelector('.toggle-item[data-add]');
+    if (!item) return;
+    item.setAttribute('onclick', `ownFlatPrompt('${escJsStr(optName)}')`);
+    item.querySelector('.toggle-price').textContent = '직접 입력';
+    const nameEl = item.querySelector('.toggle-name');
+    if (nameEl && !nameEl.dataset.ownTagged) {
+      nameEl.innerHTML = nameEl.textContent + ' <span style="color:var(--gold);font-size:11px;">(내 분야)</span>';
+      nameEl.dataset.ownTagged = '1';
+    }
+  }
+
+  function ownFlatPrompt(optName) {
+    const current = state.flatOptionTotal || '';
+    const input = prompt('본인 파트(' + optName + ') 가격을 입력해주세요 (원)', current);
+    if (input === null) return;
+    const price = Number(input) || 0;
+    state.flatOptionTotal = price;
+    const item = document.querySelector('.toggle-item[data-add]');
+    if (price > 0) {
+      item.classList.add('selected');
+      item.querySelector('.toggle-price').textContent = '+' + fmtFull(price);
+    } else {
+      item.classList.remove('selected');
+      item.querySelector('.toggle-price').textContent = '직접 입력';
+    }
+    calcTotal();
+  }
+
+  function getOwnPartPrice() {
+    if (!partnerMode) return 0;
+    const optionNames = CATEGORY_TO_OPTION[partnerInfo.category] || [];
+    let sum = 0;
+    optionNames.forEach(optName => {
+      const o = state.optionGrades[optName];
+      if (o && o.grade === '직접입력') sum += o.price;
+    });
+    if (optionNames.includes('하객 답례품') && state.flatOptionTotal > 0) sum += state.flatOptionTotal;
+    return sum;
   }
 
   function updateProNotice() {
@@ -1576,22 +1681,42 @@
       const memo = document.getElementById('f-memo').value.trim();
       const isEditing = !!state.quoteId;
 
-      const payload = {
-        type: isEditing ? 'update_quote' : 'quote',
-        name, phone,
-        eventName: state.eventName,
-        spaceName: state.spaceName || '미선택',
-        seasonName: state.seasonName || '미선택',
-        guests: state.guests,
-        optionsList: selectedOptions,
-        optionGradeDetail: JSON.stringify(state.optionGrades),
-        proGradeIncluded: hasProGrade ? 'Y' : 'N',
-        totalPrice: total > 0 ? total : '별도 협의',
-        loginProvider: loggedInProviderLabel,
-        email: loggedInEmail,
-        kakaoId, consultTime, memo
-      };
-      if (isEditing) payload.quoteId = state.quoteId;
+      let payload;
+      if (partnerMode) {
+        payload = {
+          type: 'submit_referral_quote',
+          customerName: name, customerPhone: phone,
+          eventName: state.eventName,
+          spaceName: state.spaceName || '미선택',
+          seasonName: state.seasonName || '미선택',
+          guests: state.guests,
+          optionsList: selectedOptions,
+          totalPrice: total > 0 ? total : '별도 협의',
+          memo,
+          referrerEmail: loggedInEmail,
+          referrerCompany: partnerInfo.company,
+          referrerCategory: partnerInfo.category,
+          referrerPartPrice: getOwnPartPrice(),
+          noticeAgreedAt: sessionStorage.getItem('referral_notice_agreed_at') || ''
+        };
+      } else {
+        payload = {
+          type: isEditing ? 'update_quote' : 'quote',
+          name, phone,
+          eventName: state.eventName,
+          spaceName: state.spaceName || '미선택',
+          seasonName: state.seasonName || '미선택',
+          guests: state.guests,
+          optionsList: selectedOptions,
+          optionGradeDetail: JSON.stringify(state.optionGrades),
+          proGradeIncluded: hasProGrade ? 'Y' : 'N',
+          totalPrice: total > 0 ? total : '별도 협의',
+          loginProvider: loggedInProviderLabel,
+          email: loggedInEmail,
+          kakaoId, consultTime, memo
+        };
+        if (isEditing) payload.quoteId = state.quoteId;
+      }
 
       const res = await fetch(SHEET_WEBHOOK_URL, {
         method: 'POST',
@@ -1625,14 +1750,33 @@
     const providerLabel = provider === 'kakao' ? '카카오' : provider === 'google' ? '구글' : provider;
     loggedInProviderLabel = providerLabel;
     loggedInEmail = user.email || '';
+
+    // 협력사 계정으로 로그인된 경우(이메일/비번 가입자) — 협력사 모드로 전환
+    try {
+      const { data: partnerRow } = await sb.from('partners').select('category, company, grade, status').eq('id', user.id).single();
+      if (partnerRow && partnerRow.status === 'approved') {
+        partnerMode = true;
+        partnerInfo = partnerRow;
+        applyPartnerOwnPricing();
+        const nameLabel = document.getElementById('label-name-early');
+        const phoneLabel = document.getElementById('label-phone-early');
+        if (nameLabel) nameLabel.textContent = '고객(지인) 이름';
+        if (phoneLabel) phoneLabel.textContent = '고객(지인) 연락처';
+      }
+    } catch (e) { /* 협력사 테이블에 없으면 일반 고객으로 진행 */ }
+
     const box = document.getElementById('login-status-box');
     if (box) {
       box.innerHTML = `
+        ${partnerMode ? `<div class="notice-box" style="background:rgba(200,169,110,.12);border:1px solid var(--gold-light);border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--ink);line-height:1.7;">
+          🤝 <strong>협력사 모드</strong> — ${partnerInfo.company} (${partnerInfo.category})<br>
+          지인 행사 견적을 만들고 계십니다. 본인 분야는 직접 가격을 입력하시면 마진 없이 그대로 지급됩니다.
+        </div>` : ''}
         <div class="login-status">
           <span>${providerLabel ? providerLabel + ' 계정으로 로그인됨' : '로그인됨'} ${name ? '· ' + name + '님' : ''}</span>
           <button type="button" onclick="logoutSimulator()">로그아웃</button>
         </div>
-        <button type="button" style="width:100%;background:var(--cream);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;margin-bottom:16px;" onclick="openMyQuotes()">📋 지난 견적 보기</button>`;
+        ${!partnerMode ? `<button type="button" style="width:100%;background:var(--cream);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;margin-bottom:16px;" onclick="openMyQuotes()">📋 지난 견적 보기</button>` : ''}`;
     }
     const socialList = document.querySelector('.social-list');
     if (socialList) socialList.style.display = 'none';
