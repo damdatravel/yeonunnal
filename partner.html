@@ -20,7 +20,8 @@
   body{background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-serif;font-weight:300;min-height:100vh;}
 
   header{background:var(--ink);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;}
-  .logo{font-family:'Noto Serif KR',serif;font-size:20px;color:var(--gold);letter-spacing:.08em;text-decoration:none;}
+  .logo{display:flex;align-items:center;gap:7px;font-family:'Noto Serif KR',serif;font-size:20px;color:var(--gold);letter-spacing:.08em;text-decoration:none;}
+  .logo img{height:22px;width:auto;display:block;}
   .header-right{display:flex;align-items:center;gap:16px;}
   .header-company{font-size:13px;color:rgba(255,255,255,.6);display:none;}
   .logout-btn{background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);font-size:12px;padding:6px 14px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;display:none;}
@@ -143,7 +144,7 @@
 <body>
 
 <header>
-  <a href="index.html" class="logo">여는날</a>
+  <a href="index.html" class="logo"><img src="images/nav-logo-symbol.png" alt="여는날 심볼">여는날</a>
   <div class="header-right">
     <span class="header-company" id="header-company"></span>
     <button class="logout-btn" id="logout-btn" onclick="doLogout()">로그아웃</button>
