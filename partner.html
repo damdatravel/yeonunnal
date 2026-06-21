@@ -5,6 +5,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>여는날 — 협력사 센터</title>
+<link rel="icon" type="image/png" sizes="32x32" href="images/icon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="images/icon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="images/icon-180.png">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=Noto+Sans+KR:wght@300;400;500&display=swap');
 
@@ -201,7 +204,7 @@
       </div>
       <div class="fg">
         <label>협력 분야 <span class="req">*</span></label>
-        <select id="su-category">
+        <select id="su-category" onchange="onCategoryChange()">
           <option value="">선택해주세요</option>
           <option>플로리스트 · 꽃장식</option>
           <option>스냅 · 영상 촬영</option>
@@ -307,13 +310,44 @@
     </div>
     <div class="tabs" style="margin-top:0">
       <button class="tab-btn active" id="tab-projects" onclick="showDashTab('projects')">📋 공고 현황</button>
+      <button class="tab-btn" id="tab-notices" onclick="showDashTab('notices')">📢 공지사항</button>
       <button class="tab-btn" id="tab-myinfo" onclick="showDashTab('myinfo')">👤 내 정보</button>
+      <button class="tab-btn" id="tab-referral" onclick="showDashTab('referral')">🤝 지인 행사 견적</button>
     </div>
     <div class="panel active" id="panel-projects">
       <div id="project-list"><div class="empty-state">불러오는 중...</div></div>
     </div>
+    <div class="panel" id="panel-notices">
+      <div id="notice-list-partner"><div class="empty-state">불러오는 중...</div></div>
+    </div>
     <div class="panel" id="panel-myinfo">
       <div id="myinfo-content"></div>
+    </div>
+    <div class="panel" id="panel-referral">
+      <div class="notice" style="background:var(--cream);border-radius:8px;padding:14px 16px;font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.8;">
+        <strong style="color:var(--ink);">안내</strong><br>
+        지인·가족의 행사를 여는날로 진행하실 때 사용하세요. 고객이 보는 것과 같은 견적 화면으로 이동하며, 본인 분야 차례가 오면 등급 선택 대신 <strong>직접 가격 입력</strong> 칸이 나타납니다 — 그 가격 그대로 마진 없이 지급됩니다. 마지막에 완성하면 정식 견적으로 접수됩니다.
+      </div>
+      <button class="btn-gold" onclick="openReferralNotice()">지인 행사 견적 만들기 →</button>
+    </div>
+
+    <div class="modal-overlay" id="referral-notice-modal" style="display:none">
+      <div class="modal-box" style="max-width:460px;">
+        <div class="modal-title">지인 행사 견적 안내</div>
+        <div style="font-size:13px;color:#4a4338;line-height:1.9;background:var(--cream);border-radius:8px;padding:14px 16px;margin-bottom:16px;">
+          1. 본인 분야는 가격을 직접 입력하시면, 그 금액 그대로 마진 없이 지급됩니다.<br><br>
+          2. <strong>나머지 분야는 평소와 동일하게 admin 큐레이션(최대 3명 추천 → 고객 최종선택)을 거칩니다.</strong> 본인 인맥으로 다른 분야까지 채울 수 없습니다.<br><br>
+          3. "완성하기"를 누르면 정식 견적으로 접수되며, 이후 진행은 admin 확인을 거칩니다.
+        </div>
+        <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;margin-bottom:16px;cursor:pointer;">
+          <input type="checkbox" id="referral-notice-checkbox" onchange="document.getElementById('referral-notice-confirm-btn').disabled = !this.checked;" style="margin-top:2px;">
+          <span>위 내용을 확인했습니다</span>
+        </label>
+        <div class="modal-btns">
+          <button class="modal-btn-sub" id="referral-notice-confirm-btn" disabled onclick="confirmReferralNotice()">이동하기</button>
+          <button class="modal-btn-cancel" onclick="document.getElementById('referral-notice-modal').style.display='none'">취소</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -406,6 +440,43 @@
     document.getElementById('tab-' + name).classList.add('active');
     document.getElementById('panel-' + name).classList.add('active');
     if (name === 'myinfo') renderMyInfo();
+    if (name === 'notices') loadNoticesForPartner();
+  }
+
+  async function loadNoticesForPartner() {
+    const el = document.getElementById('notice-list-partner');
+    el.innerHTML = '<div class="empty-state">불러오는 중...</div>';
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ type: 'get_notices', category: currentPartner.category })
+      });
+      const data = await res.json();
+      const notices = data.notices || [];
+      if (notices.length === 0) { el.innerHTML = '<div class="empty-state">등록된 공지가 없습니다</div>'; return; }
+      el.innerHTML = notices.map(n => `
+        <div class="project-card">
+          <div class="pc-header">
+            <div class="pc-title">${n.important ? '📌 ' : ''}${n.title}</div>
+          </div>
+          <div class="pc-meta" style="margin-top:6px;white-space:pre-wrap;">${n.content}</div>
+          <div class="pc-meta" style="margin-top:8px;font-size:11px;">${n.date}</div>
+        </div>`).join('');
+    } catch (e) {
+      el.innerHTML = '<div class="empty-state">불러오기 실패</div>';
+    }
+  }
+
+  function openReferralNotice() {
+    document.getElementById('referral-notice-checkbox').checked = false;
+    document.getElementById('referral-notice-confirm-btn').disabled = true;
+    document.getElementById('referral-notice-modal').style.display = 'flex';
+  }
+
+  function confirmReferralNotice() {
+    sessionStorage.setItem('referral_notice_agreed_at', new Date().toISOString());
+    location.href = 'simulator_v2.html';
   }
 
   // ── 파트너 데이터 로드 ──
@@ -516,6 +587,8 @@
       company: d.company, name: d.name, phone: d.phone,
       kakao_id: d.kakao_id, category: d.category, grade: d.grade || '아마추어', intro: d.intro || '',
       portfolio_url: d.portfolio_url || '',
+      terms_agreed_at: d.terms_agreed_at, privacy_agreed_at: d.privacy_agreed_at,
+      category_addendum_key: d.category_addendum_key, category_addendum_agreed_at: d.category_addendum_agreed_at,
       status: 'pending'
     });
     if (error) {
@@ -536,6 +609,74 @@
   }
 
   // ── 회원가입 ──
+  // ── 분야별 특약 (식품/장소대여/공연) ──
+  const PERFORMANCE_ADDENDUM = {
+    key: 'performance',
+    title: '공연 분야 특약 동의',
+    body: `<strong>공연 분야 특약 (버스킹·사회자·코미디언)</strong><br><br>
+      1. 공연 중 사용하는 음악·영상 등 저작물의 저작권 및 공연권은 협력사가 직접 확보하여야 하며, 한국음악저작권협회(KOMCA) 등에 대한 공연권료 납부 의무가 있는 경우 협력사가 이를 부담합니다.<br><br>
+      2. 협력사의 저작권 미준수로 인하여 회사 또는 고객에게 손해(저작권 침해 분쟁, 권리단체의 경고·청구 등)가 발생하는 경우, 협력사가 그 책임을 부담하며 회사에 발생한 손해를 배상하여야 합니다.<br><br>
+      자세한 내용은 <a href="terms.html#partner" target="_blank">이용약관 제10조</a>를 참고하세요.`
+  };
+  const ADDENDA = {
+    '푸드트럭 · 음료바': {
+      key: 'food',
+      title: '식품 분야 특약 동의',
+      body: `<strong>식품 분야 특약 (푸드트럭·음료바)</strong><br><br>
+        1. 식품위생법 등 관련 법령에 따라 필요한 영업신고·허가를 갖추고 있어야 하며, 회사 요청 시 관련 서류를 제출합니다.<br><br>
+        2. 조리·제공하는 음식에 주요 알레르기 유발 식품(난류, 우유, 갑각류, 땅콩 등)이 포함된 경우, 고객에게 사전에 고지합니다.<br><br>
+        3. 조리 기구(화로, 가스버너 등) 사용 시 화재 예방을 위한 안전조치를 갖춥니다.<br><br>
+        4. 식품으로 인한 사고(식중독 등) 발생 시 1차 책임은 협력사에 있습니다.<br><br>
+        자세한 내용은 <a href="terms.html#partner" target="_blank">이용약관 제10조</a>를 참고하세요.`
+    },
+    '장소 대여 제공': {
+      key: 'venue',
+      title: '장소 대여 특약 동의',
+      body: `<strong>장소 대여 특약</strong><br><br>
+        1. 대여 제공하는 장소·시설에 대한 화재보험 등 책임보험에 가입하고 있어야 하며, 회사 요청 시 보험증권을 제출합니다.<br><br>
+        2. 전기시설, 비상구, 소방설비 등 안전을 사전에 점검하고 관련 법령상 안전기준을 준수합니다.<br><br>
+        3. 행사 종료 후 원상복구하여야 하며, 협력사의 관리 부실로 인한 시설 파손은 협력사가 복구 비용을 부담합니다.<br><br>
+        자세한 내용은 <a href="terms.html#partner" target="_blank">이용약관 제10조</a>를 참고하세요.`
+    },
+    '버스킹 · 음악': PERFORMANCE_ADDENDUM,
+    '사회자 · MC': PERFORMANCE_ADDENDUM,
+    '코미디언 · 공연': PERFORMANCE_ADDENDUM
+  };
+  let addendumAgreed = { key: null, category: null, agreedAt: null };
+  let categorySelectPrevValue = '';
+
+  function onCategoryChange() {
+    const val = document.getElementById('su-category').value;
+    if (ADDENDA[val]) {
+      openAddendumModal(val);
+    } else {
+      categorySelectPrevValue = val;
+    }
+  }
+
+  function openAddendumModal(category) {
+    const a = ADDENDA[category];
+    document.getElementById('addendum-title').textContent = a.title;
+    document.getElementById('addendum-body').innerHTML = a.body;
+    document.getElementById('addendum-checkbox').checked = false;
+    document.getElementById('addendum-confirm-btn').disabled = true;
+    document.getElementById('addendum-modal').dataset.category = category;
+    document.getElementById('addendum-modal').style.display = 'flex';
+  }
+
+  function confirmAddendum() {
+    const category = document.getElementById('addendum-modal').dataset.category;
+    const a = ADDENDA[category];
+    addendumAgreed = { key: a.key, category, agreedAt: new Date().toISOString() };
+    categorySelectPrevValue = category;
+    document.getElementById('addendum-modal').style.display = 'none';
+  }
+
+  function cancelAddendum() {
+    document.getElementById('su-category').value = categorySelectPrevValue;
+    document.getElementById('addendum-modal').style.display = 'none';
+  }
+
   async function doSignup() {
     const btn = document.getElementById('su-submit-btn');
     if (btn.disabled) return; // 중복 클릭 방지
@@ -563,11 +704,22 @@
     if (!document.getElementById('su-consent').checked) {
       alert('개인정보 수집·이용에 동의해주세요.'); return;
     }
+    if (ADDENDA[category] && (!addendumAgreed.agreedAt || addendumAgreed.category !== category)) {
+      alert('선택하신 분야의 특약에 동의해주세요.');
+      openAddendumModal(category);
+      return;
+    }
 
     btn.disabled = true;
     btn.textContent = '처리 중...';
 
-    const partnerData = { company, name, phone, kakao_id: kakao, category, grade, intro, portfolio_url: portfolio };
+    const partnerData = {
+      company, name, phone, kakao_id: kakao, category, grade, intro, portfolio_url: portfolio,
+      terms_agreed_at: new Date().toISOString(),
+      privacy_agreed_at: new Date().toISOString(),
+      category_addendum_key: ADDENDA[category] ? addendumAgreed.key : null,
+      category_addendum_agreed_at: ADDENDA[category] ? addendumAgreed.agreedAt : null
+    };
     localStorage.setItem('pendingPartner', JSON.stringify(partnerData));
 
     try {
@@ -804,5 +956,19 @@
     btn.disabled = false; btn.textContent = '제출하기';
   }
 </script>
+<div class="modal-overlay" id="addendum-modal" style="display:none">
+  <div class="modal-box" style="max-width:480px;">
+    <div class="modal-title" id="addendum-title"></div>
+    <div style="max-height:320px;overflow-y:auto;font-size:12px;color:#4a4338;line-height:1.8;background:var(--cream);border-radius:8px;padding:14px 16px;margin-bottom:16px;" id="addendum-body"></div>
+    <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;margin-bottom:16px;cursor:pointer;">
+      <input type="checkbox" id="addendum-checkbox" onchange="document.getElementById('addendum-confirm-btn').disabled = !this.checked;" style="margin-top:2px;">
+      <span>위 특약 내용을 확인했으며 동의합니다</span>
+    </label>
+    <div class="modal-btns">
+      <button class="modal-btn-sub" id="addendum-confirm-btn" disabled onclick="confirmAddendum()">동의하고 계속하기</button>
+      <button class="modal-btn-cancel" onclick="cancelAddendum()">취소</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
