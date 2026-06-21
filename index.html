@@ -54,6 +54,9 @@
       padding: 16px 48px;
     }
     .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       font-family: 'Noto Serif KR', serif;
       font-size: 1.25rem;
       font-weight: 600;
@@ -61,6 +64,7 @@
       letter-spacing: 0.1em;
       text-decoration: none;
     }
+    .nav-logo img { height: 26px; width: auto; display: block; }
     .nav-links {
       display: flex;
       gap: 36px;
@@ -438,7 +442,7 @@
 
   <!-- NAV -->
   <nav id="nav">
-    <a href="#" class="nav-logo">여는날</a>
+    <a href="#" class="nav-logo"><img src="images/nav-logo-symbol.png" alt="여는날 심볼">여는날</a>
     <ul class="nav-links">
       <li><a href="#about">소개</a></li>
       <li><a href="#service">서비스</a></li>
