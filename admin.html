@@ -17,7 +17,8 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-serif;font-weight:300;min-height:100vh;}
   header{background:var(--ink);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
-  .logo{font-family:'Noto Serif KR',serif;font-size:18px;color:var(--gold);letter-spacing:.08em;}
+  .logo{display:flex;align-items:center;gap:6px;font-family:'Noto Serif KR',serif;font-size:18px;color:var(--gold);letter-spacing:.08em;}
+  .logo img{height:20px;width:auto;display:block;}
   .admin-badge{font-size:11px;color:var(--muted);border:1px solid var(--muted);padding:2px 8px;border-radius:4px;}
   .logout-btn{background:none;border:1px solid var(--muted);color:var(--muted);font-size:12px;padding:4px 12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
   .logout-btn:hover{color:var(--gold);border-color:var(--gold);}
@@ -88,7 +89,7 @@
 
 <header>
   <div style="display:flex;align-items:center;gap:12px;">
-    <span class="logo">여는날</span>
+    <span class="logo"><img src="images/nav-logo-symbol.png" alt="여는날 심볼">여는날</span>
     <span class="admin-badge">ADMIN<span id="admin-name-badge"></span></span>
   </div>
   <button class="logout-btn" id="logout-btn" style="display:none" onclick="logout()">로그아웃</button>
