@@ -41,11 +41,15 @@
     justify-content: space-between;
   }
   .logo {
+    display: flex;
+    align-items: center;
+    gap: 7px;
     font-family: 'Noto Serif KR', serif;
     font-size: 20px;
     color: var(--gold);
     letter-spacing: 0.08em;
   }
+  .logo img { height: 22px; width: auto; display: block; }
   .logo span { color: #fff; font-weight: 300; font-size: 13px; margin-left: 10px; opacity: 0.6; }
 
   /* HERO */
@@ -615,7 +619,7 @@
   <a href="index.html" style="color:var(--muted);font-size:13px;text-decoration:none;display:flex;align-items:center;gap:6px;transition:color 0.2s;" onmouseover="this.style.color='#c8a96e'" onmouseout="this.style.color='#8a7d6a'">
     ← 홈으로
   </a>
-  <div class="logo">여는날 <span>Yeonunnal</span></div>
+  <div class="logo"><img src="images/nav-logo-symbol.png" alt="여는날 심볼">여는날 <span>Yeonunnal</span></div>
   <div style="width:60px;"></div>
 </header>
 
