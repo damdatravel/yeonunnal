@@ -863,7 +863,7 @@
       const result = await res.json();
       if (res.status === 409 && result.error === 'active_jobs') {
         const list = (result.activeProjects || [])
-          .map(p => `· ${p.projectTitle} (${p.status === '최종선정됨' ? '진행 확정' : '고객 선택 대기 중'})`)
+          .map(p => `· ${p.projectTitle} (${p.status === '최종선정됨' ? '최종선정 후 6개월 이내 — 직접거래금지 기간' : '고객 선택 대기 중'})`)
           .join('\n');
         alert(
           '진행 중인 행사가 있어 지금은 탈퇴할 수 없습니다.\n\n' +
