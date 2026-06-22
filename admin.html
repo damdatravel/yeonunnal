@@ -347,6 +347,17 @@
       <div class="form-group"><label>비밀번호 * (4자 이상)</label><input type="password" id="admin-new-password" placeholder="본인만 아는 비밀번호"></div>
       <button class="btn-gold" onclick="addAdmin()">추가하기</button>
     </div>
+
+    <div class="section-head" style="margin-top:32px;"><h3 style="font-size:15px;color:var(--red);">🧹 테스트 데이터 정리</h3></div>
+    <div class="notice" style="background:rgba(192,57,43,.08);">
+      <strong>주의</strong><br>
+      구글시트는 휴지통이 없어 삭제하면 복구되지 않습니다. 검색 결과를 먼저 확인하고, 정말 지울 것만 체크해서 삭제해주세요.
+    </div>
+    <div style="display:flex;gap:8px;max-width:480px;margin-bottom:16px;">
+      <input type="text" id="testdata-keyword" value="test" style="flex:1;border:1.5px solid var(--line);border-radius:6px;padding:10px 12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;" placeholder="검색어 (기본: test)">
+      <button class="btn-ink" onclick="findTestData()">검색</button>
+    </div>
+    <div id="testdata-results"></div>
   </div>
 </div>
 
@@ -359,6 +370,85 @@
   let adminName = '';
   let isMasterAdmin = false;
   let projects = [];
+
+  // ── 테스트 데이터 정리 (마스터 전용) ──
+  let testDataResults = [];
+
+  async function findTestData() {
+    const keyword = document.getElementById('testdata-keyword').value.trim() || 'test';
+    const resultsEl = document.getElementById('testdata-results');
+    resultsEl.innerHTML = '<div class="empty-state">검색 중...</div>';
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ type: 'find_test_data', keyword, password: adminPw })
+      });
+      const data = await res.json();
+      if (data.result !== 'success') throw new Error(data.message || '검색 실패');
+      testDataResults = data.results || [];
+      renderTestDataResults();
+    } catch (e) {
+      resultsEl.innerHTML = '<div class="empty-state">검색 실패: ' + e.message + '</div>';
+    }
+  }
+
+  function renderTestDataResults() {
+    const resultsEl = document.getElementById('testdata-results');
+    if (testDataResults.length === 0) {
+      resultsEl.innerHTML = '<div class="empty-state">검색 결과가 없습니다</div>';
+      return;
+    }
+    resultsEl.innerHTML = `
+      <div style="margin-bottom:10px;">
+        <label style="font-size:13px;cursor:pointer;">
+          <input type="checkbox" checked onchange="toggleAllTestData(this.checked)"> 전체 선택 (${testDataResults.length}건)
+        </label>
+      </div>
+      <div style="max-height:320px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;margin-bottom:14px;">
+        ${testDataResults.map((r, i) => `
+          <label style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px;cursor:pointer;">
+            <input type="checkbox" class="testdata-cb" data-idx="${i}" checked>
+            <span style="color:var(--muted);font-size:11px;flex:0 0 70px;">${r.sheet}</span>
+            <span>${r.summary}</span>
+          </label>
+        `).join('')}
+      </div>
+      <button class="btn-danger" onclick="deleteSelectedTestData()">선택 항목 삭제</button>
+    `;
+  }
+
+  function toggleAllTestData(checked) {
+    document.querySelectorAll('.testdata-cb').forEach(cb => { cb.checked = checked; });
+  }
+
+  async function deleteSelectedTestData() {
+    const selected = [];
+    document.querySelectorAll('.testdata-cb:checked').forEach(cb => {
+      selected.push(testDataResults[parseInt(cb.dataset.idx)]);
+    });
+    if (selected.length === 0) { alert('삭제할 항목을 선택해주세요.'); return; }
+    if (!confirm(`${selected.length}건을 삭제합니다.\n구글시트는 복구가 안 되니 다시 한번 확인해주세요.\n계속하시겠습니까?`)) return;
+
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          type: 'delete_test_data',
+          items: selected.map(r => ({ sheet: r.sheet, rowIndex: r.rowIndex })),
+          password: adminPw
+        })
+      });
+      const data = await res.json();
+      if (data.result !== 'success') throw new Error(data.message || '삭제 실패');
+      alert(`${data.deletedCount}건 삭제되었습니다.`);
+      testDataResults = [];
+      document.getElementById('testdata-results').innerHTML = '';
+    } catch (e) {
+      alert('삭제 실패: ' + e.message);
+    }
+  }
 
   // ── 인쇄 / PDF ──
   function printCurrentPanel(title) {
