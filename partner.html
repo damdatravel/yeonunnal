@@ -104,6 +104,10 @@
   .btn-responded{background:var(--cream);color:var(--muted);border:1px solid var(--line);
     border-radius:6px;padding:8px 18px;font-size:13px;cursor:default;
     font-family:'Noto Sans KR',sans-serif;margin-top:12px;}
+  .status-line{display:block;font-size:12px;border-radius:6px;padding:9px 12px;margin-top:12px;line-height:1.6;}
+  .status-wait{background:var(--cream);color:var(--muted);}
+  .status-good{background:rgba(39,174,96,.12);color:var(--green);font-weight:500;}
+  .status-pass{background:var(--cream);color:#8a6a5a;}
   .empty-state{text-align:center;padding:40px 0;color:var(--muted);font-size:14px;line-height:1.9;}
 
   /* MY INFO */
@@ -905,6 +909,18 @@
       projectMap = {};
       projects.forEach(p => { projectMap[p.id] = p; });
 
+      // 내 참여 현황도 같이 불러와서 공고별 결과 안내에 사용 (검토중/추천됨/미선정/최종선정/추천안됨)
+      let myResponses = {};
+      try {
+        const rRes = await fetch(WEBHOOK, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ type: 'get_my_responses', userId: currentPartner?.email || '' })
+        });
+        const rData = await rRes.json();
+        (rData.responses || []).forEach(r => { myResponses[r.projectId] = r; });
+      } catch (e) { /* 상태 조회 실패해도 공고 목록 자체는 정상 표시 */ }
+
       if (projects.length === 0) {
         el.innerHTML = '<div class="empty-state">현재 모집 중인 공고가 없습니다<br><span style="font-size:12px;">새 공고 등록 시 카카오톡으로 알려드려요</span></div>';
         return;
@@ -912,7 +928,27 @@
       el.innerHTML = '';
       projects.slice().reverse().forEach(p => {
         const isOpen = p.status === '모집중';
-        const responded = respondedIds.includes(p.id);
+        const myResp = myResponses[p.id];
+        const responded = !!myResp || respondedIds.includes(p.id);
+
+        let statusHtml = '';
+        let showRespondBtn = !responded;
+        if (myResp && myResp.participate === '참여') {
+          if (myResp.recommendStatus === '최종선정됨') {
+            statusHtml = '<span class="status-line status-good">🎉 최종 선정되었습니다! 곧 여는날 담당자가 카카오톡으로 안내드려요.</span>';
+          } else if (myResp.recommendStatus === '미선정') {
+            statusHtml = '<span class="status-line status-pass">이번 건은 고객님이 다른 협력사를 선택하셨습니다. 다음 공고에서 또 뵐 수 있길 바랍니다.</span>';
+          } else if (myResp.recommendStatus === '추천됨') {
+            statusHtml = '<span class="status-line status-wait">추천 명단에 포함되어 고객님의 최종 선택을 기다리는 중입니다.</span>';
+          } else if (myResp.recommendationsConfirmed) {
+            statusHtml = '<span class="status-line status-pass">이번 공고에는 추천되지 않았습니다. 다음 기회에 또 응답해주세요!</span>';
+          } else {
+            statusHtml = '<span class="status-line status-wait">응답 검토 중입니다. 결과는 이곳에서 확인하실 수 있어요.</span>';
+          }
+        } else if (responded) {
+          statusHtml = '<span class="status-line status-wait">불참 의사를 전달하셨습니다.</span>';
+        }
+
         el.innerHTML += `
           <div class="project-card${isOpen ? '' : ' closed'}">
             <span class="badge ${isOpen ? 'badge-open' : 'badge-closed'}">${p.status}</span>
@@ -923,10 +959,8 @@
               ⏰ 마감: ${p.deadline}
               ${p.detail ? '<br><br>' + p.detail : ''}
             </div>
-            ${isOpen ? (responded
-              ? '<button class="btn-responded">✓ 이미 응답하셨습니다</button>'
-              : `<button class="btn-respond" data-pid="${p.id}" onclick="openModalById(this.dataset.pid)">참여 여부 알리기</button>`)
-              : ''}
+            ${isOpen && showRespondBtn ? `<button class="btn-respond" data-pid="${p.id}" onclick="openModalById(this.dataset.pid)">참여 여부 알리기</button>` : ''}
+            ${statusHtml}
           </div>`;
       });
     } catch(e) {
