@@ -5,83 +5,89 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY
 );
 
-// Code.gs(Apps Script) 웹훅 — 활동로그 기록용 (partners.js의 logActivity와 동일 패턴)
+// Code.gs(Apps Script) 웹훅 — 관리자 신원 확인(다중 관리자 지원) + 활동로그 기록용
 const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzG1GPR8OhMIeBeTFvt7gE5CGiyQx3ggnLiVIah9geT89m-_poYFEwmi9K--NZ0HxDKjg/exec';
 
-function logActivity(actorName, action, detail) {
+// 입력된 비밀번호로 관리자 신원 확인 (마스터 또는 개별 등록 관리자, Code.gs의 admin_login에 위임)
+async function verifyAdmin(adminPw) {
+  if (!adminPw) return null;
+  try {
+    const res = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ type: 'admin_login', password: adminPw })
+    });
+    const data = await res.json();
+    if (data.result === 'success' && data.auth) {
+      return { name: data.adminName || '관리자', isMaster: !!data.isMaster };
+    }
+  } catch (e) {
+    // 검증 자체가 실패하면(네트워크 오류 등) 인증 실패로 처리
+  }
+  return null;
+}
+
+// 활동 기록 (실패해도 본 작업에 영향 없도록 결과를 기다리지 않음)
+function logActivity(adminName, action, detail) {
   fetch(WEBHOOK_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ type: 'log_external_action', adminName: actorName, action, detail })
+    body: JSON.stringify({ type: 'log_external_action', adminName, action, detail })
   }).catch(() => {});
 }
 
-// 협력사 본인 탈퇴 처리
-// - 호출자는 자신의 Supabase 세션 access_token만 보내면 됨 (관리자 비밀번호로 우회 불가 — 본인 계정만 삭제 가능)
-// - 1) partners 테이블 행 삭제  2) Auth 계정 삭제  3) 활동로그 기록
-// - 구글시트(협력신청/참여신청/프로젝트공고)의 과거 행사 기록은 건드리지 않음 — 정산·분쟁 증빙용으로 별도 보관
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const authHeader = req.headers['authorization'] || '';
-  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
-  if (!token) {
-    return res.status(401).json({ error: 'missing token' });
+  let body = req.body;
+  if (typeof body === 'string') {
+    try { body = JSON.parse(body); } catch (e) { body = {}; }
   }
 
-  // 토큰으로 본인 신원 확인
-  const { data: userData, error: userErr } = await supabase.auth.getUser(token);
-  if (userErr || !userData?.user) {
-    return res.status(401).json({ error: 'invalid session' });
+  const { action, adminPw, status, id, grade } = body || {};
+
+  // 관리자 신원 확인 — 마스터 비밀번호 또는 "관리자" 시트에 등록된 개별 비밀번호 모두 허용
+  const admin = await verifyAdmin(adminPw);
+  if (!admin) {
+    return res.status(401).json({ error: 'unauthorized' });
   }
-  const userId = userData.user.id;
-  const userEmail = userData.user.email;
 
   try {
-    // 0) 탈퇴 전 진행 중인 참여건 확인 (추천됨: 고객 선택 대기 중 / 최종선정됨: 행사 진행 확정)
-    //    확인 자체가 실패하면(네트워크 오류 등) 안전하게 탈퇴를 막는다 — 확정 안 된 상태로 계정을 지우지 않기 위함
-    let activeCheck;
-    try {
-      const checkRes = await fetch(WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ type: 'check_partner_active_jobs', email: userEmail })
-      });
-      activeCheck = await checkRes.json();
-    } catch (e) {
-      return res.status(503).json({ error: 'check_failed' });
-    }
-    if (activeCheck?.result !== 'success') {
-      return res.status(503).json({ error: 'check_failed' });
-    }
-    if (activeCheck.hasActive) {
-      return res.status(409).json({ error: 'active_jobs', activeProjects: activeCheck.activeProjects || [] });
-    }
-
-    // 로그용 업체명 확보 (실패해도 진행)
-    let company = userEmail;
-    try {
-      const { data: partnerRow } = await supabase
+    if (action === 'list') {
+      const { data, error } = await supabase
         .from('partners')
-        .select('company')
-        .eq('id', userId)
-        .single();
-      if (partnerRow?.company) company = partnerRow.company;
-    } catch (e) {}
+        .select('*')
+        .eq('status', status)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return res.status(200).json({ partners: data });
+    }
 
-    // 1) partners 테이블 행 삭제
-    const { error: delRowErr } = await supabase.from('partners').delete().eq('id', userId);
-    if (delRowErr) throw delRowErr;
+    if (action === 'updateStatus') {
+      const { data: before } = await supabase.from('partners').select('company').eq('id', id).single();
+      const { error } = await supabase
+        .from('partners')
+        .update({ status })
+        .eq('id', id);
+      if (error) throw error;
+      logActivity(admin.name, '협력사 상태 변경 → ' + status, before ? before.company : id);
+      return res.status(200).json({ success: true });
+    }
 
-    // 2) Auth 계정 삭제 — 이후 동일 이메일로 재가입 가능
-    const { error: delAuthErr } = await supabase.auth.admin.deleteUser(userId);
-    if (delAuthErr) throw delAuthErr;
+    if (action === 'updateGrade') {
+      const { data: before } = await supabase.from('partners').select('company').eq('id', id).single();
+      const { error } = await supabase
+        .from('partners')
+        .update({ grade })
+        .eq('id', id);
+      if (error) throw error;
+      logActivity(admin.name, '협력사 등급 변경 → ' + grade, before ? before.company : id);
+      return res.status(200).json({ success: true });
+    }
 
-    logActivity(`${company} (본인 탈퇴)`, '협력사 회원 탈퇴', userEmail);
-
-    return res.status(200).json({ success: true });
+    return res.status(400).json({ error: 'unknown action' });
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
