@@ -22,6 +22,8 @@
   .admin-badge{font-size:11px;color:var(--muted);border:1px solid var(--muted);padding:2px 8px;border-radius:4px;}
   .logout-btn{background:none;border:1px solid var(--muted);color:var(--muted);font-size:12px;padding:4px 12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
   .logout-btn:hover{color:var(--gold);border-color:var(--gold);}
+  .link-btn{font-size:12px;color:var(--muted);text-decoration:none;border:1px solid var(--muted);padding:4px 12px;border-radius:4px;margin-right:8px;}
+  .link-btn:hover{color:var(--gold);border-color:var(--gold);}
 
   /* LOGIN */
   #login-screen{display:flex;align-items:center;justify-content:center;min-height:80vh;padding:24px;}
@@ -84,34 +86,20 @@
   .section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
   .section-head h3{font-family:'Noto Serif KR',serif;font-size:18px;font-weight:400;}
 
-  /* 예약 캘린더 */
-  .cal-header{display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:18px;}
-  .cal-nav-btn{background:var(--cream);border:1px solid var(--line);border-radius:6px;padding:6px 14px;cursor:pointer;font-size:14px;font-family:'Noto Sans KR',sans-serif;}
-  .cal-nav-btn:hover{border-color:var(--gold);color:var(--gold);}
-  .cal-month-label{font-family:'Noto Serif KR',serif;font-size:18px;min-width:120px;text-align:center;}
-  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;max-width:760px;}
-  .cal-dow{text-align:center;font-size:12px;color:var(--muted);padding:4px 0 8px;font-weight:500;}
-  .cal-day{position:relative;min-height:68px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;cursor:pointer;background:var(--white);font-size:12px;transition:border-color .15s;}
-  .cal-day:hover{border-color:var(--gold-light);}
-  .cal-day.empty{background:transparent;border:none;cursor:default;}
-  .cal-day.past{opacity:.4;cursor:default;background:var(--cream);}
-  .cal-day .cal-daynum{font-weight:500;color:var(--ink);}
-  .cal-day.today .cal-daynum{color:var(--gold);text-decoration:underline;}
-  .cal-day.status-hold{background:rgba(200,169,110,.16);border-color:var(--gold-light);}
-  .cal-day.status-confirmed{background:rgba(192,57,43,.10);border-color:var(--red);}
-  .cal-day-info{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .cal-legend{display:flex;gap:18px;margin-top:16px;font-size:12px;color:var(--muted);flex-wrap:wrap;}
-  .cal-legend-dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:middle;}
-
-  /* 모달 (공통) */
-  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;}
-  .modal-box{background:var(--white);border-radius:12px;padding:26px 24px;max-width:420px;width:100%;}
-  .modal-title{font-family:'Noto Serif KR',serif;font-size:18px;margin-bottom:4px;}
-  .modal-sub{font-size:12px;color:var(--muted);margin-bottom:18px;}
-  .modal-btns{display:flex;gap:10px;margin-top:6px;}
-  .modal-btn-sub{flex:1;background:var(--gold);color:var(--white);border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
-  .modal-btn-cancel{flex:0 0 72px;background:var(--cream);color:var(--muted);border:none;border-radius:8px;padding:12px;font-size:14px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
-  .modal-btn-clear{flex:0 0 96px;background:none;color:var(--red);border:1px solid var(--line);border-radius:8px;padding:12px;font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+  /* 인쇄 / PDF */
+  #print-area{display:none;}
+  @media print {
+    body * { visibility: hidden; }
+    #print-area, #print-area * { visibility: visible; }
+    #print-area { display:block !important; position:absolute; left:0; top:0; width:100%; padding:20px; }
+    #print-area button, #print-area .btn-sm, #print-area .btn-ink, #print-area .btn-gold,
+    #print-area .btn-danger, #print-area select, #print-area input, #print-area textarea,
+    #print-area .tabs { display:none !important; }
+    .print-header{margin-bottom:20px;border-bottom:2px solid #1a1610;padding-bottom:12px;}
+    .print-header h1{font-family:'Noto Serif KR',serif;font-size:20px;margin:0;}
+    .print-header h2{font-size:15px;color:#555;margin:4px 0 0;font-weight:400;}
+    .print-header .print-date{font-size:11px;color:#888;margin-top:4px;}
+  }
 </style>
 </head>
 <body>
@@ -121,6 +109,7 @@
     <span class="logo"><img src="images/nav-logo-symbol.png" alt="여는날 심볼">여는날</span>
     <span class="admin-badge">ADMIN<span id="admin-name-badge"></span></span>
   </div>
+  <a class="link-btn" href="consult.html" target="_blank">💬 상담 콘솔 →</a>
   <button class="logout-btn" id="logout-btn" style="display:none" onclick="logout()">로그아웃</button>
 </header>
 
@@ -141,8 +130,6 @@
 <div id="main-screen">
   <div class="tabs">
     <button class="tab-btn active" id="tab-projects" onclick="showTab('projects')">공고 관리</button>
-    <button class="tab-btn" id="tab-consult" onclick="showTab('consult')">💬 고객 상담</button>
-    <button class="tab-btn" id="tab-calendar" onclick="showTab('calendar')">📅 예약 캘린더</button>
     <button class="tab-btn" id="tab-responses" onclick="showTab('responses')">응답 현황</button>
     <button class="tab-btn" id="tab-new" onclick="showTab('new')">공고 등록</button>
     <button class="tab-btn" id="tab-partners" onclick="showTab('partners')">협력사 승인</button>
@@ -156,117 +143,19 @@
   <div class="panel active" id="panel-projects">
     <div class="section-head">
       <h3>공고 목록</h3>
-      <button class="btn-sm" onclick="loadProjects()">새로고침</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-sm" onclick="printCurrentPanel('공고 목록')">🖨️ 인쇄/PDF</button>
+        <button class="btn-sm" onclick="loadProjects()">새로고침</button>
+      </div>
     </div>
     <div id="project-list"><div class="empty-state">불러오는 중...</div></div>
-  </div>
-
-  <!-- 고객 상담 (견적 조회/수정) -->
-  <div class="panel" id="panel-consult">
-    <div class="section-head"><h3>고객 상담 — 견적 조회·수정</h3></div>
-    <div class="notice">
-      <strong>안내</strong><br>
-      이름·연락처·견적번호로 검색해서 상담 중인 고객의 견적을 바로 조정할 수 있습니다. 옵션을 바꾸면 합계가 자동으로 재계산됩니다.
-    </div>
-    <div style="display:flex;gap:8px;max-width:480px;margin-bottom:16px;">
-      <input type="text" id="consult-search" placeholder="이름, 연락처, 또는 견적번호" style="flex:1;border:1.5px solid var(--line);border-radius:6px;padding:10px 12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;" onkeydown="if(event.key==='Enter')searchQuotes()">
-      <button class="btn-ink" onclick="searchQuotes()">검색</button>
-    </div>
-    <div id="consult-results"><div class="empty-state">검색하거나, 최근 견적을 불러오는 중입니다...</div></div>
-
-    <div id="consult-editor" style="display:none;margin-top:28px;border-top:1px solid var(--line);padding-top:24px;">
-      <div class="section-head"><h3 style="font-size:16px;">견적 수정 — <span id="cq-title"></span></h3></div>
-
-      <div style="display:flex;gap:12px;flex-wrap:wrap;">
-        <div class="form-group" style="flex:1;min-width:160px;"><label>고객명</label><input type="text" id="cq-name"></div>
-        <div class="form-group" style="flex:1;min-width:160px;"><label>연락처</label><input type="tel" id="cq-phone"></div>
-      </div>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;">
-        <div class="form-group" style="flex:1;min-width:160px;"><label>행사 유형</label><input type="text" id="cq-event"></div>
-        <div class="form-group" style="flex:1;min-width:160px;"><label>공간</label><input type="text" id="cq-space"></div>
-        <div class="form-group" style="flex:1;min-width:120px;"><label>시즌/날짜 메모</label><input type="text" id="cq-season"></div>
-      </div>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;">
-        <div class="form-group" style="flex:1;min-width:140px;"><label>인원</label><input type="number" id="cq-guests" oninput="recalcConsultTotal()"></div>
-        <div class="form-group" style="flex:1;min-width:140px;"><label>기본 패키지가 (원)</label><input type="number" id="cq-baseprice" oninput="recalcConsultTotal()"></div>
-        <div class="form-group" style="flex:1;min-width:140px;"><label>희망 상담 시간대</label><input type="text" id="cq-consulttime"></div>
-      </div>
-
-      <div class="section-head" style="margin-top:8px;"><h3 style="font-size:14px;">옵션</h3></div>
-      <div id="cq-options-wrap" style="margin-bottom:16px;"></div>
-
-      <div class="form-group"><label>메모</label><textarea id="cq-memo" style="height:80px;"></textarea></div>
-
-      <div style="background:var(--cream);border-radius:8px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
-        <span style="font-size:13px;color:var(--muted);">실시간 예상 합계 (케이터링 인당 3만원 포함)</span>
-        <span id="cq-total-display" style="font-family:'Noto Serif KR',serif;font-size:18px;">—</span>
-      </div>
-
-      <div style="display:flex;gap:10px;">
-        <button class="btn-gold" style="width:auto;padding:12px 28px;" onclick="saveConsultQuote()">저장</button>
-        <button class="btn-sm" onclick="goToCalendarWithCustomer()">📅 이 고객 날짜 지정하러 가기</button>
-        <button class="btn-sm" onclick="closeConsultEditor()">닫기</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 예약 캘린더 -->
-  <div class="panel" id="panel-calendar">
-    <div class="section-head">
-      <h3>예약 캘린더</h3>
-      <button class="btn-sm" onclick="loadCalendar()">새로고침</button>
-    </div>
-    <div class="notice">
-      <strong>안내</strong><br>
-      상담 중인 날짜는 <strong>가예약</strong>, 계약금 받고 확정된 날짜는 <strong>확정</strong>으로 표시해주세요. 날짜를 클릭하면 등록·수정·해제할 수 있습니다.<br>
-      여기서 등록한 날짜는 추후 홈페이지 공개 캘린더에도 그대로 반영됩니다.
-    </div>
-    <div class="cal-header">
-      <button class="cal-nav-btn" onclick="changeCalMonth(-1)">← 이전</button>
-      <span class="cal-month-label" id="cal-month-label"></span>
-      <button class="cal-nav-btn" onclick="changeCalMonth(1)">다음 →</button>
-    </div>
-    <div class="cal-grid" id="cal-dow-row">
-      <div class="cal-dow">일</div><div class="cal-dow">월</div><div class="cal-dow">화</div>
-      <div class="cal-dow">수</div><div class="cal-dow">목</div><div class="cal-dow">금</div><div class="cal-dow">토</div>
-    </div>
-    <div class="cal-grid" id="cal-grid"></div>
-    <div class="cal-legend">
-      <span><span class="cal-legend-dot" style="background:var(--white);border:1px solid var(--line);"></span>가능</span>
-      <span><span class="cal-legend-dot" style="background:rgba(200,169,110,.4);"></span>가예약</span>
-      <span><span class="cal-legend-dot" style="background:rgba(192,57,43,.35);"></span>확정</span>
-      <span><span class="cal-legend-dot" style="background:var(--cream);"></span>지난 날짜</span>
-    </div>
-  </div>
-
-  <!-- 예약 날짜 등록/수정 모달 -->
-  <div class="modal-overlay" id="cal-modal" style="display:none">
-    <div class="modal-box">
-      <div class="modal-title" id="cal-modal-date"></div>
-      <div class="modal-sub">상태와 고객 정보를 입력해주세요</div>
-      <div class="form-group">
-        <label>상태 *</label>
-        <select id="cal-status">
-          <option value="가예약">가예약 — 상담 진행 중</option>
-          <option value="확정">확정 — 계약금 수령 완료</option>
-        </select>
-      </div>
-      <div class="form-group"><label>고객명</label><input type="text" id="cal-customer-name" placeholder="예: 김OO님"></div>
-      <div class="form-group"><label>연락처</label><input type="tel" id="cal-customer-phone" placeholder="010-0000-0000"></div>
-      <div class="form-group"><label>행사 유형</label><input type="text" id="cal-event-type" placeholder="예: 메인 웨딩, 리마인드 웨딩 등"></div>
-      <div class="form-group"><label>메모</label><textarea id="cal-memo" placeholder="상담 중 참고할 내용"></textarea></div>
-      <div class="modal-btns">
-        <button class="modal-btn-sub" onclick="saveCalendarDate()">저장</button>
-        <button class="modal-btn-clear" id="cal-clear-btn" onclick="clearCalendarDate()" style="display:none;">해제</button>
-        <button class="modal-btn-cancel" onclick="closeCalModal()">취소</button>
-      </div>
-    </div>
   </div>
 
   <!-- 응답 현황 -->
   <div class="panel" id="panel-responses">
     <div class="section-head">
       <h3>응답 현황</h3>
+      <button class="btn-sm" onclick="printCurrentPanel('응답 현황')">🖨️ 인쇄/PDF</button>
     </div>
     <div class="form-group" style="max-width:320px;margin-bottom:16px;">
       <label>공고 선택</label>
@@ -327,7 +216,10 @@
   <div class="panel" id="panel-partners">
     <div class="section-head">
       <h3>협력사 승인</h3>
-      <button class="btn-sm" onclick="loadPartners()">새로고침</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-sm" onclick="printCurrentPanel('협력사 승인 현황')">🖨️ 인쇄/PDF</button>
+        <button class="btn-sm" onclick="loadPartners()">새로고침</button>
+      </div>
     </div>
     <div class="tabs" style="border-bottom:1px solid var(--line);margin-bottom:16px;">
       <button class="tab-btn active" id="ptab-pending" onclick="showPartnerTab('pending')" style="font-size:12px;padding:8px 14px;">심사중</button>
@@ -341,7 +233,10 @@
   <div class="panel" id="panel-pricing">
     <div class="section-head">
       <h3>가격 관리</h3>
-      <button class="btn-sm" onclick="loadPricing()">새로고침</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-sm" onclick="printCurrentPanel('가격표')">🖨️ 인쇄/PDF</button>
+        <button class="btn-sm" onclick="loadPricing()">새로고침</button>
+      </div>
     </div>
     <div class="notice">
       <strong>안내</strong><br>
@@ -384,7 +279,10 @@
   <div class="panel" id="panel-notices">
     <div class="section-head">
       <h3>공지사항 관리</h3>
-      <button class="btn-sm" onclick="loadNotices()">새로고침</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-sm" onclick="printCurrentPanel('공지사항 목록')">🖨️ 인쇄/PDF</button>
+        <button class="btn-sm" onclick="loadNotices()">새로고침</button>
+      </div>
     </div>
     <div class="notice">
       <strong>안내</strong><br>
@@ -424,7 +322,10 @@
   <div class="panel" id="panel-activitylog">
     <div class="section-head">
       <h3>활동 로그</h3>
-      <button class="btn-sm" onclick="loadActivityLog()">새로고침</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-sm" onclick="printCurrentPanel('활동 로그')">🖨️ 인쇄/PDF</button>
+        <button class="btn-sm" onclick="loadActivityLog()">새로고침</button>
+      </div>
     </div>
     <div class="notice"><strong>안내</strong><br>최근 200건까지 표시됩니다. 누가 언제 무엇을 했는지 기록입니다.</div>
     <div id="activity-log-list"><div class="empty-state">불러오는 중...</div></div>
@@ -449,6 +350,8 @@
   </div>
 </div>
 
+<div id="print-area"></div>
+
 <script>
   const WEBHOOK = 'https://script.google.com/macros/s/AKfycbzG1GPR8OhMIeBeTFvt7gE5CGiyQx3ggnLiVIah9geT89m-_poYFEwmi9K--NZ0HxDKjg/exec';
   const PARTNERS_API = '/api/partners';
@@ -456,6 +359,21 @@
   let adminName = '';
   let isMasterAdmin = false;
   let projects = [];
+
+  // ── 인쇄 / PDF ──
+  function printCurrentPanel(title) {
+    const activePanel = document.querySelector('.panel.active');
+    if (!activePanel) return;
+    document.getElementById('print-area').innerHTML = `
+      <div class="print-header">
+        <h1>여는날</h1>
+        <h2>${title}</h2>
+        <div class="print-date">출력일: ${new Date().toLocaleString('ko-KR')}</div>
+      </div>
+      ${activePanel.innerHTML}
+    `;
+    window.print();
+  }
 
   // ── 로그인 ──
   async function doLogin() {
@@ -513,8 +431,6 @@
     document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
     document.getElementById('panel-' + name).classList.add('active');
     document.getElementById('tab-' + name).classList.add('active');
-    if (name === 'consult') { searchQuotes(); if (consultPricing.options.length === 0) loadConsultPricing(); }
-    if (name === 'calendar') loadCalendar();
     if (name === 'responses') loadResponses();
     if (name === 'partners') loadPartners();
     if (name === 'pricing') loadPricing();
@@ -1208,399 +1124,6 @@
     }
   }
 
-  // ── 고객 상담 (견적 조회/수정) ──
-  let consultPricing = { events: {}, options: [] };
-  let currentQuote = null;
-  let consultOptionGrades = {};
-  let consultFlatTotal = 0;
-  let pendingCalCustomer = null; // 캘린더 탭으로 넘길 고객정보 (상담 콘솔 → 캘린더 연동용)
-
-  function escHtmlAdmin(s) { return String(s == null ? '' : s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
-  function escJsStrAdmin(s) { return String(s == null ? '' : s).replace(/'/g, "\\'"); }
-
-  async function loadConsultPricing() {
-    try {
-      const res = await fetch(WEBHOOK, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ type: 'get_pricing', password: adminPw })
-      });
-      const data = await res.json();
-      if (data.result === 'success') {
-        consultPricing = { events: data.events || {}, options: data.options || [] };
-      }
-    } catch (e) { /* 가격 로딩 실패해도 검색 자체는 계속 가능 */ }
-  }
-
-  async function searchQuotes() {
-    const q = document.getElementById('consult-search').value.trim();
-    const listEl = document.getElementById('consult-results');
-    listEl.innerHTML = '<div class="empty-state">불러오는 중...</div>';
-    try {
-      const res = await fetch(WEBHOOK, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ type: 'admin_search_quotes', query: q, password: adminPw })
-      });
-      const data = await res.json();
-      if (data.result !== 'success') throw new Error(data.message || '검색 실패');
-      renderQuoteResults(data.results || []);
-    } catch (e) {
-      listEl.innerHTML = '<div class="empty-state">검색 실패. 다시 시도해주세요.</div>';
-    }
-  }
-
-  function renderQuoteResults(results) {
-    const listEl = document.getElementById('consult-results');
-    if (!results || results.length === 0) {
-      listEl.innerHTML = '<div class="empty-state">결과가 없습니다</div>';
-      return;
-    }
-    listEl.innerHTML = results.map(r => {
-      const priceTxt = typeof r.totalPrice === 'number' ? r.totalPrice.toLocaleString() + '원' : (r.totalPrice || '—');
-      return `
-      <div class="project-card" style="padding:14px 16px;margin-bottom:8px;cursor:pointer;" onclick="loadQuoteForEdit('${escJsStrAdmin(r.quoteId)}')">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div><strong style="font-size:14px;">${escHtmlAdmin(r.name)}</strong>
-            <span style="font-size:12px;color:var(--muted);margin-left:8px;">${escHtmlAdmin(r.phone)}</span></div>
-          <span style="font-size:12px;color:var(--muted);">${escHtmlAdmin(r.date)}</span>
-        </div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px;">${escHtmlAdmin(r.eventName)} · ${priceTxt}</div>
-      </div>`;
-    }).join('');
-  }
-
-  async function loadQuoteForEdit(quoteId) {
-    try {
-      const res = await fetch(WEBHOOK, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ type: 'admin_get_quote', quoteId, password: adminPw })
-      });
-      const data = await res.json();
-      if (data.result !== 'success') throw new Error(data.message || '불러오기 실패');
-      currentQuote = data.quote;
-      if (consultPricing.options.length === 0) await loadConsultPricing();
-      renderQuoteEditor();
-    } catch (e) {
-      alert('견적 불러오기 실패: ' + e.message);
-    }
-  }
-
-  function renderQuoteEditor() {
-    const q = currentQuote;
-    try { consultOptionGrades = JSON.parse(q.optionGradeDetail || '{}'); } catch (e) { consultOptionGrades = {}; }
-    const flatOpt = consultPricing.options.find(o => o.type === 'flat');
-    consultFlatTotal = (String(q.optionsList || '').includes('하객 답례품')) ? (flatOpt ? flatOpt.amateurPrice : 150000) : 0;
-
-    document.getElementById('consult-editor').style.display = 'block';
-    document.getElementById('cq-title').textContent = (q.name || '') + ' · ' + (q.quoteId || '');
-    document.getElementById('cq-name').value = q.name || '';
-    document.getElementById('cq-phone').value = q.phone || '';
-    document.getElementById('cq-event').value = q.eventName || '';
-    document.getElementById('cq-space').value = q.spaceName || '';
-    document.getElementById('cq-season').value = q.seasonName || '';
-    document.getElementById('cq-guests').value = q.guests || 30;
-    document.getElementById('cq-consulttime').value = q.consultTime || '';
-    document.getElementById('cq-memo').value = q.memo || '';
-
-    // 기본 패키지가는 시트에 따로 저장돼있지 않아서, 기존 합계에서 케이터링·옵션 금액을 역산해서 채워줌
-    let optionSum = 0;
-    Object.values(consultOptionGrades).forEach(o => { optionSum += (o.price || 0); });
-    optionSum += consultFlatTotal;
-    const guestsNum = parseInt(q.guests) || 0;
-    const originalTotal = typeof q.totalPrice === 'number' ? q.totalPrice : (parseInt(q.totalPrice) || 0);
-    const derivedBase = Math.max(0, originalTotal - (guestsNum * 30000) - optionSum);
-    document.getElementById('cq-baseprice').value = derivedBase;
-
-    renderConsultOptions();
-    recalcConsultTotal();
-    document.getElementById('consult-editor').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  function renderConsultOptions() {
-    const wrap = document.getElementById('cq-options-wrap');
-    const gradeOpts = consultPricing.options.filter(o => o.type !== 'flat');
-    const flatOpt = consultPricing.options.find(o => o.type === 'flat');
-
-    if (gradeOpts.length === 0 && !flatOpt) {
-      wrap.innerHTML = '<div class="empty-state">옵션 정보를 불러오지 못했습니다 (가격 관리 탭에서 새로고침 후 다시 시도해주세요)</div>';
-      return;
-    }
-
-    let html = gradeOpts.map(o => {
-      const current = consultOptionGrades[o.name]?.grade || '';
-      return `
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-        <label style="flex:1;margin:0;font-size:13px;color:var(--ink);">${escHtmlAdmin(o.emoji || '')} ${escHtmlAdmin(o.name)}</label>
-        <select style="flex:0 0 220px;border:1.5px solid var(--line);border-radius:6px;padding:7px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;" onchange="onConsultOptionChange('${escJsStrAdmin(o.name)}', this)">
-          <option value="" ${current === '' ? 'selected' : ''}>선택 안 함</option>
-          <option value="아마추어" ${current === '아마추어' ? 'selected' : ''}>아마추어 (${(o.amateurPrice || 0).toLocaleString()})</option>
-          <option value="준프로" ${current === '준프로' ? 'selected' : ''}>준프로 (${(o.semiproPrice || 0).toLocaleString()})</option>
-          <option value="프로" ${current === '프로' ? 'selected' : ''}>프로 (${(o.proPrice || 0).toLocaleString()}~)</option>
-        </select>
-      </div>`;
-    }).join('');
-
-    if (flatOpt) {
-      const checked = consultFlatTotal > 0;
-      html += `
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-        <label style="flex:1;margin:0;font-size:13px;cursor:pointer;">
-          <input type="checkbox" id="cq-flat-check" ${checked ? 'checked' : ''} onchange="onConsultFlatToggle(this.checked, ${flatOpt.amateurPrice || 0})">
-          ${escHtmlAdmin(flatOpt.emoji || '')} ${escHtmlAdmin(flatOpt.name)}
-        </label>
-        <div id="cq-flat-price-wrap" style="display:${checked ? 'block' : 'none'};">
-          <input type="number" id="cq-flat-price" value="${consultFlatTotal || flatOpt.amateurPrice || 0}" style="width:140px;border:1.5px solid var(--line);border-radius:6px;padding:7px 10px;font-size:12px;" oninput="onConsultFlatPriceInput()">
-        </div>
-      </div>`;
-    }
-    wrap.innerHTML = html;
-  }
-
-  function onConsultOptionChange(optName, selectEl) {
-    const val = selectEl.value;
-    if (!val) {
-      delete consultOptionGrades[optName];
-    } else {
-      const opt = consultPricing.options.find(o => o.name === optName);
-      const price = !opt ? 0 : (val === '아마추어' ? opt.amateurPrice : val === '준프로' ? opt.semiproPrice : opt.proPrice);
-      consultOptionGrades[optName] = { grade: val, price: price || 0 };
-    }
-    recalcConsultTotal();
-  }
-
-  function onConsultFlatToggle(checked, defaultPrice) {
-    const wrap = document.getElementById('cq-flat-price-wrap');
-    if (checked) {
-      wrap.style.display = 'block';
-      consultFlatTotal = parseInt(document.getElementById('cq-flat-price')?.value) || defaultPrice || 0;
-    } else {
-      wrap.style.display = 'none';
-      consultFlatTotal = 0;
-    }
-    recalcConsultTotal();
-  }
-
-  function onConsultFlatPriceInput() {
-    if (document.getElementById('cq-flat-check')?.checked) {
-      consultFlatTotal = parseInt(document.getElementById('cq-flat-price').value) || 0;
-      recalcConsultTotal();
-    }
-  }
-
-  function recalcConsultTotal() {
-    const basePrice = parseInt(document.getElementById('cq-baseprice').value) || 0;
-    const guests = parseInt(document.getElementById('cq-guests').value) || 0;
-    const catering = guests * 30000;
-    let optionTotal = 0;
-    Object.values(consultOptionGrades).forEach(o => { optionTotal += (o.price || 0); });
-    optionTotal += consultFlatTotal || 0;
-    const total = basePrice + catering + optionTotal;
-    document.getElementById('cq-total-display').textContent = total.toLocaleString() + '원';
-    return total;
-  }
-
-  async function saveConsultQuote() {
-    if (!currentQuote) return;
-    const total = recalcConsultTotal();
-    const optionParts = Object.entries(consultOptionGrades).map(([name, o]) => `${name}(${o.grade})`);
-    if (consultFlatTotal > 0) optionParts.push('하객 답례품');
-
-    const payload = {
-      type: 'admin_update_quote',
-      quoteId: currentQuote.quoteId,
-      name: document.getElementById('cq-name').value.trim(),
-      phone: document.getElementById('cq-phone').value.trim(),
-      eventName: document.getElementById('cq-event').value.trim(),
-      spaceName: document.getElementById('cq-space').value.trim(),
-      seasonName: document.getElementById('cq-season').value.trim(),
-      guests: parseInt(document.getElementById('cq-guests').value) || 0,
-      optionsList: optionParts.join(', '),
-      optionGradeDetail: JSON.stringify(consultOptionGrades),
-      proGradeIncluded: Object.values(consultOptionGrades).some(o => o.grade === '프로') ? 'Y' : 'N',
-      totalPrice: total,
-      loginProvider: currentQuote.loginProvider || '',
-      email: currentQuote.email || '',
-      kakaoId: currentQuote.kakaoId || '',
-      consultTime: document.getElementById('cq-consulttime').value.trim(),
-      memo: document.getElementById('cq-memo').value.trim(),
-      password: adminPw
-    };
-
-    try {
-      const res = await fetch(WEBHOOK, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      if (data.result !== 'success') throw new Error(data.message || '저장 실패');
-      alert('저장되었습니다.');
-      searchQuotes();
-    } catch (e) {
-      alert('저장 실패: ' + e.message);
-    }
-  }
-
-  function closeConsultEditor() {
-    document.getElementById('consult-editor').style.display = 'none';
-    currentQuote = null;
-  }
-
-  function goToCalendarWithCustomer() {
-    if (!currentQuote) return;
-    pendingCalCustomer = {
-      name: document.getElementById('cq-name').value.trim(),
-      phone: document.getElementById('cq-phone').value.trim(),
-      eventType: document.getElementById('cq-event').value.trim(),
-      quoteId: currentQuote.quoteId
-    };
-    showTab('calendar');
-  }
-
-  // ── 예약 캘린더 ──
-  let calToday = new Date();
-  let calViewYear = calToday.getFullYear();
-  let calViewMonth = calToday.getMonth(); // 0-based
-  let calBookings = {}; // { 'YYYY-MM-DD': {status, customerName, phone, eventType, memo} }
-  let calSelectedDate = '';
-
-  function calYearMonthStr(y, m) {
-    return y + '-' + String(m + 1).padStart(2, '0');
-  }
-
-  async function loadCalendar() {
-    document.getElementById('cal-grid').innerHTML = '<div style="grid-column:1/-1;padding:30px 0;text-align:center;color:var(--muted);">불러오는 중...</div>';
-    try {
-      const res = await fetch(WEBHOOK, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ type: 'get_calendar', yearMonth: calYearMonthStr(calViewYear, calViewMonth), password: adminPw })
-      });
-      const data = await res.json();
-      if (data.result !== 'success') throw new Error(data.message || '불러오기 실패');
-      calBookings = {};
-      (data.bookings || []).forEach(b => { calBookings[b.date] = b; });
-      renderCalendar();
-    } catch (e) {
-      document.getElementById('cal-grid').innerHTML = '<div style="grid-column:1/-1;padding:30px 0;text-align:center;color:var(--muted);">불러오기 실패. 새로고침 해주세요.</div>';
-    }
-  }
-
-  function changeCalMonth(delta) {
-    calViewMonth += delta;
-    if (calViewMonth < 0) { calViewMonth = 11; calViewYear--; }
-    if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
-    loadCalendar();
-  }
-
-  function renderCalendar() {
-    document.getElementById('cal-month-label').textContent = `${calViewYear}년 ${calViewMonth + 1}월`;
-    const grid = document.getElementById('cal-grid');
-    grid.innerHTML = '';
-
-    const firstDow = new Date(calViewYear, calViewMonth, 1).getDay();
-    const daysInMonth = new Date(calViewYear, calViewMonth + 1, 0).getDate();
-    const todayStr = `${calToday.getFullYear()}-${String(calToday.getMonth()+1).padStart(2,'0')}-${String(calToday.getDate()).padStart(2,'0')}`;
-
-    for (let i = 0; i < firstDow; i++) {
-      grid.innerHTML += '<div class="cal-day empty"></div>';
-    }
-    for (let d = 1; d <= daysInMonth; d++) {
-      const dateStr = `${calViewYear}-${String(calViewMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-      const isPast = dateStr < todayStr;
-      const isToday = dateStr === todayStr;
-      const booking = calBookings[dateStr];
-      let cls = 'cal-day';
-      if (isPast) cls += ' past';
-      if (isToday) cls += ' today';
-      if (booking?.status === '가예약') cls += ' status-hold';
-      if (booking?.status === '확정') cls += ' status-confirmed';
-
-      let infoHtml = '';
-      if (booking) {
-        infoHtml = `<div class="cal-day-info">${booking.status}${booking.customerName ? ' · ' + booking.customerName : ''}</div>`;
-      }
-      grid.innerHTML += `
-        <div class="${cls}" onclick="openCalModal('${dateStr}')">
-          <div class="cal-daynum">${d}</div>
-          ${infoHtml}
-        </div>`;
-    }
-  }
-
-  function openCalModal(dateStr) {
-    calSelectedDate = dateStr;
-    const booking = calBookings[dateStr];
-    document.getElementById('cal-modal-date').textContent = dateStr;
-    document.getElementById('cal-status').value = booking?.status || '가예약';
-    if (!booking && pendingCalCustomer) {
-      document.getElementById('cal-customer-name').value = pendingCalCustomer.name || '';
-      document.getElementById('cal-customer-phone').value = pendingCalCustomer.phone || '';
-      document.getElementById('cal-event-type').value = pendingCalCustomer.eventType || '';
-      document.getElementById('cal-memo').value = pendingCalCustomer.quoteId ? ('연결 견적번호: ' + pendingCalCustomer.quoteId) : '';
-      pendingCalCustomer = null; // 한 번만 적용
-    } else {
-      document.getElementById('cal-customer-name').value = booking?.customerName || '';
-      document.getElementById('cal-customer-phone').value = booking?.phone || '';
-      document.getElementById('cal-event-type').value = booking?.eventType || '';
-      document.getElementById('cal-memo').value = booking?.memo || '';
-    }
-    document.getElementById('cal-clear-btn').style.display = booking ? 'block' : 'none';
-    document.getElementById('cal-modal').style.display = 'flex';
-  }
-
-  function closeCalModal() {
-    document.getElementById('cal-modal').style.display = 'none';
-    calSelectedDate = '';
-  }
-
-  async function saveCalendarDate() {
-    if (!calSelectedDate) return;
-    try {
-      const res = await fetch(WEBHOOK, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          type: 'set_calendar_date',
-          date: calSelectedDate,
-          status: document.getElementById('cal-status').value,
-          customerName: document.getElementById('cal-customer-name').value.trim(),
-          phone: document.getElementById('cal-customer-phone').value.trim(),
-          eventType: document.getElementById('cal-event-type').value.trim(),
-          memo: document.getElementById('cal-memo').value.trim(),
-          password: adminPw
-        })
-      });
-      const data = await res.json();
-      if (data.result !== 'success') throw new Error(data.message);
-      closeCalModal();
-      loadCalendar();
-    } catch (e) {
-      alert('저장 실패: ' + e.message);
-    }
-  }
-
-  async function clearCalendarDate() {
-    if (!calSelectedDate) return;
-    if (!confirm(`${calSelectedDate} 날짜를 다시 "가능" 상태로 되돌리시겠습니까?`)) return;
-    try {
-      const res = await fetch(WEBHOOK, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ type: 'set_calendar_date', date: calSelectedDate, status: '', password: adminPw })
-      });
-      const data = await res.json();
-      if (data.result !== 'success') throw new Error(data.message);
-      closeCalModal();
-      loadCalendar();
-    } catch (e) {
-      alert('해제 실패: ' + e.message);
-    }
-  }
-
-  // 세션 유지
   window.addEventListener('load', () => {
     const saved = sessionStorage.getItem('adminPw');
     if (saved) {
