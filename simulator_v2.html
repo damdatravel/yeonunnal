@@ -882,34 +882,10 @@
     </div>
 
     <div class="section-title" style="margin-top:8px; font-size:16px;">희망 날짜</div>
-    <div class="section-sub" style="margin-bottom:12px;">대략적인 시기를 알려주세요</div>
-    <div class="card-grid triple">
-      <div class="option-card" data-group="season" data-val="spring" data-add="0" onclick="selectCard(this)">
-        <div class="check-badge"></div>
-        <span class="emoji">🌸</span>
-        <div class="card-name" style="font-size:12px;">봄 (3~5월)</div>
-      </div>
-      <div class="option-card" data-group="season" data-val="summer" data-add="0" onclick="selectCard(this)">
-        <div class="check-badge"></div>
-        <span class="emoji">☀️</span>
-        <div class="card-name" style="font-size:12px;">여름 (6~8월)</div>
-      </div>
-      <div class="option-card" data-group="season" data-val="fall" data-add="0" onclick="selectCard(this)">
-        <div class="check-badge"></div>
-        <span class="emoji">🍂</span>
-        <div class="card-name" style="font-size:12px;">가을 (9~11월)</div>
-      </div>
-      <div class="option-card" data-group="season" data-val="winter" data-add="0" onclick="selectCard(this)">
-        <div class="check-badge"></div>
-        <span class="emoji">❄️</span>
-        <div class="card-name" style="font-size:12px;">겨울 (12~2월)</div>
-      </div>
-      <div class="option-card" data-group="season" data-val="undecided" data-add="0" onclick="selectCard(this)">
-        <div class="check-badge"></div>
-        <span class="emoji">🗓️</span>
-        <div class="card-name" style="font-size:12px;">미정</div>
-      </div>
-    </div>
+    <div class="section-sub" style="margin-bottom:12px;">예약금 결제 기준 90일 이내 날짜를 선택해주세요</div>
+    <input type="date" id="shooting-date" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;color:var(--text);background:#fff;box-sizing:border-box;"
+      onchange="selectDate(this.value)">
+    <div id="date-error" style="display:none;margin-top:6px;color:#e53e3e;font-size:13px;">90일 이내 날짜만 예약 가능합니다.</div>
   </div>
 
   <!-- STEP 3: 인원 -->
@@ -972,7 +948,7 @@
         <span class="ql-val" id="q-space">—</span>
       </div>
       <div class="quote-line">
-        <span class="ql-name">시즌</span>
+        <span class="ql-name">날짜</span>
         <span class="ql-val" id="q-season">—</span>
       </div>
       <div class="quote-line">
@@ -1352,10 +1328,33 @@
   const spaceNames = {
     yedan: '여는날 in 영종', eulwang: '을왕리 해변 (협의 중)', masian: '마시안 해변·숲 (협의 중)'
   };
-  const seasonNames = {
-    spring: '봄 (3~5월)', summer: '여름 (6~8월)', fall: '가을 (9~11월)',
-    winter: '겨울 (12~2월)', undecided: '미정'
-  };
+  // 날짜 피커 min/max 설정 (오늘+1 ~ 오늘+90)
+  (function() {
+    const el = document.getElementById('shooting-date');
+    if (!el) return;
+    const today = new Date();
+    const min = new Date(today); min.setDate(today.getDate() + 1);
+    const max = new Date(today); max.setDate(today.getDate() + 90);
+    el.min = min.toISOString().split('T')[0];
+    el.max = max.toISOString().split('T')[0];
+  })();
+
+  function selectDate(val) {
+    const errEl = document.getElementById('date-error');
+    if (!val) { state.season = null; state.seasonName = ''; updateNextBtn(); calcTotal(); return; }
+    const today = new Date(); today.setHours(0,0,0,0);
+    const max = new Date(today); max.setDate(today.getDate() + 90);
+    const selected = new Date(val);
+    if (selected > max) {
+      errEl.style.display = 'block';
+      state.season = null; state.seasonName = '';
+    } else {
+      errEl.style.display = 'none';
+      state.season = val;
+      state.seasonName = val.replace(/-/g, '. ');
+    }
+    updateNextBtn(); calcTotal();
+  }
 
   function selectCard(el) {
     const group = el.dataset.group;
@@ -1557,7 +1556,7 @@
       if (!name || !phone) {
         btn.disabled = true; btn.textContent = '이름과 연락처를 입력해주세요';
       } else if (!state.space || !state.season) {
-        btn.disabled = true; btn.textContent = '공간과 시즌을 선택해주세요';
+        btn.disabled = true; btn.textContent = '공간과 날짜를 선택해주세요';
       } else {
         btn.disabled = false; btn.textContent = '다음 →';
       }
@@ -1821,8 +1820,8 @@
           if (preview) preview.classList.add('show');
         }
         if (state.season) {
-          const seasonEl = document.querySelector(`[data-group="season"][data-val="${state.season}"]`);
-          if (seasonEl) seasonEl.classList.add('selected');
+          const dateEl = document.getElementById('shooting-date');
+          if (dateEl) dateEl.value = state.season;
         }
         // 인원 슬라이더 복원
         const guestSlider = document.getElementById('guest-slider');
