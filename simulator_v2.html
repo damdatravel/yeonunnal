@@ -1057,6 +1057,20 @@
          style="display:block;background:#FEE500;color:#3A1D1D;text-align:center;padding:14px;font-size:15px;font-weight:500;margin-top:16px;border-radius:8px;text-decoration:none;">
         💬 카카오채널 바로 상담하기
       </a>
+
+      <!-- 예약금 결제 섹션 -->
+      <div style="margin-top:24px;padding:22px 20px;background:var(--cream);border-radius:14px;border:1px solid var(--line);">
+        <div style="font-family:'Noto Serif KR',serif;font-size:15px;color:var(--ink);margin-bottom:8px;">💳 예약금으로 자리 먼저 확보하기</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:16px;">
+          예약금 <strong style="color:var(--ink);">10만원</strong>을 결제하시면 우선 예약이 확정됩니다.<br>
+          결제 금액은 최종 서비스 비용에서 전액 차감됩니다.
+        </div>
+        <button id="deposit-btn" onclick="requestDeposit()"
+          style="width:100%;background:var(--ink);color:var(--white);border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif;letter-spacing:0.02em;">
+          예약금 100,000원 결제하기 →
+        </button>
+        <div id="payment-result" style="margin-top:12px;font-size:13px;text-align:center;line-height:1.7;min-height:18px;"></div>
+      </div>
     </div>
   </div>
 
@@ -1936,6 +1950,65 @@
     w.document.close();
     w.print();
   }
+
+  // ── 포트원 V1 결제 ──────────────────────────────────────────
+  // 아래 두 값은 포트원 관리자 콘솔에서 확인 후 채워넣으세요.
+  // PortOne 관리자(admin.portone.io) → 내 계정 → 가맹점 식별코드
+  const PORTONE_IMP_UID = 'imp_XXXXXXXX'; // ← 포트원 가맹점 식별코드
+  // NHN KCP MID — 발급 완료 시 T0000 → 실제 MID로 교체
+  const PORTONE_KCP_MID = 'T0000';        // ← KCP MID (테스트: T0000)
+
+  // SDK 동적 로드
+  (function loadIMP() {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.iamport.kr/v1/iamport.js';
+    s.onload = function () {
+      IMP.init(PORTONE_IMP_UID);
+      window._impReady = true;
+    };
+    document.head.appendChild(s);
+  })();
+
+  function requestDeposit() {
+    if (!window._impReady) {
+      alert('결제 모듈이 로드 중입니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+    const buyerName = document.getElementById('f-name-early').value.trim() || '고객';
+    const buyerTel  = document.getElementById('f-phone-early').value.trim() || '';
+    const { total } = calcTotal();
+    const quoteDesc = total > 0
+      ? '여는날 ' + state.eventName + ' 상담 예약금 (견적 ' + fmtFull(total) + '~)'
+      : '여는날 상담 예약금';
+
+    IMP.request_pay({
+      pg:           'kcp.' + PORTONE_KCP_MID,
+      pay_method:   'card',
+      merchant_uid: 'ynn_deposit_' + Date.now(),
+      name:         '여는날 상담 예약금',
+      amount:       100000,
+      buyer_name:   buyerName,
+      buyer_tel:    buyerTel,
+      buyer_email:  loggedInEmail || '',
+      custom_data:  quoteDesc,
+      m_redirect_url: window.location.origin + '/simulator_v2.html?payment=success'
+    }, function (rsp) {
+      const resultEl = document.getElementById('payment-result');
+      const btnEl    = document.getElementById('deposit-btn');
+      if (rsp.success) {
+        btnEl.style.display = 'none';
+        resultEl.innerHTML =
+          '<span style="color:#2d6a4f;font-weight:600;">✅ 예약금 결제 완료!</span><br>' +
+          '<span style="color:var(--muted);font-size:12px;">결제번호: ' + rsp.imp_uid + '<br>' +
+          '담당자가 24시간 내 연락드릴게요.</span>';
+      } else {
+        resultEl.innerHTML =
+          '<span style="color:#c0392b;">결제가 취소되었거나 실패했습니다.</span><br>' +
+          '<span style="color:var(--muted);font-size:12px;">' + (rsp.error_msg || '') + '</span>';
+      }
+    });
+  }
+  // ─────────────────────────────────────────────────────────
 
   function loadQuoteForEdit(q) {
     state.quoteId = q.quoteId;
