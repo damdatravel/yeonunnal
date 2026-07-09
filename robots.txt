@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /consult.html
+Disallow: /partner.html
+Disallow: /select.html
+Disallow: /api/
+
+Sitemap: https://yeonunnal.com/sitemap.xml
